@@ -1,0 +1,17 @@
+#include <windows.h>
+#include "resource.h"
+
+IDR_MAIN MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+END
+
+IDR_MAIN ACCELERATORS
+BEGIN
+    VK_F4,            ID_FILE_EXIT,   VIRTKEY, ALT
+END
+
+ID_ADD                  PNG                     "add.png"

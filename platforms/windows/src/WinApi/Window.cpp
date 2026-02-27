@@ -1,0 +1,154 @@
+#include "Window.h"
+
+#include "ApiException.h"
+
+extern HINSTANCE HInstance;
+
+std::vector<Window*> Window::pointers;
+
+LRESULT Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_NCCREATE: {
+		auto pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
+		auto pWnd = static_cast<Window*>(pCreate->lpCreateParams);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+		pWnd->hWnd = hWnd;
+		return pWnd->OnMessage(message, wParam, lParam);
+	}
+	case WM_NCDESTROY: {
+		auto pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		auto lResult = pWnd->OnMessage(message, wParam, lParam);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(nullptr));
+		pWnd->hWnd = nullptr;
+		return lResult;
+	}
+	}
+	auto pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	if (pWnd != nullptr) {
+		return pWnd->OnMessage(message, wParam, lParam);
+	}
+	return ::DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+LRESULT Window::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_COMMAND:
+		return OnWmCommand(wParam, lParam);
+	}
+	return ::DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+LRESULT Window::OnWmCreate(WPARAM wParam, LPARAM lParam)
+{
+	OnCreate(reinterpret_cast<CREATESTRUCT*>(lParam));
+	return 0;
+}
+
+LRESULT Window::OnWmDestroy(WPARAM wParam, LPARAM lparam)
+{
+	OnDestroy();
+	return 0;
+}
+
+LRESULT Window::OnWmSize(WPARAM wParam, LPARAM lParam)
+{
+	OnSize(LOWORD(lParam), HIWORD(lParam));
+	return 0;
+}
+
+LRESULT Window::OnWmPaint(WPARAM wParam, LPARAM lParam)
+{
+	PAINTSTRUCT ps;
+	BeginPaint(hWnd, &ps);
+	DeviceContext dc(ps.hdc);
+	OnPaint(dc);
+	EndPaint(hWnd, &ps);
+	return 0;
+}
+
+LRESULT Window::OnWmEraseBackground(WPARAM wParam, LPARAM lParam)
+{
+	OnEraseBackground(DeviceContext(reinterpret_cast<HDC>(wParam)));
+	return 1;
+}
+
+Window::~Window() {
+	if (hWnd != nullptr) {
+		Destroy();
+	}
+	pointers.erase(std::remove(pointers.begin(), pointers.end(), this), pointers.end());
+}
+
+LRESULT Window::OnWmCommand(WPARAM wParam, LPARAM lParam)
+{
+	OnCommand(LOWORD(wParam), HIWORD(wParam), reinterpret_cast<HWND>(lParam));
+	return 0;
+}
+
+LRESULT Window::OnWmClose(WPARAM wParam, LPARAM lparam)
+{
+	OnClose();
+	return 0;
+}
+
+LPCSTR Window::ClassName()
+{
+	return "Inu.Window";
+}
+
+void Window::Register()
+{
+	WNDCLASS wc;
+	ZeroMemory(&wc, sizeof(wc));
+	ZeroMemory(&wc, sizeof(wc));
+	wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wc.lpfnWndProc = &WndProc;
+	wc.hInstance = HInstance;
+	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+	wc.lpszClassName = ClassName();
+	ATOM atom = ::RegisterClass(&wc);
+	//if (atom == 0) {
+	//	throw ApiException();
+	//}
+}
+
+void Window::Create(DWORD style, HWND hParent, HMENU hMenu)
+{
+	Register();
+	hWnd = ::CreateWindow(
+		ClassName(),
+		nullptr,
+		style,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		hParent,
+		hMenu,
+		HInstance,
+		this
+	);
+	if (hWnd == nullptr) {
+		throw ApiException();
+	}
+}
+
+void Window::Create(HWND hParent, UINT id)
+{
+	Create(WS_CHILD | WS_VISIBLE, hParent, reinterpret_cast<HMENU>(static_cast<UINT_PTR>(id)));
+}
+
+void Window::Destroy() const
+{
+	DestroyWindow(hWnd);
+}
+
+void Window::Move(int x, int y, UINT width, UINT height)
+{
+	MoveWindow(hWnd, x, y, width, height, TRUE);
+}
+
+void Window::Invalidate()
+{
+	InvalidateRect(HWnd(), nullptr, TRUE);
+}
