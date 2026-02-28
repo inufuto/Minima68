@@ -7,7 +7,7 @@ set(WINAPI_SOURCES
 set(WINAPI_HEADERS
     Window.h
     ApiException.h
- ApplicationWindow.h "Registry.h" "Uncopyable.h" "ComPtr.h" "DeviceContext.h" )
+ ApplicationWindow.h "Registry.h" "ComPtr.h" "DeviceContext.h" )
 
 add_library(WinApi STATIC ${WINAPI_SOURCES} ${WINAPI_HEADERS})
 

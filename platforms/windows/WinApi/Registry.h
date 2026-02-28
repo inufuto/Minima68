@@ -1,6 +1,6 @@
 #pragma once
 #include "ApiException.h"
-#include "Uncopyable.h"
+#include "../../../core/Uncopyable.h"
 
 class Registry : public Uncopyable
 {

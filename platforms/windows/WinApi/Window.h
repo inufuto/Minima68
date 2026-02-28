@@ -5,7 +5,7 @@
 #include <windows.h>
 
 #include "DeviceContext.h"
-#include "Uncopyable.h"
+#include "../../../core/Uncopyable.h"
 
 class CommandTarget abstract :public Uncopyable
 {

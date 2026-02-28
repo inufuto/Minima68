@@ -1,6 +1,6 @@
 #pragma once
 #include <windows.h>
-#include "Uncopyable.h"
+#include "../../../core/Uncopyable.h"
 
 class DeviceContext : public Uncopyable
 {

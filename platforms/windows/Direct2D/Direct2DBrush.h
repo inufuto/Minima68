@@ -1,6 +1,6 @@
 #pragma once
 #include <d2d1.h>
-#include "../WinApi/Uncopyable.h"
+#include "../../../core/Uncopyable.h"
 #include "../WinApi/ComPtr.h"
 
 class Direct2DBrush : public Uncopyable

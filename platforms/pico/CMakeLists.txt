@@ -26,6 +26,7 @@ target_include_directories(trial PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(trial 
+        core
         hardware_dma
         )
 

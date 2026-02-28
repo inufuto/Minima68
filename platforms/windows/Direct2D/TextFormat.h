@@ -2,7 +2,7 @@
 #include <d2d1.h>
 #include <dwrite.h>
 
-#include "../WinApi/Uncopyable.h"
+#include "../../../core/Uncopyable.h"
 #include "../WinApi/ComPtr.h"
 
 std::wstring ToWideString(const std::string& narrow);

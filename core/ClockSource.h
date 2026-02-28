@@ -2,14 +2,15 @@
 #include <cstdint>
 #include <vector>
 
-class ClockDestination
+#include "Uncopyable.h"
+
+class ClockDestination abstract
 {
 public:
 	virtual void OnClock(uint32_t time) = 0;
-	virtual ~ClockDestination() = default;
 };
 
-class ClockSource 
+class ClockSource : public Uncopyable
 {
 private:
 	std::vector<ClockDestination*> destinations;

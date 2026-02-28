@@ -1,6 +1,6 @@
 #pragma once
 #include <wincodec.h>
-#include "../WinApi/Uncopyable.h"
+#include "../../../core/Uncopyable.h"
 #include "../WinApi/ComPtr.h"
 
 class WicBitmap : public Uncopyable
