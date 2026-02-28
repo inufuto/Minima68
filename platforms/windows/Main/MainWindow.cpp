@@ -2,6 +2,8 @@
 
 #include "MainWindow.h"
 
+#include <string>
+
 #include "Direct2DBrush.h"
 #include "resource.h"
 
@@ -29,14 +31,16 @@ void SubWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 void SubWindow::OnRender(class ::RenderTarget& renderTarget)
 {
 	RenderTargetWindow::OnRender(renderTarget);
-	renderTarget.DrawText("AAA", textFormat, D2D1::RectF(0.0f, 0.0f, 100.0f, 100.0f), brush);
+	auto s= std::to_string(masterClock.Time());
+	renderTarget.DrawText(s.c_str(), textFormat, D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush);
 	renderTarget.DrawBitmap(bitmap, D2D1::RectF(100.0f, 0.0f, 200.0f, 100.0f), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 }
 
 
-MainWindow::MainWindow()
-	: ApplicationWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN))
-		, LoadAccelerators(HInstance, MAKEINTRESOURCE(IDR_MAIN)))
+MainWindow::MainWindow() :
+	ApplicationWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN)),
+		LoadAccelerators(HInstance, MAKEINTRESOURCE(IDR_MAIN))),
+	masterClock(4000000), subWindow(masterClock)
 {}
 
 LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
@@ -44,6 +48,8 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message) {
 	case WM_CREATE:
 		return OnWmCreate(wParam, lParam);
+	case WM_DESTROY:
+		return OnWmDestroy(wParam, lParam);
 	case WM_SIZE:
 		return OnWmSize(wParam, lParam);
 	case WM_PAINT:
@@ -58,6 +64,13 @@ void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	subWindow.Create(HWnd(), 1);
 	SolidColorBrush brush;
 	brush.Create(subWindow.RenderTarget(), D2D1::ColorF(D2D1::ColorF::Red));
+	masterClock.Start(subWindow.HWnd());
+}
+
+void MainWindow::OnDestroy()
+{
+	masterClock.Stop();
+	ApplicationWindow::OnDestroy();
 }
 
 void MainWindow::OnSize(UINT width, UINT height)
