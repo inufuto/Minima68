@@ -31,7 +31,7 @@ void SubWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 void SubWindow::OnRender(class ::RenderTarget& renderTarget)
 {
 	RenderTargetWindow::OnRender(renderTarget);
-	auto s= std::to_string(masterClock.Time());
+	auto s = std::to_string(masterClock.Time() / 4000000);
 	renderTarget.DrawText(s.c_str(), textFormat, D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush);
 	renderTarget.DrawBitmap(bitmap, D2D1::RectF(100.0f, 0.0f, 200.0f, 100.0f), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 }

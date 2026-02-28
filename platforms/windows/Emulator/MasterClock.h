@@ -14,6 +14,9 @@ private:
 	LARGE_INTEGER last;
 	int32_t time;
 	HANDLE hThread;
+private:
+	static unsigned __stdcall ThreadProc(void* pThis);
+
 public:
 	explicit MasterClock(double targetFrequency);
 	~MasterClock() override;
