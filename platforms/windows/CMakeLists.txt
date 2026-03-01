@@ -24,16 +24,16 @@ set(HEADERS
 )
 
 # Create executable
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS})
+add_executable(${MAIN_PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS})
 
 # Set resource compiler include directories
 if(WIN32)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_include_directories(${MAIN_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 # Windows linker settings
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE
+    target_link_libraries(${MAIN_PROJECT_NAME} PRIVATE
         core
         WinApi
         Direct2D      

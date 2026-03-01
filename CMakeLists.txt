@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # オプションでターゲットを切り替え
-option(BUILD_FOR_PICO "Build for Raspberry Pi Pico" OFF)
+option(BUILD_FOR_PICO "Build for Raspberry Pi Pico" ON)
 
 if(BUILD_FOR_PICO)
     # == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
@@ -16,10 +16,12 @@ if(BUILD_FOR_PICO)
     # ====================================================================================
 
     include(pico_sdk_import.cmake)
-    project(Minima80i C CXX ASM)
+    project(Minima85 C CXX ASM)
+    set(MAIN_PROJECT_NAME ${PROJECT_NAME})
     pico_sdk_init()
 else()
-    project(Minima80i C CXX)
+    project(Minima85 C CXX)
+    set(MAIN_PROJECT_NAME ${PROJECT_NAME})
 endif()
 
 # 共通ロジック追加

@@ -6,29 +6,29 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(minima80i pico.cpp )
+add_executable(${MAIN_PROJECT_NAME} pico.cpp )
 
-pico_set_program_name(minima80i "minima80i")
-pico_set_program_version(minima80i "0.1")
+pico_set_program_name(${MAIN_PROJECT_NAME} "${MAIN_PROJECT_NAME}")
+pico_set_program_version(${MAIN_PROJECT_NAME} "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(minima80i 0)
-pico_enable_stdio_usb(minima80i 0)
+pico_enable_stdio_uart(${MAIN_PROJECT_NAME} 0)
+pico_enable_stdio_usb(${MAIN_PROJECT_NAME} 0)
 
 # Add the standard library to the build
-target_link_libraries(minima80i
+target_link_libraries(${MAIN_PROJECT_NAME}
         pico_stdlib)
 
 # Add the standard include files to the build
-target_include_directories(minima80i PRIVATE
+target_include_directories(${MAIN_PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
 # Add any user requested libraries
-target_link_libraries(minima80i 
+target_link_libraries(${MAIN_PROJECT_NAME} 
         core
         hardware_dma
         )
 
-pico_add_extra_outputs(minima80i)
+pico_add_extra_outputs(${MAIN_PROJECT_NAME})
 
