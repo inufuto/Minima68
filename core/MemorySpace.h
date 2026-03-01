@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-class MemorySpace abstract
+class MemorySpace
 {
 public:
 	virtual uint8_t Read(uint16_t address) const = 0;

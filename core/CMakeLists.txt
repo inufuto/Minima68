@@ -5,7 +5,7 @@ set(CORE_SOURCES
 
 set(CORE_HEADERS
 	ClockSource.h
- "PairRegister.h" "Z80Cpu.h" "MemorySpace.h" "Uncopyable.h")
+  "Z80Cpu.h" "MemorySpace.h" "Uncopyable.h")
 
 add_library(core STATIC ${CORE_SOURCES} ${CORE_HEADERS}
 )

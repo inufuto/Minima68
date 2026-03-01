@@ -4,7 +4,7 @@
 
 #include "Uncopyable.h"
 
-class ClockDestination abstract
+class ClockDestination
 {
 public:
 	virtual void OnClock(uint32_t time) = 0;

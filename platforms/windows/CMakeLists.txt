@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.10)
-project(Trial)
+project(Minima80i)
 
 # Add WinApi subdirectory
 add_subdirectory(WinApi)
