@@ -1,11 +1,12 @@
 # core library
 set(CORE_SOURCES
 	ClockSource.cpp
- "Z80Cpu.cpp")
+	
+	I8085.cpp)
 
 set(CORE_HEADERS
 	ClockSource.h
-  "Z80Cpu.h" "MemorySpace.h" "Uncopyable.h")
+   "MemorySpace.h" "Uncopyable.h" "I8085.h")
 
 add_library(core STATIC ${CORE_SOURCES} ${CORE_HEADERS}
 )

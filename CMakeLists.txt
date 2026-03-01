@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # オプションでターゲットを切り替え
-option(BUILD_FOR_PICO "Build for Raspberry Pi Pico" ON)
+option(BUILD_FOR_PICO "Build for Raspberry Pi Pico" OFF)
 
 if(BUILD_FOR_PICO)
     # == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
