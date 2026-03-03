@@ -1,8 +1,10 @@
-#include "Emulator.h"
+#include "Minima85Win.h"
 
 #include <string>
 
-void Emulator::WritePort(uint16_t address, uint8_t value)
+uint8_t Minima85Win::ram[0x10000];
+
+void Minima85Win::WritePort(uint16_t address, uint8_t value)
 {
 	char c = static_cast<char>(value);
 	if (c == '\r') {
@@ -13,7 +15,7 @@ void Emulator::WritePort(uint16_t address, uint8_t value)
 	}
 }
 
-void Emulator::Start(HWND hWnd)
+void Minima85Win::Start(HWND hWnd)
 {
 	masterClock.AddDestination(&Cpu());
 #ifdef _DEBUG
@@ -25,14 +27,14 @@ void Emulator::Start(HWND hWnd)
 }
 
 #ifdef _DEBUG
-void Emulator::LoadProgramFromFile(uint16_t address, const char* path) {
+void Minima85Win::LoadProgramFromFile(uint16_t address, const char* path) {
 	FILE* file;
 	fopen_s(&file, path, "rb");
 	if (file) {
 		fseek(file, 0, SEEK_END);
 		auto size = ftell(file);
 		fseek(file, 0, SEEK_SET);
-		fread(Bytes() + address, 1, size, file);
+		fread(ram + address, 1, size, file);
 		fclose(file);
 	}
 }

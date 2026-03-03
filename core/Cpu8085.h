@@ -2,19 +2,17 @@
 
 #include <functional>
 
+#include "AbtractEmulator.h"
 #include "ClockSource.h"
 #include "MemorySpace.h"
 #include "Uncopyable.h"
 
-class I8085 : public ClockDestination, Uncopyable
+class Cpu8085 : public ClockDestination, Uncopyable, public RegisterHolder
 {
 public:
-	uint16_t MakeWord(uint8_t high, uint8_t low) { return high << 8 | low; }
-	uint8_t HighByte(uint16_t word) { return word >> 8; }
-	uint8_t LowByte(uint16_t word) { return word & 0xff; }
-	uint16_t ProgramCounter() const { return pc; }
-	uint16_t RegisterBc() const { return bc.word; }
-
+	static uint16_t MakeWord(uint8_t high, uint8_t low) { return high << 8 | low; }
+	static uint8_t HighByte(uint16_t word) { return word >> 8; }
+	static uint8_t LowByte(uint16_t word) { return word & 0xff; }
 	union PairRegister
 	{
 		struct {
@@ -24,6 +22,7 @@ public:
 		uint16_t word;
 	};
 private:
+	static constexpr int RegisterCount = 6;
 	struct Flag {
 		static constexpr uint8_t Carry = 1 << 0;
 		static constexpr uint8_t Overflow = 1 << 1;
@@ -33,7 +32,6 @@ private:
 		static constexpr uint8_t Zero = 1 << 6;
 		static constexpr uint8_t Sign = 1 << 7;
 	};
-
 	struct InterruptBit
 	{
 		static constexpr uint8_t MaskRst55 = 1 << 0;
@@ -50,20 +48,28 @@ private:
 		static constexpr uint8_t SetSod = 1 << 6;
 		static constexpr uint8_t Sod = 1 << 7;
 	};
+	struct Instruction
+	{
+		int clockCount;
+		const char* mnemonic;
+		std::function<void(Cpu8085&)> execute;
+	};
+	static const Instruction Instructions[];
+	struct RegisterView
+	{
+		std::string name;
+		int size;
+		std::function<uint16_t (const Cpu8085&)> read;
+		std::function<void(Cpu8085&, uint16_t)> write;
+	};
+	static const RegisterView RegisterViews[];
+	std::string name;
 	MemorySpace* pMemorySpace;
 	MemorySpace* pIoSpace;
 	PairRegister af, bc, de, hl;
 	uint16_t sp, pc;
 	bool interruptsDisabled;
 	uint8_t interruptBits;
-
-	struct Instruction
-	{
-		int clockCount;
-		const char* mnemonic;
-		std::function<void(I8085&)> execute;
-	};
-	static const Instruction Instructions[];
 	const Instruction* pNextInstruction;
 	int clockCountToExecute;
 	bool halted;
@@ -121,7 +127,7 @@ private:
 	void DecimalAdjust(uint8_t& byteRegister);
 	void LoadWordConst(uint16_t& wordRegister) { wordRegister = FetchWord(); }
 	void LoadWordMemory(uint16_t& wordRegister);
-	void LoadWord(uint16_t& wordRegister, uint16_t address);
+	void LoadWord(uint16_t& wordRegister, uint16_t address) const;
 	void StoreWord(uint16_t address, uint16_t value);
 	void AddWord(uint16_t& wordRegister, uint16_t value);
 	void SubtractWord(uint16_t& wordRegister, uint16_t value);
@@ -147,7 +153,16 @@ private:
 	void Input(uint8_t& byteRegister);
 	void Output(uint8_t byteRegister);
 public:
-	I8085(MemorySpace* pMemorySpace, MemorySpace* pIoSpace) : pMemorySpace(pMemorySpace), pIoSpace(pIoSpace) {}
+	Cpu8085(const char* name, MemorySpace* pMemorySpace, MemorySpace* pIoSpace)
+		: name(name), pMemorySpace(pMemorySpace), pIoSpace(pIoSpace) {
+	}
+	uint16_t ProgramCounter() const { return pc; }
+	uint16_t RegisterBc() const { return bc.word; }
 	void Reset();
 	void OnClock(uint32_t time) override;
+	int GetRegisterCount() const override;
+	const char* GetRegisterName(int index) const override;
+	int GetRegisterSize(int index) const override;
+	uint16_t ReadRegister(int index) const override;
+	void WriteRegister(int index, uint16_t value) override;
 };

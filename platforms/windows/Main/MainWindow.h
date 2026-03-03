@@ -1,6 +1,6 @@
 #pragma once
 #include "Direct2DBitmap.h"
-#include "Emulator.h"
+#include "Minima85Win.h"
 #include "../WinApi/ApplicationWindow.h"
 #include "../Direct2D/RenderTargetWindow.h"
 #include "Emulator/MasterClock.h"
@@ -11,20 +11,20 @@ private:
 	TextFormat textFormat;
 	SolidColorBrush brush;
 	Direct2DBitmap bitmap;
-	Emulator& emulator;
+	Minima85Win& emulator;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	void OnRender(class RenderTarget& renderTarget) override;
 public:
-	explicit SubWindow(Emulator& emulator) : emulator(emulator) {}
+	explicit SubWindow(Minima85Win& emulator) : emulator(emulator) {}
 };
 
 class MainWindow : public ApplicationWindow
 {
 private:
 	SubWindow subWindow;
-	Emulator emulator;
+	Minima85Win emulator;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;

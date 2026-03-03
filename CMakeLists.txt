@@ -15,7 +15,7 @@ if(BUILD_FOR_PICO)
     set(picotoolVersion 2.2.0-a4)
     # ====================================================================================
 
-    include(pico_sdk_import.cmake)
+    include(platforms/pico/pico_sdk_import.cmake)
     project(Minima85 C CXX ASM)
     set(MAIN_PROJECT_NAME ${PROJECT_NAME})
     pico_sdk_init()
