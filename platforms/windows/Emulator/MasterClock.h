@@ -22,6 +22,6 @@ public:
 	~MasterClock() override;
 	int32_t Time() const { return time; }
 	void Start(HWND hWnd);
-	void Stop() { running = false; }
+	void Stop();
 	void Loop();
 };

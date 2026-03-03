@@ -50,4 +50,5 @@ public:
 	void Destroy() const;
 	void Move(int x, int y, UINT width, UINT height);
 	void Invalidate();
+	void SetText(LPCSTR text) const { ::SetWindowText(hWnd, text); }
 };

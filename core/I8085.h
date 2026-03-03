@@ -6,12 +6,14 @@
 #include "MemorySpace.h"
 #include "Uncopyable.h"
 
-class I8085 : ClockDestination, Uncopyable
+class I8085 : public ClockDestination, Uncopyable
 {
 public:
 	uint16_t MakeWord(uint8_t high, uint8_t low) { return high << 8 | low; }
 	uint8_t HighByte(uint16_t word) { return word >> 8; }
 	uint8_t LowByte(uint16_t word) { return word & 0xff; }
+	uint16_t ProgramCounter() const { return pc; }
+	uint16_t RegisterBc() const { return bc.word; }
 
 	union PairRegister
 	{
@@ -26,10 +28,10 @@ private:
 		static constexpr uint8_t Carry = 1 << 0;
 		static constexpr uint8_t Overflow = 1 << 1;
 		static constexpr uint8_t Parity = 1 << 2;
-		static constexpr uint8_t HalfCarry = 1 << 3;
+		static constexpr uint8_t HalfCarry = 1 << 4;
 		static constexpr uint8_t X5 = 1 << 5;
-		static constexpr uint8_t Sign = 1 << 6;
-		static constexpr uint8_t Zero = 1 << 7;
+		static constexpr uint8_t Zero = 1 << 6;
+		static constexpr uint8_t Sign = 1 << 7;
 	};
 
 	struct InterruptBit
@@ -65,6 +67,7 @@ private:
 	const Instruction* pNextInstruction;
 	int clockCountToExecute;
 	bool halted;
+	uint16_t currentInstructionPc;
 private:
 	uint8_t FetchByte() { return pMemorySpace->Read(pc++); }
 	uint16_t FetchWord();
@@ -84,7 +87,7 @@ private:
 	void LoadByte(uint8_t& byteRegister, const uint16_t address) const { byteRegister = pMemorySpace->Read(address); }
 	void LoadByte(uint8_t& byteRegister) { LoadByte(byteRegister, FetchWord()); }
 	void StoreByte(const uint16_t address, const uint8_t byteRegister) const { pMemorySpace->Write(address, byteRegister); }
-	void StoreByte(const uint8_t byteRegister) { pMemorySpace->Write(FetchByte(), byteRegister); }
+	void StoreByte(const uint8_t byteRegister) { pMemorySpace->Write(FetchWord(), byteRegister); }
 	void AddByte(uint8_t& destination, uint8_t source);
 	void AddByteMemory(uint8_t& destination, uint16_t address);
 	void AddByteImmediate(uint8_t& byteRegister) { AddByte(byteRegister, FetchByte()); }

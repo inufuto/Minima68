@@ -1,11 +1,11 @@
 # Emulator library
 set(EMULATOR_SOURCES
 MasterClock.cpp
-)
+ "Emulator.cpp")
 
 set(EMULATOR_HEADERS
 MasterClock.h
-)
+ "Emulator.h")
 
 add_library(Emulator STATIC ${EMULATOR_SOURCES} ${EMULATOR_HEADERS})
 

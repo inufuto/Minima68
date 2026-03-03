@@ -7,15 +7,24 @@ unsigned MasterClock::ThreadProc(void* pThis)
 	return 0;
 }
 
-MasterClock::MasterClock(double targetFrequency) :targetFrequency(targetFrequency), running(false)
+MasterClock::MasterClock(double targetFrequency) :targetFrequency(targetFrequency), running(false), hThread(nullptr), time(0)
 {
 	QueryPerformanceFrequency(&timerFrequency);
 }
 
 MasterClock::~MasterClock() {
-	if (hThread != nullptr) {
-		CloseHandle(hThread);
-		hThread = nullptr;
+	Stop();
+}
+
+void MasterClock::Stop()
+{
+	if (running) {
+		running = false;
+		if (hThread != nullptr) {
+			WaitForSingleObject(hThread, INFINITE);
+			CloseHandle(hThread);
+			hThread = nullptr;
+		}
 	}
 }
 

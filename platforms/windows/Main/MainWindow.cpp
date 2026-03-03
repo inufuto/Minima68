@@ -8,6 +8,7 @@
 #include "resource.h"
 
 extern HINSTANCE HInstance;
+extern LPCSTR ProductName;
 
 LRESULT SubWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -31,16 +32,17 @@ void SubWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 void SubWindow::OnRender(class ::RenderTarget& renderTarget)
 {
 	RenderTargetWindow::OnRender(renderTarget);
-	auto s = std::to_string(masterClock.Time() / 4000000);
-	renderTarget.DrawText(s.c_str(), textFormat, D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush);
-	renderTarget.DrawBitmap(bitmap, D2D1::RectF(100.0f, 0.0f, 200.0f, 100.0f), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+	auto s = std::to_string(emulator.Cpu().ProgramCounter());
+	renderTarget.DrawText(s, textFormat, D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush);
+	auto rect = D2D1::RectF(100.0f, 0.0f, 200.0f, 100.0f);
+	renderTarget.DrawBitmap(bitmap, rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 }
 
 
 MainWindow::MainWindow() :
 	ApplicationWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN)),
 		LoadAccelerators(HInstance, MAKEINTRESOURCE(IDR_MAIN))),
-	masterClock(4000000), subWindow(masterClock)
+	subWindow(emulator)
 {}
 
 LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
@@ -60,16 +62,17 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 
 void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
+	SetText(ProductName);
 	ApplicationWindow::OnCreate(pCreateStruct);
 	subWindow.Create(HWnd(), 1);
 	SolidColorBrush brush;
 	brush.Create(subWindow.RenderTarget(), D2D1::ColorF(D2D1::ColorF::Red));
-	masterClock.Start(subWindow.HWnd());
+	emulator.Start(subWindow.HWnd());
 }
 
 void MainWindow::OnDestroy()
 {
-	masterClock.Stop();
+	emulator.Stop();
 	ApplicationWindow::OnDestroy();
 }
 

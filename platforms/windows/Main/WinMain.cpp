@@ -3,7 +3,7 @@
 #include "MainWindow.h"
 
 LPCSTR CompanyName = "Inufuto";
-LPCSTR ProductName = "Trial";
+LPCSTR ProductName = "Minima85";
 HINSTANCE HInstance;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

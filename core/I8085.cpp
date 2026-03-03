@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "../platforms/windows/WinApi/ApiException.h"
+
 static const std::function<void(I8085&)> Nop = [](I8085& cpu) {};
 const I8085::Instruction I8085::Instructions[] = {
 	{ 4, "NOP",Nop},
@@ -1255,7 +1257,7 @@ const I8085::Instruction I8085::Instructions[] = {
 	{
 		/* f2 JP nn */
 		cpu.JumpIf([](const uint8_t flags) {
-			return (flags & Flag::Sign) != 0;
+			return !(flags & Flag::Sign);
 		});
 	}},
 	{4,"DI",[](I8085& cpu)
@@ -1267,7 +1269,7 @@ const I8085::Instruction I8085::Instructions[] = {
 	{
 		/* f4 CP nn */
 		cpu.CallIf([](const uint8_t flags) {
-			return (flags & Flag::Sign) != 0;
+			return !(flags & Flag::Sign);
 		});
 	} },
 	{12,"PUSH\tPSW",[](I8085& cpu)
@@ -1356,18 +1358,6 @@ uint16_t I8085::PopWord()
 	return MakeWord(high, low);
 }
 
-void I8085::FetchInstruction()
-{
-	if (halted) {
-		clockCountToExecute = 1;
-		return;
-	}
-	uint8_t opcode = FetchByte();
-	pNextInstruction = &Instructions[opcode];
-	assert(pNextInstruction->clockCount != 0);
-	clockCountToExecute = pNextInstruction->clockCount;
-}
-
 void I8085::UpdateZeroSignParity(uint8_t value)
 {
 	if (value == 0) {
@@ -1444,6 +1434,12 @@ void I8085::AddByte(uint8_t& destination, uint8_t source)
 	else {
 		ClearFlag(Flag::Carry);
 	}
+	if (((destination & 0x0f) + (source & 0x0f)) & 0x10) {
+		SetFlag(Flag::HalfCarry);
+	}
+	else {
+		ClearFlag(Flag::HalfCarry);
+	}
 	UpdateOverflowForAddition(destination, source, static_cast<uint8_t>(result));
 	UpdateZeroSignParity(static_cast<uint8_t>(result));
 	destination = static_cast<uint8_t>(result);
@@ -1466,6 +1462,12 @@ void I8085::AddByteWithCarry(uint8_t& destination, uint8_t source)
 	else {
 		ClearFlag(Flag::Carry);
 	}
+	if (((destination & 0x0f) + (source & 0x0f) + carry) & 0x10) {
+		SetFlag(Flag::HalfCarry);
+	}
+	else {
+		ClearFlag(Flag::HalfCarry);
+	}
 	UpdateOverflowForAddition(destination, source, static_cast<uint8_t>(result));
 	UpdateZeroSignParity(static_cast<uint8_t>(result));
 	destination = static_cast<uint8_t>(result);
@@ -1486,6 +1488,12 @@ void I8085::SubtractByte(uint8_t& destination, uint8_t source)
 	}
 	else {
 		ClearFlag(Flag::Carry);
+	}
+	if (static_cast<int16_t>(destination & 0x0f) - static_cast<int16_t>(source & 0x0f) < 0) {
+		ClearFlag(Flag::HalfCarry);
+	}
+	else {
+		SetFlag(Flag::HalfCarry);
 	}
 	UpdateOverflowForSubtraction(destination, source, static_cast<uint8_t>(result));
 	UpdateZeroSignParity(static_cast<uint8_t>(result));
@@ -1509,6 +1517,12 @@ void I8085::SubtractByteWithCarry(uint8_t& destination, const uint8_t source)
 	else {
 		ClearFlag(Flag::Carry);
 	}
+	if (static_cast<int16_t>(destination & 0x0f) - static_cast<int16_t>(source & 0x0f) - carry < 0) {
+		SetFlag(Flag::HalfCarry);
+	}
+	else {
+		ClearFlag(Flag::HalfCarry);
+	}
 	UpdateOverflowForSubtraction(destination, source, static_cast<uint8_t>(result));
 	UpdateZeroSignParity(static_cast<uint8_t>(result));
 	destination = static_cast<uint8_t>(result);
@@ -1526,6 +1540,7 @@ void I8085::AndByte(uint8_t& destination, const uint8_t source)
 	destination &= source;
 	UpdateZeroSignParity(destination);
 	ClearFlag(Flag::Carry);
+	SetFlag(Flag::HalfCarry);
 }
 
 void I8085::AndByteMemory(uint8_t& destination, const uint16_t address)
@@ -1540,6 +1555,7 @@ void I8085::XorByte(uint8_t& destination, const uint8_t source)
 	destination ^= source;
 	UpdateZeroSignParity(destination);
 	ClearFlag(Flag::Carry);
+	ClearFlag(Flag::HalfCarry);
 }
 
 void I8085::XorByteMemory(uint8_t& destination, const uint16_t address)
@@ -1554,6 +1570,7 @@ void I8085::OrByte(uint8_t& destination, const uint8_t source)
 	destination |= source;
 	UpdateZeroSignParity(destination);
 	ClearFlag(Flag::Carry);
+	ClearFlag(Flag::HalfCarry);
 }
 
 void I8085::OrByteMemory(uint8_t& destination, const uint16_t address)
@@ -1577,7 +1594,15 @@ void I8085::CompareByteMemory(const uint8_t destination, const uint16_t source)
 
 void I8085::IncreaseByte(uint8_t& byteRegister, const int offset)
 {
-	byteRegister += offset;
+	auto original = byteRegister;
+	uint8_t byteOffset = static_cast<uint8_t>(offset);
+	byteRegister += byteOffset;
+	if (((original & 0x0f) + byteOffset) > 0x0f) {
+		SetFlag(Flag::HalfCarry);
+	}
+	else {
+		ClearFlag(Flag::HalfCarry);
+	}
 	UpdateZeroSignParity(byteRegister);
 }
 
@@ -1641,18 +1666,25 @@ void I8085::RotateRight(uint8_t& byteRegister)
 void I8085::DecimalAdjust(uint8_t& byteRegister)
 {
 	uint8_t correction = 0;
-	if ((af.low & Flag::HalfCarry) != 0 || (af.high & 0x0f) > 9) {
+	bool carryFlag = false;
+	if ((af.low & Flag::HalfCarry) != 0 || (byteRegister & 0x0f) > 9) {
 		correction |= 0x06;
 	}
-	if ((af.low & Flag::Carry) != 0 || (af.high & 0xf0) > 0x90 || ((af.high & 0xf0) == 0x90 && (af.high & 0x0f) > 9)) {
+	if ((af.low & Flag::Carry) != 0 || (byteRegister > 0x99) || (byteRegister > 0x8f && (byteRegister & 0x0f) > 9)) {
 		correction |= 0x60;
-		SetFlag(Flag::Carry);
+		carryFlag = true;
+	}
+	if ((byteRegister & 0x0f) + (correction & 0x0f) >= 0x10) {
+		SetFlag(Flag::HalfCarry);
 	}
 	else {
-		ClearFlag(Flag::Carry);
+		ClearFlag(Flag::HalfCarry);
 	}
-	af.high += correction;
-	UpdateZeroSignParity(af.high);
+	byteRegister += correction;
+	if (carryFlag) {
+		SetFlag(Flag::Carry);
+	}
+	UpdateZeroSignParity(byteRegister);
 }
 
 void I8085::LoadWordMemory(uint16_t& wordRegister)
@@ -1676,10 +1708,10 @@ void I8085::StoreWord(uint16_t address, uint16_t value)
 	pMemorySpace->Write(address + 1, HighByte(value));
 }
 
-void I8085::AddWord(uint16_t& wordRegister, uint16_t value)
+void I8085::AddWord(uint16_t& wordRegister, const uint16_t value)
 {
 	auto result = static_cast<uint32_t>(wordRegister) + value;
-	if (result & 0x10000) {
+	if (result >= 0x10000) {
 		SetFlag(Flag::Carry);
 	}
 	else {
@@ -1801,7 +1833,7 @@ void I8085::WriteInterruptBits(uint8_t byteRegister)
 
 void I8085::Jump(const uint16_t address) {
 	pc = address;
-	FetchInstruction();
+	//FetchInstruction();
 }
 
 void I8085::Jump()
@@ -1817,6 +1849,7 @@ void I8085::JumpIf(const std::function<bool(uint8_t)>& condition)
 		pNextInstruction = &Instructions[0xc3]; // JMP
 	}
 	else {
+		auto aaa = 111;
 		FetchWord();// skip the address operand
 	}
 }
@@ -1825,7 +1858,7 @@ void I8085::Call(const uint16_t address)
 {
 	PushWord(pc);
 	pc = address;
-	FetchInstruction();
+	//FetchInstruction();
 }
 
 void I8085::CallIf(const std::function<bool(uint8_t)>& condition)
@@ -1842,7 +1875,7 @@ void I8085::CallIf(const std::function<bool(uint8_t)>& condition)
 void I8085::Return()
 {
 	pc = PopWord();
-	FetchInstruction();
+	//FetchInstruction();
 }
 
 void I8085::ReturnIf(const std::function<bool(uint8_t)>& condition)
@@ -1872,7 +1905,7 @@ void I8085::Input(uint8_t& byteRegister)
 	byteRegister = pIoSpace->Read(address);
 }
 
-void I8085::Output(uint8_t byteRegister)
+void I8085::Output(const uint8_t byteRegister)
 {
 	auto address = FetchByte();
 	pIoSpace->Write(address, byteRegister);
@@ -1889,7 +1922,7 @@ void I8085::Reset()
 	sp = 0;
 	pc = 0;
 	interruptsDisabled = false;
-	interruptBits = 0;
+	interruptBits = InterruptBit::MaskRst | InterruptBit::MaskIntr;
 	halted = false;
 	FetchInstruction();
 }
@@ -1897,7 +1930,30 @@ void I8085::Reset()
 void I8085::OnClock(uint32_t time)
 {
 	if (--clockCountToExecute == 0) {
-		pNextInstruction->execute(*this);
-		FetchInstruction();
+		auto pInstruction = pNextInstruction;
+
+		//char buffer[256];
+		//sprintf_s(buffer, sizeof(buffer), "%04X: %s %02X\n", currentInstructionPc, pInstruction->mnemonic, af.high);
+		//OutputDebugString(buffer);
+
+		pInstruction->execute(*this);
+		af.low &= 0xd5;
+		af.low |= 0x02;
+		if (pNextInstruction == pInstruction) {
+			FetchInstruction();
+		}
 	}
+}
+
+void I8085::FetchInstruction()
+{
+	if (halted) {
+		clockCountToExecute = 1;
+		return;
+	}
+	currentInstructionPc = pc;
+	uint8_t opcode = FetchByte();
+	pNextInstruction = &Instructions[opcode];
+	assert(pNextInstruction->clockCount != 0);
+	clockCountToExecute = pNextInstruction->clockCount;
 }

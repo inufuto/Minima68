@@ -1,5 +1,6 @@
 #pragma once
 #include "Direct2DBitmap.h"
+#include "Emulator.h"
 #include "../WinApi/ApplicationWindow.h"
 #include "../Direct2D/RenderTargetWindow.h"
 #include "Emulator/MasterClock.h"
@@ -10,20 +11,20 @@ private:
 	TextFormat textFormat;
 	SolidColorBrush brush;
 	Direct2DBitmap bitmap;
-	MasterClock& masterClock;
+	Emulator& emulator;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	void OnRender(class RenderTarget& renderTarget) override;
 public:
-	explicit SubWindow(MasterClock& masterClock) : masterClock(masterClock) {}
+	explicit SubWindow(Emulator& emulator) : emulator(emulator) {}
 };
 
 class MainWindow : public ApplicationWindow
 {
 private:
 	SubWindow subWindow;
-	MasterClock masterClock;
+	Emulator emulator;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
