@@ -1,6 +1,7 @@
 #include "Cpu8085.h"
 
 #include <cassert>
+#include <cstdio>
 
 static const std::function<void(Cpu8085&)> Nop = [](Cpu8085& cpu) {};
 const Cpu8085::Instruction Cpu8085::Instructions[] = {
@@ -2014,4 +2015,43 @@ void Cpu8085::WriteRegister(int index, uint16_t value)
 {
 	assert(index >= 0 && index < GetRegisterCount());
 	RegisterViews[index].write(*this, value);
+}
+
+void Cpu8085::BuildAssemblyElement(uint16_t address, AssemblyElement* pElement) const
+{
+	auto opcode = pMemorySpace->Read(address);
+	const auto& instruction = Instructions[opcode];
+	auto pSource = instruction.mnemonic;
+	pElement->size = 1;
+	pElement->mnemonic.clear();
+	char c;
+	while ((c = *pSource++) != 0 && c != '\t') {
+		pElement->mnemonic += c;
+	}
+	pElement->operand.clear();
+	if (c != 0) {
+		while ((c = *pSource++) != 0) {
+			switch (c) {
+			case 'b': {
+				auto byteValue = pMemorySpace->Read(address + 1);
+				char byteBuffer[4];
+				snprintf(byteBuffer, sizeof(byteBuffer), "$%02X", byteValue);
+				pElement->operand += byteBuffer;
+				++pElement->size;
+				break;
+			}
+			case 'w': {
+				auto low = pMemorySpace->Read(address + 1);
+				auto high = pMemorySpace->Read(address + 2);
+				char wordBuffer[6];
+				snprintf(wordBuffer, sizeof(wordBuffer), "$%04X", MakeWord(high, low));
+				pElement->operand += wordBuffer;
+				pElement->size += 2;
+				break;
+			}
+			default:
+				pElement->operand += c;
+			}
+		}
+	}
 }

@@ -2,12 +2,10 @@
 
 #include <functional>
 
-#include "AbtractEmulator.h"
-#include "ClockSource.h"
+#include "Cpu.h"
 #include "MemorySpace.h"
-#include "Uncopyable.h"
 
-class Cpu8085 : public ClockDestination, Uncopyable, public RegisterHolder
+class Cpu8085 : public Cpu
 {
 public:
 	static uint16_t MakeWord(uint8_t high, uint8_t low) { return high << 8 | low; }
@@ -165,4 +163,6 @@ public:
 	int GetRegisterSize(int index) const override;
 	uint16_t ReadRegister(int index) const override;
 	void WriteRegister(int index, uint16_t value) override;
+	uint16_t LastInstructionAddress() const override { return currentInstructionPc; }
+	void BuildAssemblyElement(uint16_t address, AssemblyElement* pElement) const override;
 };

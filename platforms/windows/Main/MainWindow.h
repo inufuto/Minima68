@@ -1,4 +1,5 @@
 #pragma once
+#include "AssemblyWindow.h"
 #include "Direct2DBitmap.h"
 #include "MemoryWindow.h"
 #include "Minima85Win.h"
@@ -30,6 +31,8 @@ private:
 	Minima85Win emulator;
 	RegisterWindow registerWindow;
 	TitledPane registerPane{ &registerWindow };
+	AssemblyWindow assemblyWindow;
+	TitledPane assemblyPane{ &assemblyWindow };
 	MemoryWindow memoryWindow{ emulator.MemorySpaceAt(0) };
 	TitledPane memoryPane{ &memoryWindow };
 	SubWindow subWindow;

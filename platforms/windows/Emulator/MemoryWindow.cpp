@@ -51,7 +51,7 @@ void MemoryWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	topAddress = selectedAddress = 0;
 	isDragging = false;
 
-	minWindowWidth = DipToPixel(marginX * 2 + addressWidth + spaceWidth + (valueWidth + spaceWidth) * BytesPerLine);
+	minWindowWidth = DipToPixel(marginX * 2 + addressWidth + spaceWidth + (valueWidth + spaceWidth) * BytesPerLine) + GetSystemMetrics(SM_CXVSCROLL);
 }
 
 void MemoryWindow::OnSize(UINT width, UINT height)
@@ -68,13 +68,13 @@ void MemoryWindow::OnRender(class ::RenderTarget& renderTarget)
 	rect.top = 0.0f;
 	for (auto leftAddress = topAddress; leftAddress <  + AddressRange && rect.top < size.height; leftAddress += BytesPerLine) {
 		rect.bottom = rect.top + lineHeight;
-		rect.left = 0.0f;
-		rect.right = addressWidth;
+		rect.left = marginX;
+		rect.right = rect.left + addressWidth;
 		char addressText[4 + 1];
 		sprintf_s(addressText, sizeof(addressText), "%04X", leftAddress);
 		renderTarget.DrawText(addressText, TextFormat(), rect, TextBrush());
-
 		rect.left = rect.right + spaceWidth;
+
 		for (int i = 0; i < BytesPerLine; ++i) {
 			rect.right = rect.left + valueWidth;
 			uint32_t address = leftAddress + i;
@@ -221,7 +221,7 @@ void MemoryWindow::OnLButtonUp(UINT flags, POINT point)
 void MemoryWindow::OnMouseWheel(UINT flags, short delta, POINT point)
 {
 	auto linesToScroll = delta / WHEEL_DELTA;
-	auto bytesToScroll = linesToScroll * BytesPerLine;
+	auto bytesToScroll = -linesToScroll * BytesPerLine;
 	int32_t newTopAddress = static_cast<int32_t>(topAddress) + bytesToScroll;
 	if (newTopAddress >= 0 && newTopAddress < static_cast<int32_t>(AddressRange)) {
 		topAddress = static_cast<uint32_t>(newTopAddress);

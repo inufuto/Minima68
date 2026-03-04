@@ -9,7 +9,6 @@ private:
 private:
 	bool active;
 	Font font;
-private:
 	int titleHeight;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
@@ -21,4 +20,5 @@ public:
 	explicit TitledPane(Window* pChild) : pChild(pChild) {}
 	bool Active() const { return active; }
 	void Active(bool active);
+	int TitleHeight() const { return titleHeight; }
 };

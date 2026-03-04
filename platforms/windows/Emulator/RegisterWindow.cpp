@@ -26,6 +26,7 @@ void RegisterWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	}
 
 	minWindowWidth = DipToPixel(marginX * 2 + maxNameWidth + maxValueWidth);
+	minWindowHeight = DipToPixel(lineHeight * count);
 }
 
 void RegisterWindow::DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, const int index, bool selected)

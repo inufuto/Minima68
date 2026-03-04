@@ -1,9 +1,9 @@
 #include <windows.h>
 
-#include "MainWindow.h"
-
 #include <string>
-
+#undef min
+#undef max
+#include "MainWindow.h"
 #include "Direct2DBrush.h"
 #include "resource.h"
 
@@ -42,7 +42,8 @@ void SubWindow::OnRender(::RenderTarget& renderTarget)
 MainWindow::MainWindow() :
 	EmulatorWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN)),
 		LoadAccelerators(HInstance, MAKEINTRESOURCE(IDR_MAIN))),
-	emulator(this), registerWindow(&emulator.Cpu()), subWindow(emulator)
+	emulator(this), registerWindow(&emulator.Cpu()),
+	assemblyWindow(&emulator.Cpu(), emulator.MemorySpaceAt(0)), subWindow(emulator)
 {
 }
 
@@ -67,6 +68,7 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmEraseBackground(wParam, lParam);
 	case WM_UPDATE_EMULATOR:
 		registerWindow.Invalidate();
+		//assemblyWindow.UpdateList();
 		memoryWindow.Invalidate();
 		subWindow.Invalidate();
 		//Invalidate();
@@ -85,9 +87,11 @@ void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	SetText(ProductName);
 	registerPane.Create(HWnd(), 1);
 	registerPane.SetText("Registers");
-	memoryPane.Create(HWnd(), 2);
+	assemblyPane.Create(HWnd(), 2);
+	assemblyPane.SetText("Assembly");
+	memoryPane.Create(HWnd(), 3);
 	memoryPane.SetText("Memory");
-	subWindow.Create(HWnd(), 3);
+	subWindow.Create(HWnd(), 4);
 	SolidColorBrush brush;
 	brush.Create(subWindow.RenderTarget(), D2D1::ColorF(D2D1::ColorF::Red));
 	emulator.Start();
@@ -105,17 +109,19 @@ void MainWindow::OnSize(UINT width, UINT height)
 	auto cxBorder = GetSystemMetrics(SM_CXBORDER);
 	auto x = 0;
 	{
-		auto paneWidth = registerWindow.MinWindowWidth();
-		registerPane.Move(x, 0, paneWidth, height);
-		x += paneWidth;
+		auto paneWidth = std::max(registerWindow.MinWindowWidth(), assemblyWindow.MinWindowWidth());
+		{
+			auto paneHeight = registerPane.TitleHeight() + registerWindow.MinWindowHeight();
+			registerPane.Move(x, 0, paneWidth, paneHeight);
+			assemblyPane.Move(x, paneHeight, paneWidth, height - paneHeight);
+		}
+		x += paneWidth + cxBorder;
 	}
-	x += cxBorder;
 	{
 		auto paneWidth = memoryWindow.MinWindowWidth();
 		memoryPane.Move(x, 0, paneWidth, height);
-		x += paneWidth;
+		x += paneWidth + cxBorder;
 	}
-	x += cxBorder;
 	subWindow.Move(x, 0, width - x, height);
 }
 

@@ -12,6 +12,7 @@ private:
 	float lineHeight;
 	float maxNameWidth, maxValueWidth;
 	int minWindowWidth;
+	int minWindowHeight;
 protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	int ItemCount() override { return pRegisterHolder->GetRegisterCount(); }
@@ -22,4 +23,5 @@ public:
 		: pRegisterHolder(pRegisterHolder) {
 	}
 	auto MinWindowWidth() const { return minWindowWidth; }
+	auto MinWindowHeight() const { return minWindowHeight; }
 };
