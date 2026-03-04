@@ -35,3 +35,14 @@ void RenderTargetWindow::OnPaint(DeviceContext& dc)
 	OnRender(renderTarget);
 	renderTarget->EndDraw();
 }
+
+float RenderTargetWindow::GetDpiScale() const
+{
+	auto dpi = ::GetDpiForWindow(HWnd());
+	return dpi / 96.0f;
+}
+
+UINT RenderTargetWindow::DipToPixel(float dip) const
+{
+	return static_cast<UINT>(dip * GetDpiScale());
+}

@@ -46,13 +46,25 @@ int ApplicationWindow::Run(int nCmdShow)
 	while (true) {
 		try {
 			MSG msg;
-			if (!GetMessage(&msg, nullptr, 0, 0)) {
-				return static_cast<int>(msg.wParam);
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+					if (msg.message == WM_QUIT) {
+						return static_cast<int>(msg.wParam);
+					}
+					if (hAccel == nullptr || !TranslateAccelerator(HWnd(), hAccel, &msg)) {
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
+					}
 			}
-			if (hAccel == nullptr || !TranslateAccelerator(HWnd(), hAccel, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
+			else {
+				OnIdle();
 			}
+			//if (!GetMessage(&msg, nullptr, 0, 0)) {
+			//	return static_cast<int>(msg.wParam);
+			//}
+			//if (hAccel == nullptr || !TranslateAccelerator(HWnd(), hAccel, &msg)) {
+			//	TranslateMessage(&msg);
+			//	DispatchMessage(&msg);
+			//}
 		}
 		catch (ApiException e) {
 			MessageBox(HWnd(), e.what(), ProductName, MB_ICONERROR);

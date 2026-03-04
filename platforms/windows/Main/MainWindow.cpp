@@ -40,16 +40,18 @@ void SubWindow::OnRender(::RenderTarget& renderTarget)
 
 
 MainWindow::MainWindow() :
-	ApplicationWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN)),
+	EmulatorWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN)),
 		LoadAccelerators(HInstance, MAKEINTRESOURCE(IDR_MAIN))),
-	emulator(this),	registerWindow(&emulator.Cpu()), subWindow(emulator)
+	emulator(this), registerWindow(&emulator.Cpu()), subWindow(emulator)
 {
 }
 
 void MainWindow::Invalidate()
 {
-	registerWindow.Invalidate();
-	subWindow.Invalidate();
+	if (!waitingForUpdate) {
+		waitingForUpdate = true;
+		PostMessage(HWnd(), WM_UPDATE_EMULATOR, 0, 0);
+	}
 }
 
 LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
@@ -63,18 +65,29 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmSize(wParam, lParam);
 	case WM_PAINT:
 		return OnWmPaint(wParam, lParam);
+	case WM_UPDATE_EMULATOR:
+		registerWindow.Invalidate();
+		memoryWindow.Invalidate();
+		subWindow.Invalidate();
+		//Invalidate();
+		//RedrawWindow(HWnd(), nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+		UpdateWindow(HWnd());
+		waitingForUpdate = false;
+		return 0;
 	}
-	return ApplicationWindow::OnMessage(message, wParam, lParam);
+	return EmulatorWindow::OnMessage(message, wParam, lParam);
 }
 
 void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
+	waitingForUpdate = false;
+	EmulatorWindow::OnCreate(pCreateStruct);
 	SetText(ProductName);
-	titledPane.Create(HWnd(), 1);
-	titledPane.SetText("Registers");
-	titledPane.Active(true);
-	ApplicationWindow::OnCreate(pCreateStruct);
-	subWindow.Create(HWnd(), 2);
+	registerPane.Create(HWnd(), 1);
+	registerPane.SetText("Registers");
+	memoryPane.Create(HWnd(), 2);
+	memoryPane.SetText("Memory");
+	subWindow.Create(HWnd(), 3);
 	SolidColorBrush brush;
 	brush.Create(subWindow.RenderTarget(), D2D1::ColorF(D2D1::ColorF::Red));
 	emulator.Start();
@@ -83,14 +96,23 @@ void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 void MainWindow::OnDestroy()
 {
 	emulator.Stop();
-	ApplicationWindow::OnDestroy();
+	EmulatorWindow::OnDestroy();
 }
 
 void MainWindow::OnSize(UINT width, UINT height)
 {
-	auto w = registerWindow.MinWindowWidth();
-	titledPane.Move(0, 0, w, height);
-	subWindow.Move(w, 0, width - w, height);
+	auto x = 0;
+	{
+		auto paneWidth = registerWindow.MinWindowWidth();
+		registerPane.Move(x, 0, paneWidth, height);
+		x += paneWidth;
+	}
+	{
+		auto paneWidth = memoryWindow.MinWindowWidth();
+		memoryPane.Move(x, 0, paneWidth, height);
+		x += paneWidth;
+	}
+	subWindow.Move(x, 0, width - x, height);
 }
 
 void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)

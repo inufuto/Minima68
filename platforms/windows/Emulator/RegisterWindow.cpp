@@ -8,12 +8,9 @@ void RegisterWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
 	ListWindow::OnCreate(pCreateStruct);
 
-	DWRITE_TEXT_METRICS metrics;
-	TextLayout textLayout;
-	textLayout.Create(TextFormat(), "W", 1000.0f, 1000.0f);
-	textLayout.GetMetrics(&metrics);
-	lineHeight = metrics.height;
-	auto charWidth = metrics.width;
+	auto charSize = CharSize();
+	auto charWidth = charSize.width;
+	lineHeight = charSize.height;
 
 	marginX = 4.0f;
 	auto count = pRegisterHolder->GetRegisterCount();
@@ -28,9 +25,7 @@ void RegisterWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 		maxValueWidth = (std::max)(valueWidth, maxValueWidth);
 	}
 
-	auto dpi = ::GetDpiForWindow(HWnd());
-	auto dpiScale = dpi / 96.0f;
-	minWindowWidth = static_cast<UINT>((marginX * 2 + maxNameWidth + maxValueWidth) * dpiScale);
+	minWindowWidth = DipToPixel(marginX * 2 + maxNameWidth + maxValueWidth);
 }
 
 void RegisterWindow::DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, const int index, bool selected)

@@ -11,6 +11,7 @@ private:
 protected:
 	ApplicationWindow(HMENU hMenu, HACCEL hAccel) : hMenu(hMenu), hAccel(hAccel) {}
 
+	virtual void OnIdle() {}
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	using Window::OnWmClose;
 	void OnClose() override;

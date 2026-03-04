@@ -15,6 +15,8 @@ protected:
 	{
 		renderTarget->Clear(D2D1::ColorF(D2D1::ColorF(GetSysColor(COLOR_WINDOW), 1.0f)));
 	}
+	float GetDpiScale() const;
+	UINT DipToPixel(float dip) const;
 public:
 	HwndRenderTarget& RenderTarget() { return renderTarget; }
 };

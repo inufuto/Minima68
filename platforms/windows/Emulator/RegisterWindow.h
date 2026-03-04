@@ -8,10 +8,10 @@ class RegisterWindow : public ListWindow
 {
 private:
 	RegisterHolder* pRegisterHolder;
-	int minWindowWidth;
 	float marginX;
 	float lineHeight;
 	float maxNameWidth, maxValueWidth;
+	int minWindowWidth;
 protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	int ItemCount() override { return pRegisterHolder->GetRegisterCount(); }

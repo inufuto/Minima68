@@ -2,11 +2,13 @@
 set(EMULATOR_SOURCES
 MasterClock.cpp
 Minima85Win.cpp
-  "RegisterWindow.cpp" "ListWindow.cpp" "StatusWindow.cpp" "TitledPane.cpp")
+EmulatorWindow.cpp
+  "RegisterWindow.cpp" "ListWindow.cpp" "StatusWindow.cpp" "TitledPane.cpp" "MemoryWindow.cpp")
 
 set(EMULATOR_HEADERS
 MasterClock.h
- "Minima85Win.h" "RegisterWindow.h" "ListWindow.h" "StatusWindow.h" "TitledPane.h")
+EmulatorWindow.h
+ "Minima85Win.h" "RegisterWindow.h" "ListWindow.h" "StatusWindow.h" "TitledPane.h" "MemoryWindow.h")
 
 add_library(Emulator STATIC ${EMULATOR_SOURCES} ${EMULATOR_HEADERS})
 

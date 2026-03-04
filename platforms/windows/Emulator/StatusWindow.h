@@ -14,6 +14,7 @@ private:
 	SolidColorBrush highlightTextBrush;
 protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
+	D2D1_SIZE_F CharSize();
 public:
 	auto TextFormat() const { return textFormat.Ptr(); }
 	auto BackgroundBrush() const { return backgroundBrush.Ptr(); }

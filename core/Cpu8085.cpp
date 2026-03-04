@@ -964,7 +964,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* c0 RNZ */
 		cpu.ReturnIf([](const uint8_t flags) {
-			return !(flags & Flag::Zero);
+			return (flags & Flag::Zero) == 0;
 		});
 	}},
 	{10,"POP\tB",[](Cpu8085& cpu)
@@ -977,7 +977,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* c2 JNZ nn */
 		cpu.JumpIf([](const uint8_t flags) {
-			return !(flags & Flag::Zero);
+			return (flags & Flag::Zero) == 0;
 		});
 	}},
 	{10,"JMP\tw",[](Cpu8085& cpu)
@@ -989,7 +989,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* c4 CNZ nn */
 		cpu.CallIf([](const uint8_t flags) {
-			return !(flags & Flag::Zero);
+			return (flags & Flag::Zero) == 0;
 		});
 	} },
 	{12,"PUSH\tB",[](Cpu8085& cpu)
@@ -1057,7 +1057,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* d0 RNC */
 		cpu.ReturnIf([](const uint8_t flags) {
-			return !(flags & Flag::Carry);
+			return (flags & Flag::Carry) == 0;
 		});
 	} },
 	{10,"POP\tD",[](Cpu8085& cpu)
@@ -1069,7 +1069,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* d2 JNC nn */
 		cpu.JumpIf([](const uint8_t flags) {
-			return !(flags & Flag::Carry);
+			return (flags & Flag::Carry) == 0;
 		});
 	}},
 	{ 10,"OUT\tb",[](Cpu8085& cpu)
@@ -1081,7 +1081,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* d4 CNC nn */
 		cpu.CallIf([](const uint8_t flags) {
-			return !(flags & Flag::Carry);
+			return (flags & Flag::Carry) == 0;
 		});
 	} },
 	{12,"PUSH\tD",[](Cpu8085& cpu)
@@ -1151,7 +1151,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* e0 RPO */
 		cpu.ReturnIf([](const uint8_t flags) {
-			return !(flags & Flag::Parity);
+			return (flags & Flag::Parity) == 0;
 		});
 	} },
 	{10,"POP\tH",[](Cpu8085& cpu)
@@ -1163,7 +1163,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* e2 JPO nn */
 		cpu.JumpIf([](const uint8_t flags) {
-			return !(flags & Flag::Parity);
+			return (flags & Flag::Parity) == 0;
 		});
 	}},
 	{18,"XTHL",[](Cpu8085& cpu)
@@ -1175,7 +1175,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* e4 CPO nn */
 		cpu.CallIf([](const uint8_t flags) {
-			return !(flags & Flag::Parity);
+			return (flags & Flag::Parity) == 0;
 		});
 	} },
 	{12,"PUSH\tH",[](Cpu8085& cpu)
@@ -1243,7 +1243,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* f0 RP */
 		cpu.ReturnIf([](const uint8_t flags) {
-			return !(flags & Flag::Sign);
+			return (flags & Flag::Sign) == 0;
 		});
 	} },
 	{10,"POP\tPSW",[](Cpu8085& cpu)
@@ -1255,7 +1255,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* f2 JP nn */
 		cpu.JumpIf([](const uint8_t flags) {
-			return !(flags & Flag::Sign);
+			return (flags & Flag::Sign) == 0;
 		});
 	}},
 	{4,"DI",[](Cpu8085& cpu)
@@ -1267,7 +1267,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	{
 		/* f4 CP nn */
 		cpu.CallIf([](const uint8_t flags) {
-			return !(flags & Flag::Sign);
+			return (flags & Flag::Sign) == 0;
 		});
 	} },
 	{12,"PUSH\tPSW",[](Cpu8085& cpu)
@@ -1416,7 +1416,7 @@ void Cpu8085::UpdateZeroSignParity(const uint8_t value)
 	}
 	int parity = 0;
 	for (int i = 0; i < 8; ++i) {
-		if (value & (1 << i)) {
+		if ((value & (1 << i)) != 0) {
 			++parity;
 		}
 	}
@@ -1470,13 +1470,13 @@ void Cpu8085::MoveImmediateMemory(uint16_t address)
 void Cpu8085::AddByte(uint8_t& destination, uint8_t source)
 {
 	auto result = static_cast<uint16_t>(destination) + source;
-	if (result & 0x100) {
+	if ((result & 0x100) != 0) {
 		SetFlag(Flag::Carry);
 	}
 	else {
 		ClearFlag(Flag::Carry);
 	}
-	if (((destination & 0x0f) + (source & 0x0f)) & 0x10) {
+	if ((((destination & 0x0f) + (source & 0x0f)) & 0x10) != 0) {
 		SetFlag(Flag::HalfCarry);
 	}
 	else {
@@ -1498,13 +1498,13 @@ void Cpu8085::AddByteWithCarry(uint8_t& destination, uint8_t source)
 {
 	auto carry = (af.low & Flag::Carry) != 0 ? 1 : 0;
 	auto result = static_cast<uint16_t>(destination) + source + carry;
-	if (result & 0x100) {
+	if ((result & 0x100) != 0) {
 		SetFlag(Flag::Carry);
 	}
 	else {
 		ClearFlag(Flag::Carry);
 	}
-	if (((destination & 0x0f) + (source & 0x0f) + carry) & 0x10) {
+	if ((((destination & 0x0f) + (source & 0x0f) + carry) & 0x10) != 0) {
 		SetFlag(Flag::HalfCarry);
 	}
 	else {
@@ -1659,7 +1659,7 @@ void Cpu8085::RotateLeftCircular(uint8_t& byteRegister)
 {
 	auto highBit = byteRegister & 0x80;
 	byteRegister <<= 1;
-	if (highBit) {
+	if (highBit != 0) {
 		byteRegister |= 1;
 		SetFlag(Flag::Carry);
 	}
@@ -1672,7 +1672,7 @@ void Cpu8085::RotateRightCircular(uint8_t& byteRegister)
 {
 	auto lowBit = byteRegister & 1;
 	byteRegister >>= 1;
-	if (lowBit) {
+	if (lowBit != 0) {
 		byteRegister |= 0x80;
 		SetFlag(Flag::Carry);
 	}
@@ -1685,7 +1685,7 @@ void Cpu8085::RotateLeft(uint8_t& byteRegister)
 {
 	auto highBit = byteRegister & 0x80;
 	byteRegister = (byteRegister << 1) | ((af.low & Flag::Carry) != 0 ? 1 : 0);
-	if (highBit) {
+	if (highBit != 0) {
 		SetFlag(Flag::Carry);
 	}
 	else {
@@ -1697,7 +1697,7 @@ void Cpu8085::RotateRight(uint8_t& byteRegister)
 {
 	auto lowBit = byteRegister & 1;
 	byteRegister = (byteRegister >> 1) | ((af.low & Flag::Carry) != 0 ? 0x80 : 0);
-	if (lowBit) {
+	if (lowBit != 0) {
 		SetFlag(Flag::Carry);
 	}
 	else {
@@ -1796,7 +1796,7 @@ void Cpu8085::ShiftWordRightArithmetic(uint16_t& wordRegister)
 {
 	auto lowBit = wordRegister & 1;
 	wordRegister = (wordRegister >> 1) | (wordRegister & 0x8000);
-	if (lowBit) {
+	if (lowBit != 0) {
 		SetFlag(Flag::Carry);
 	}
 	else {
@@ -1808,7 +1808,7 @@ void Cpu8085::RotateWordLeft(uint16_t& wordRegister)
 {
 	auto highBit = wordRegister & 0x8000;
 	wordRegister = (wordRegister << 1) | ((af.low & Flag::Carry) != 0 ? 1 : 0);
-	if (highBit) {
+	if (highBit != 0) {
 		SetFlag(Flag::Carry);
 	}
 	else {
@@ -1834,7 +1834,7 @@ void Cpu8085::RotateWordLeft(uint16_t& wordRegister)
 	}
 	auto parity = 0;
 	for (int i = 0; i < 16; ++i) {
-		if (wordRegister & (1 << i)) {
+		if ((wordRegister & (1 << i)) != 0) {
 			++parity;
 		}
 	}
@@ -1862,13 +1862,13 @@ void Cpu8085::ExchangeStack(uint16_t& wordRegister)
 
 void Cpu8085::WriteInterruptBits(uint8_t byteRegister)
 {
-	if (byteRegister & InterruptBit::SetRst) {
+	if ((byteRegister & InterruptBit::SetRst) != 0) {
 		interruptBits = (interruptBits & ~InterruptBit::MaskRst) | (byteRegister & InterruptBit::MaskRst);
 	}
-	if (byteRegister & InterruptBit::ClearRst75) {
+	if ((byteRegister & InterruptBit::ClearRst75) != 0) {
 		interruptBits &= ~InterruptBit::RequestRst75;
 	}
-	if (byteRegister & InterruptBit::SetSod) {
+	if ((byteRegister & InterruptBit::SetSod) != 0) {
 		interruptBits = (interruptBits & ~InterruptBit::Sod) | (byteRegister & InterruptBit::Sod);
 	}
 }
