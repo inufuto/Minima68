@@ -7,11 +7,10 @@
 void RegisterWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
 	ListWindow::OnCreate(pCreateStruct);
-	textFormat.Create("Consolas", FontSize);
 
 	DWRITE_TEXT_METRICS metrics;
 	TextLayout textLayout;
-	textLayout.Create(textFormat, "W", 1000.0f, 1000.0f);
+	textLayout.Create(TextFormat(), "W", 1000.0f, 1000.0f);
 	textLayout.GetMetrics(&metrics);
 	lineHeight = metrics.height;
 	auto charWidth = metrics.width;
@@ -53,7 +52,7 @@ void RegisterWindow::DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, co
 	nameRect.left += marginX;
 	nameRect.right = nameRect.left + maxNameWidth;
 
-	renderTarget.DrawText(pRegisterHolder->GetRegisterName(index), textFormat.Ptr(), nameRect, pBrush);
+	renderTarget.DrawText(pRegisterHolder->GetRegisterName(index), TextFormat(), nameRect, pBrush);
 
 	D2D1_RECT_F valueRect = rect;
 	valueRect.left = nameRect.right;
@@ -62,5 +61,5 @@ void RegisterWindow::DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, co
 	char value[32];
 	sprintf_s(value, sizeof(value), "%0*X", pRegisterHolder->GetRegisterSize(index) * 2, pRegisterHolder->ReadRegister(index));
 
-	renderTarget.DrawText(value, textFormat.Ptr(), valueRect, pBrush);
+	renderTarget.DrawText(value, TextFormat(), valueRect, pBrush);
 }

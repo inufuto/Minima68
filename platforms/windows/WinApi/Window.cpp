@@ -152,3 +152,11 @@ void Window::Invalidate()
 {
 	InvalidateRect(HWnd(), nullptr, TRUE);
 }
+
+std::string Window::GetText() const
+{
+	auto length = GetWindowTextLength(hWnd);
+	std::string text(length, '\0');
+	GetWindowText(hWnd, &text[0], length + 1);
+	return text;
+}

@@ -1,8 +1,13 @@
 #pragma once
 #include "../Direct2D/RenderTargetWindow.h"
+#include "../Direct2D/TextFormat.h"
 
 class StatusWindow : public RenderTargetWindow
 {
+protected:
+	static constexpr float FontSize = 10.0f * 96 / 72;
+private:
+	TextFormat textFormat;
 	SolidColorBrush backgroundBrush;
 	SolidColorBrush textBrush;
 	SolidColorBrush highlightBrush;
@@ -10,6 +15,7 @@ class StatusWindow : public RenderTargetWindow
 protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 public:
+	auto TextFormat() const { return textFormat.Ptr(); }
 	auto BackgroundBrush() const { return backgroundBrush.Ptr(); }
 	auto TextBrush() const { return textBrush.Ptr(); }
 	auto HighlightBrush() const { return highlightBrush.Ptr(); }

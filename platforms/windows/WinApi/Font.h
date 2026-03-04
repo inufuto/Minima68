@@ -10,5 +10,6 @@ public:
 	~Font() override { if (hFont) { DeleteObject(hFont); } }
 	HFONT HFont() const { return hFont; }
 	void Create(const LOGFONT& logFont);
+	void Create(int height);
 	void CreateFixed(int size);
 };

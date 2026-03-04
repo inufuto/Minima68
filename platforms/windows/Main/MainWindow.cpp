@@ -70,7 +70,9 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
 	SetText(ProductName);
-	registerWindow.Create(HWnd(), 1);
+	titledPane.Create(HWnd(), 1);
+	titledPane.SetText("Registers");
+	titledPane.Active(true);
 	ApplicationWindow::OnCreate(pCreateStruct);
 	subWindow.Create(HWnd(), 2);
 	SolidColorBrush brush;
@@ -87,7 +89,7 @@ void MainWindow::OnDestroy()
 void MainWindow::OnSize(UINT width, UINT height)
 {
 	auto w = registerWindow.MinWindowWidth();
-	registerWindow.Move(0, 0, w, height);
+	titledPane.Move(0, 0, w, height);
 	subWindow.Move(w, 0, width - w, height);
 }
 

@@ -27,6 +27,6 @@ private:
 public:
 	IDWriteTextLayout* operator->() const { return pTextLayout; }
 	IDWriteTextLayout* Ptr() const { return pTextLayout; }
-	void Create(const TextFormat& textFormat, LPCSTR string, FLOAT maxWidth, FLOAT maxHeight);
+	void Create(IDWriteTextFormat* pTextFormat, LPCSTR string, FLOAT maxWidth, FLOAT maxHeight);
 	void GetMetrics(DWRITE_TEXT_METRICS* pTextMetrics) const { pTextLayout->GetMetrics(pTextMetrics); }
 };

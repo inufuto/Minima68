@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 #include <windows.h>
 
@@ -50,5 +51,6 @@ public:
 	void Destroy() const;
 	void Move(int x, int y, UINT width, UINT height);
 	virtual void Invalidate();
+	std::string GetText() const;
 	void SetText(LPCSTR text) const { ::SetWindowText(hWnd, text); }
 };

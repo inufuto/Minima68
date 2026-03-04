@@ -3,6 +3,7 @@
 void StatusWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
 	RenderTargetWindow::OnCreate(pCreateStruct);
+	textFormat.Create("Consolas", FontSize);
 	backgroundBrush.Create(RenderTarget(), D2D1::ColorF(::GetSysColor(COLOR_WINDOW)));
 	textBrush.Create(RenderTarget(), D2D1::ColorF(::GetSysColor(COLOR_WINDOWTEXT)));
 	highlightBrush.Create(RenderTarget(), D2D1::ColorF(::GetSysColor(COLOR_HIGHLIGHT)));

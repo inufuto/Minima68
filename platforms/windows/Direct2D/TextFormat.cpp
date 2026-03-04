@@ -13,12 +13,12 @@ ComPtr<IDWriteFactory> TextFormat::pFactory;
 IDWriteFactory* TextFormat::Factory()
 {
 	if (pFactory == nullptr) {
-		IDWriteFactory* pFactory;
-		HRESULT result = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pFactory));
+		IDWriteFactory* p;
+		HRESULT result = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&p));
 		if (FAILED(result)) {
 			throw ApiException(result);
 		}
-		TextFormat::pFactory.Attach(pFactory);
+		TextFormat::pFactory.Attach(p);
 	}
 	return pFactory;
 }
@@ -31,9 +31,9 @@ void TextFormat::Create(LPCSTR fontFamilyName, FLOAT fontSize, DWRITE_FONT_WEIGH
 	}
 }
 
-void TextLayout::Create(const TextFormat& textFormat, LPCSTR string, FLOAT maxWidth, FLOAT maxHeight) {
+void TextLayout::Create(IDWriteTextFormat* pTextFormat, LPCSTR string, FLOAT maxWidth, FLOAT maxHeight) {
 	auto wideString = ToWideString(string);
-	HRESULT result = TextFormat::Factory()->CreateTextLayout(wideString.c_str(), static_cast<UINT32>(wideString.size()), textFormat.Ptr(), maxWidth, maxHeight, &pTextLayout);
+	HRESULT result = TextFormat::Factory()->CreateTextLayout(wideString.c_str(), static_cast<UINT32>(wideString.size()), pTextFormat, maxWidth, maxHeight, &pTextLayout);
 	if (FAILED(result)) {
 		throw ApiException(result);
 	}

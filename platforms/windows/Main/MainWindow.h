@@ -2,6 +2,7 @@
 #include "Direct2DBitmap.h"
 #include "Minima85Win.h"
 #include "RegisterWindow.h"
+#include "TitledPane.h"
 #include "../WinApi/ApplicationWindow.h"
 #include "../Direct2D/RenderTargetWindow.h"
 
@@ -25,6 +26,7 @@ class MainWindow : public ApplicationWindow, public MasterClock::Owner
 private:
 	Minima85Win emulator;
 	RegisterWindow registerWindow;
+	TitledPane titledPane{ &registerWindow };
 	SubWindow subWindow;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
