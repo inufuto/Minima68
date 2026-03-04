@@ -63,8 +63,8 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmDestroy(wParam, lParam);
 	case WM_SIZE:
 		return OnWmSize(wParam, lParam);
-	case WM_PAINT:
-		return OnWmPaint(wParam, lParam);
+	case WM_ERASEBKGND:
+		return OnWmEraseBackground(wParam, lParam);
 	case WM_UPDATE_EMULATOR:
 		registerWindow.Invalidate();
 		memoryWindow.Invalidate();
@@ -91,6 +91,7 @@ void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	SolidColorBrush brush;
 	brush.Create(subWindow.RenderTarget(), D2D1::ColorF(D2D1::ColorF::Red));
 	emulator.Start();
+	SetFocus(memoryWindow.HWnd());
 }
 
 void MainWindow::OnDestroy()
@@ -101,18 +102,28 @@ void MainWindow::OnDestroy()
 
 void MainWindow::OnSize(UINT width, UINT height)
 {
+	auto cxBorder = GetSystemMetrics(SM_CXBORDER);
 	auto x = 0;
 	{
 		auto paneWidth = registerWindow.MinWindowWidth();
 		registerPane.Move(x, 0, paneWidth, height);
 		x += paneWidth;
 	}
+	x += cxBorder;
 	{
 		auto paneWidth = memoryWindow.MinWindowWidth();
 		memoryPane.Move(x, 0, paneWidth, height);
 		x += paneWidth;
 	}
+	x += cxBorder;
 	subWindow.Move(x, 0, width - x, height);
+}
+
+void MainWindow::OnEraseBackground(DeviceContext& dc)
+{
+	RECT rect;
+	GetClientRect(&rect);
+	dc.FillRect(&rect, GetSysColorBrush(COLOR_ACTIVEBORDER));
 }
 
 void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
@@ -121,9 +132,4 @@ void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 	case ID_FILE_EXIT:
 		SendMessage(HWnd(), WM_CLOSE, 0, 0);
 	}
-}
-
-void MainWindow::OnPaint(DeviceContext& dc)
-{
-	dc.TextOut(0, 0, "Hello, World!", 13);
 }

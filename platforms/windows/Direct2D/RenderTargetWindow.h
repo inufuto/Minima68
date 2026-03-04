@@ -17,6 +17,7 @@ protected:
 	}
 	float GetDpiScale() const;
 	UINT DipToPixel(float dip) const;
+	float PixelToDip(int pixel) const;
 public:
 	HwndRenderTarget& RenderTarget() { return renderTarget; }
 };

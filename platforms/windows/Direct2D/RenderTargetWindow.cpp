@@ -46,3 +46,8 @@ UINT RenderTargetWindow::DipToPixel(float dip) const
 {
 	return static_cast<UINT>(dip * GetDpiScale());
 }
+
+float RenderTargetWindow::PixelToDip(int pixel) const
+{
+	return static_cast<float>(pixel) / GetDpiScale();
+}

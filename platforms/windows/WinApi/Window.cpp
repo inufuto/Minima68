@@ -1,5 +1,6 @@
 #include "Window.h"
 
+#include <windowsx.h>
 #include "ApiException.h"
 
 extern HINSTANCE HInstance;
@@ -72,6 +73,42 @@ LRESULT Window::OnWmEraseBackground(WPARAM wParam, LPARAM lParam)
 {
 	OnEraseBackground(DeviceContext(reinterpret_cast<HDC>(wParam)));
 	return 1;
+}
+
+LRESULT Window::OnWmKeyDown(WPARAM wParam, LPARAM lParam)
+{
+	OnKeyDown(static_cast<UINT>(wParam), static_cast<UINT>(lParam));
+	return 0;
+}
+
+LRESULT Window::OnWmLButtonDown(WPARAM wParam, LPARAM lParam)
+{
+	OnLButtonDown(static_cast<UINT>(wParam), { (GET_X_LPARAM(lParam)), (GET_Y_LPARAM(lParam)) });
+	return 0;
+}
+
+LRESULT Window::OnWmMouseMove(WPARAM wParam, LPARAM lParam)
+{
+	OnMouseMove(static_cast<UINT>(wParam), { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+	return 0;
+}
+
+LRESULT Window::OnWmLButtonUp(WPARAM wParam, LPARAM lParam)
+{
+	OnLButtonUp(static_cast<UINT>(wParam), { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+	return 0;
+}
+
+LRESULT Window::OnWmMouseWheel(WPARAM wParam, LPARAM lParam)
+{
+	OnMouseWheel(static_cast<UINT>(wParam), static_cast<short>(HIWORD(wParam)), { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+	return 0;
+}
+
+LRESULT Window::OnWmVScroll(WPARAM wParam, LPARAM lParam)
+{
+	OnVScroll(LOWORD(wParam), HIWORD(wParam), reinterpret_cast<HWND>(lParam));
+	return 0;
 }
 
 Window::~Window() {

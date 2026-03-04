@@ -32,7 +32,7 @@ void TitledPane::OnSize(UINT width, UINT height)
 void TitledPane::OnEraseBackground(DeviceContext& dc)
 {
 	RECT rect;
-	GetClientRect(HWnd(), &rect);
+	GetClientRect(&rect);
 	HBRUSH hBrush = active ? GetSysColorBrush(COLOR_ACTIVECAPTION) : GetSysColorBrush(COLOR_INACTIVECAPTION);
 	FillRect(dc.Hdc(), &rect, hBrush);
 }
@@ -41,7 +41,7 @@ void TitledPane::OnPaint(DeviceContext& dc)
 {
 	auto text = GetText();
 	RECT rect;
-	GetClientRect(HWnd(), &rect);
+	GetClientRect(&rect);
 	rect.bottom = rect.top + titleHeight;
 	auto oldColor = dc.SetTextColor(GetSysColor(active ? COLOR_CAPTIONTEXT : COLOR_INACTIVECAPTIONTEXT));
 	auto oldBkMode = dc.SetBackgroundMode(TRANSPARENT);

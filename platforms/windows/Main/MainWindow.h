@@ -38,8 +38,8 @@ protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	void OnDestroy() override;
 	void OnSize(UINT width, UINT height) override;
+	void OnEraseBackground(DeviceContext& dc) override;
 	void OnCommand(UINT id, UINT notificationCode, HWND hWnd) override;
-	void OnPaint(DeviceContext& dc) override;
 public:
 	MainWindow();
 	void Invalidate() override;

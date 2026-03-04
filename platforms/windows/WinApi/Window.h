@@ -42,6 +42,18 @@ protected:
 	virtual void OnPaint(DeviceContext& dc) {}
 	LRESULT OnWmEraseBackground(WPARAM wParam, LPARAM lParam);
 	virtual void OnEraseBackground(DeviceContext& dc) {}
+	LRESULT OnWmKeyDown(WPARAM wParam, LPARAM lParam);
+	virtual void OnKeyDown(UINT virtualKey, UINT flags) {}
+	LRESULT OnWmLButtonDown(WPARAM wParam, LPARAM lParam);
+	virtual void OnLButtonDown(UINT flags, POINT point) {}
+	LRESULT OnWmMouseMove(WPARAM wParam, LPARAM lParam);
+	virtual void OnMouseMove(UINT flags, POINT point) {}
+	LRESULT OnWmLButtonUp(WPARAM wParam, LPARAM lParam);
+	virtual void OnLButtonUp(UINT flags, POINT point) {}
+	LRESULT OnWmMouseWheel(WPARAM wParam, LPARAM lParam);
+	virtual void OnMouseWheel(UINT flags, short delta, POINT point) {}
+	LRESULT OnWmVScroll(WPARAM wParam, LPARAM lParam);
+	virtual void OnVScroll(UINT scrollCode, UINT thumbPos, HWND hScrollBar) {}
 public:
 	Window() { pointers.push_back(this); }
 	~Window() override;
@@ -53,4 +65,5 @@ public:
 	virtual void Invalidate();
 	std::string GetText() const;
 	void SetText(LPCSTR text) const { ::SetWindowText(hWnd, text); }
+	void GetClientRect(RECT* pRect) const { ::GetClientRect(hWnd, pRect); }
 };

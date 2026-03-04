@@ -28,4 +28,5 @@ public:
 	{
 		::DrawText(hDC, string, -1, const_cast<RECT*>(&rect), format);
 	}
+	void FillRect(const RECT* pRect, HBRUSH hBrush) const { ::FillRect(hDC, pRect, hBrush); }
 };
