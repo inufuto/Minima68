@@ -15,7 +15,7 @@ void Minima85Win::WritePort(uint16_t address, uint8_t value)
 	}
 }
 
-void Minima85Win::Start(HWND hWnd)
+void Minima85Win::Start()
 {
 	masterClock.AddDestination(&Cpu());
 #ifdef _DEBUG
@@ -23,7 +23,7 @@ void Minima85Win::Start(HWND hWnd)
 	LoadProgramFromFile(0x100,"D:\\8bit\\Minima85\\8080EXM.COM");
 #endif
 	Cpu().Reset();
-	masterClock.Start(hWnd);
+	masterClock.Start();
 }
 
 #ifdef _DEBUG

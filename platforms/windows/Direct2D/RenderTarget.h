@@ -25,8 +25,10 @@ public:
 	ID2D1RenderTarget* Ptr() const { return pRenderTarget; }
 	ID2D1RenderTarget* operator->() const { return pRenderTarget; }
 
-	void DrawText(std::string string, TextFormat& textFormat,const D2D1_RECT_F& rect, Direct2DBrush& brush);
-	void DrawBitmap(Direct2DBitmap& bitmap, D2D1_RECT_F& rect, float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode);
+	D2D1_SIZE_F GetSize() const { return pRenderTarget->GetSize(); }
+	void FillRectangle(const D2D1_RECT_F& rect, ID2D1Brush* pBrush) const { pRenderTarget->FillRectangle(rect, pBrush); }
+	void DrawText(LPCTSTR string, IDWriteTextFormat* pTextFormat, const D2D1_RECT_F& rect, ID2D1Brush* pBrush) const;
+	void DrawBitmap(const Direct2DBitmap& bitmap, const D2D1_RECT_F& rect, float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode) const;
 };
 
 class HwndRenderTarget : public RenderTarget

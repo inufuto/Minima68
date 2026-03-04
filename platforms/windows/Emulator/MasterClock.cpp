@@ -7,7 +7,8 @@ unsigned MasterClock::ThreadProc(void* pThis)
 	return 0;
 }
 
-MasterClock::MasterClock(double targetFrequency) :targetFrequency(targetFrequency), running(false), hThread(nullptr), time(0)
+MasterClock::MasterClock(Owner* pOwner, double targetFrequency) :
+	pOwner(pOwner), targetFrequency(targetFrequency), running(false), hThread(nullptr), time(0)
 {
 	QueryPerformanceFrequency(&timerFrequency);
 }
@@ -28,9 +29,8 @@ void MasterClock::Stop()
 	}
 }
 
-void MasterClock::Start(HWND hWnd)
+void MasterClock::Start()
 {
-	this->hWnd = hWnd;
 	QueryPerformanceCounter(&last);
 	running = true;
 	time = 0;
@@ -52,7 +52,7 @@ void MasterClock::Loop()
 			OnClock(time);
 			++time;
 		}
-		InvalidateRect(hWnd, nullptr, TRUE);
+		pOwner->Invalidate();
 		Sleep(0);
 	}
 }

@@ -5,7 +5,7 @@
 class Minima85 : AbstractEmulator
 {
 public:
-	static constexpr double MasterClockFrequency = 10000000;
+	static constexpr double MasterClockFrequency = 8'000'000;
 private:
 	Cpu8085 cpu;
 private:

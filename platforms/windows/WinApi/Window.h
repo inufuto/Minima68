@@ -49,6 +49,6 @@ public:
 	void Create(HWND hParent, UINT id);
 	void Destroy() const;
 	void Move(int x, int y, UINT width, UINT height);
-	void Invalidate();
+	virtual void Invalidate();
 	void SetText(LPCSTR text) const { ::SetWindowText(hWnd, text); }
 };

@@ -14,8 +14,8 @@ protected:
 	uint8_t ReadPort(uint16_t address) override { return 0; }
 	void WritePort(uint16_t address, uint8_t value) override;
 public:
-	Minima85Win() : masterClock(MasterClockFrequency) {}
-	void Start(HWND hWnd);
+	explicit Minima85Win(MasterClock::Owner* pOwner) : masterClock(pOwner, MasterClockFrequency) {}
+	void Start();
 	static void LoadProgramFromFile(uint16_t address, const char* path);
 	void Stop() { masterClock.Stop(); }
 #ifdef _DEBUG

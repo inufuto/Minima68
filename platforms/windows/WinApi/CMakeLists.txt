@@ -2,12 +2,12 @@
 set(WINAPI_SOURCES
     Window.cpp
     ApiException.cpp
- ApplicationWindow.cpp "Registry.cpp" "DeviceContext.cpp" )
+ ApplicationWindow.cpp "Registry.cpp" "DeviceContext.cpp"  "Font.cpp")
 
 set(WINAPI_HEADERS
     Window.h
     ApiException.h
- ApplicationWindow.h "Registry.h" "ComPtr.h" "DeviceContext.h" )
+ ApplicationWindow.h "Registry.h" "ComPtr.h" "DeviceContext.h"  "Font.h")
 
 add_library(WinApi STATIC ${WINAPI_SOURCES} ${WINAPI_HEADERS})
 

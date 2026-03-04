@@ -30,3 +30,11 @@ void TextFormat::Create(LPCSTR fontFamilyName, FLOAT fontSize, DWRITE_FONT_WEIGH
 		throw ApiException(result);
 	}
 }
+
+void TextLayout::Create(const TextFormat& textFormat, LPCSTR string, FLOAT maxWidth, FLOAT maxHeight) {
+	auto wideString = ToWideString(string);
+	HRESULT result = TextFormat::Factory()->CreateTextLayout(wideString.c_str(), static_cast<UINT32>(wideString.size()), textFormat.Ptr(), maxWidth, maxHeight, &pTextLayout);
+	if (FAILED(result)) {
+		throw ApiException(result);
+	}
+}

@@ -29,11 +29,11 @@ void SubWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	bitmap.CreatePng(RenderTarget(), ID_ADD);
 }
 
-void SubWindow::OnRender(class ::RenderTarget& renderTarget)
+void SubWindow::OnRender(::RenderTarget& renderTarget)
 {
 	RenderTargetWindow::OnRender(renderTarget);
 	auto s = std::to_string(emulator.Cpu().ProgramCounter());
-	renderTarget.DrawText(s, textFormat, D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush);
+	renderTarget.DrawText(s.c_str(), textFormat.Ptr(), D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush.Ptr());
 	auto rect = D2D1::RectF(100.0f, 0.0f, 200.0f, 100.0f);
 	renderTarget.DrawBitmap(bitmap, rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 }
@@ -42,8 +42,15 @@ void SubWindow::OnRender(class ::RenderTarget& renderTarget)
 MainWindow::MainWindow() :
 	ApplicationWindow(::LoadMenu(HInstance, MAKEINTRESOURCE(IDR_MAIN)),
 		LoadAccelerators(HInstance, MAKEINTRESOURCE(IDR_MAIN))),
-	subWindow(emulator)
-{}
+	emulator(this),	registerWindow(&emulator.Cpu()), subWindow(emulator)
+{
+}
+
+void MainWindow::Invalidate()
+{
+	registerWindow.Invalidate();
+	subWindow.Invalidate();
+}
 
 LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -63,11 +70,12 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 void MainWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
 	SetText(ProductName);
+	registerWindow.Create(HWnd(), 1);
 	ApplicationWindow::OnCreate(pCreateStruct);
-	subWindow.Create(HWnd(), 1);
+	subWindow.Create(HWnd(), 2);
 	SolidColorBrush brush;
 	brush.Create(subWindow.RenderTarget(), D2D1::ColorF(D2D1::ColorF::Red));
-	emulator.Start(subWindow.HWnd());
+	emulator.Start();
 }
 
 void MainWindow::OnDestroy()
@@ -78,8 +86,9 @@ void MainWindow::OnDestroy()
 
 void MainWindow::OnSize(UINT width, UINT height)
 {
-	ApplicationWindow::OnSize(width, height);
-	subWindow.Move(0, 20, width, height - 20);
+	auto w = registerWindow.MinWindowWidth();
+	registerWindow.Move(0, 0, w, height);
+	subWindow.Move(w, 0, width - w, height);
 }
 
 void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)

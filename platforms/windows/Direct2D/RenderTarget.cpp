@@ -15,18 +15,19 @@ ID2D1Factory* RenderTarget::Factory()
 	return pFactory;
 }
 
-void RenderTarget::DrawText(std::string string, TextFormat& textFormat, const D2D1_RECT_F& rect, Direct2DBrush& brush) {
+void RenderTarget::DrawText(const LPCTSTR string, IDWriteTextFormat* pTextFormat, const D2D1_RECT_F& rect, ID2D1Brush* pBrush) const
+{
 	auto wideString = ToWideString(string);
 	pRenderTarget->DrawTextA(
 		wideString.c_str(),
 		static_cast<UINT32>(wideString.size()),
-		textFormat.Ptr(),
-		rect,
-		brush.Ptr()
+		pTextFormat,
+		&rect,
+		pBrush
 	);
 }
 
-void RenderTarget::DrawBitmap(Direct2DBitmap& bitmap, D2D1_RECT_F& rect, float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode)
+void RenderTarget::DrawBitmap(const Direct2DBitmap& bitmap, const D2D1_RECT_F& rect, const float opacity, const D2D1_BITMAP_INTERPOLATION_MODE interpolationMode) const
 {
 	pRenderTarget->DrawBitmap(
 		bitmap.Ptr(),

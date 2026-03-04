@@ -725,7 +725,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 		/* 90 SUB B */
 		cpu.SubtractByte(cpu.af.high, cpu.bc.high);
 	}},
-		{4,"SUB\tC",[](Cpu8085& cpu)
+	{4,"SUB\tC",[](Cpu8085& cpu)
 	{
 		/* 91 SUB C */
 		cpu.SubtractByte(cpu.af.high, cpu.bc.low);
@@ -1038,7 +1038,7 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 			return (flags & Flag::Zero) != 0;
 		});
 	}},
-		{12,"CALL\tw",[](Cpu8085& cpu)
+	{12,"CALL\tw",[](Cpu8085& cpu)
 	{
 		/* cd CALL nn */
 		cpu.Call();
@@ -1335,7 +1335,34 @@ const Cpu8085::Instruction Cpu8085::Instructions[] = {
 	} },
 };
 const Cpu8085::RegisterView Cpu8085::RegisterViews[] = {
-	{"PC",2,[](const Cpu8085& cpu) { return cpu.pc; },[](Cpu8085& cpu, uint16_t value) {cpu.pc = value; }},
+	{"PC",2,
+		[](const Cpu8085& cpu) { return cpu.pc; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.pc = value; }
+	},
+	{"SP",2,
+		[](const Cpu8085& cpu) { return cpu.sp; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.sp = value; }
+	},
+	{"A",1,
+		[](const Cpu8085& cpu) { return cpu.af.high; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.af.high = static_cast<uint8_t>(value); }
+	},
+	{"BC",2,
+		[](const Cpu8085& cpu) { return cpu.bc.word; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.bc.word = value; }
+	},
+	{"DE",2,
+		[](const Cpu8085& cpu) { return cpu.de.word; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.de.word = value; }
+	},
+	{"HL",2,
+		[](const Cpu8085& cpu) { return cpu.hl.word; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.hl.word = value; }
+	},
+	{"F",1,
+		[](const Cpu8085& cpu) { return cpu.af.low; },
+		[](Cpu8085& cpu, const uint16_t value) {cpu.af.low = static_cast<uint8_t>(value); }
+	},
 };
 
 uint16_t Cpu8085::FetchWord()
@@ -1358,6 +1385,19 @@ uint16_t Cpu8085::PopWord()
 	auto low = pMemorySpace->Read(sp++);
 	auto high = pMemorySpace->Read(sp++);
 	return MakeWord(high, low);
+}
+
+void Cpu8085::FetchInstruction()
+{
+	if (halted) {
+		clockCountToExecute = 1;
+		return;
+	}
+	currentInstructionPc = pc;
+	uint8_t opcode = FetchByte();
+	pNextInstruction = &Instructions[opcode];
+	assert(pNextInstruction->clockCount != 0);
+	clockCountToExecute = pNextInstruction->clockCount;
 }
 
 void Cpu8085::UpdateZeroSignParity(const uint8_t value)
@@ -1907,12 +1947,12 @@ void Cpu8085::Input(uint8_t& byteRegister)
 	byteRegister = pIoSpace->Read(address);
 }
 
+
 void Cpu8085::Output(const uint8_t byteRegister)
 {
 	auto address = FetchByte();
 	pIoSpace->Write(address, byteRegister);
 }
-
 
 void Cpu8085::Reset()
 {
@@ -1974,17 +2014,4 @@ void Cpu8085::WriteRegister(int index, uint16_t value)
 {
 	assert(index >= 0 && index < GetRegisterCount());
 	RegisterViews[index].write(*this, value);
-}
-
-void Cpu8085::FetchInstruction()
-{
-	if (halted) {
-		clockCountToExecute = 1;
-		return;
-	}
-	currentInstructionPc = pc;
-	uint8_t opcode = FetchByte();
-	pNextInstruction = &Instructions[opcode];
-	assert(pNextInstruction->clockCount != 0);
-	clockCountToExecute = pNextInstruction->clockCount;
 }
