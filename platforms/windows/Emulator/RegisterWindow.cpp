@@ -6,7 +6,7 @@
 
 void RegisterWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 {
-	ListWindow::OnCreate(pCreateStruct);
+	StatusWindow::OnCreate(pCreateStruct);
 
 	auto charSize = CharSize();
 	auto charWidth = charSize.width;
@@ -29,33 +29,40 @@ void RegisterWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 	minWindowHeight = DipToPixel(lineHeight * count);
 }
 
-void RegisterWindow::DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, const int index, bool selected)
+void RegisterWindow::OnRender(::RenderTarget& renderTarget)
 {
-	ID2D1Brush* pBackgroundBrush;
-	ID2D1Brush* pBrush;
-	if (selected && GetFocus() == HWnd()) {
-		pBackgroundBrush = HighlightBrush();
-		pBrush = HighlightTextBrush();
+	StatusWindow::OnRender(renderTarget);
+
+	auto count = pRegisterHolder->GetRegisterCount();
+	D2D1_RECT_F rect;
+	rect.top = 0.0f;
+	rect.left = 0.0f;
+	auto size = renderTarget.GetSize();
+	rect.right = size.width;
+
+	for (int i = 0; i < count; ++i) {
+		rect.bottom = rect.top + lineHeight;
+
+		ID2D1Brush* pBackgroundBrush = BackgroundBrush();
+		ID2D1Brush* pBrush = TextBrush();
+
+		renderTarget.FillRectangle(rect, pBackgroundBrush);
+
+		D2D1_RECT_F nameRect = rect;
+		nameRect.left += marginX;
+		nameRect.right = nameRect.left + maxNameWidth;
+
+		renderTarget.DrawText(pRegisterHolder->GetRegisterName(i), TextFormat(), nameRect, pBrush);
+
+		D2D1_RECT_F valueRect = rect;
+		valueRect.left = nameRect.right;
+		valueRect.right = valueRect.left + maxValueWidth;
+
+		char value[32];
+		sprintf_s(value, sizeof(value), "%0*X", pRegisterHolder->GetRegisterSize(i) * 2, pRegisterHolder->ReadRegister(i));
+
+		renderTarget.DrawText(value, TextFormat(), valueRect, pBrush);
+
+		rect.top = rect.bottom;
 	}
-	else {
-		pBackgroundBrush = BackgroundBrush();
-		pBrush = TextBrush();
-	}
-
-	renderTarget.FillRectangle(rect, pBackgroundBrush);
-
-	D2D1_RECT_F nameRect = rect;
-	nameRect.left += marginX;
-	nameRect.right = nameRect.left + maxNameWidth;
-
-	renderTarget.DrawText(pRegisterHolder->GetRegisterName(index), TextFormat(), nameRect, pBrush);
-
-	D2D1_RECT_F valueRect = rect;
-	valueRect.left = nameRect.right;
-	valueRect.right = valueRect.left + maxValueWidth;
-
-	char value[32];
-	sprintf_s(value, sizeof(value), "%0*X", pRegisterHolder->GetRegisterSize(index) * 2, pRegisterHolder->ReadRegister(index));
-
-	renderTarget.DrawText(value, TextFormat(), valueRect, pBrush);
 }

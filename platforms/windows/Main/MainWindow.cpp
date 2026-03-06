@@ -32,8 +32,6 @@ void SubWindow::OnCreate(CREATESTRUCT* pCreateStruct)
 void SubWindow::OnRender(::RenderTarget& renderTarget)
 {
 	RenderTargetWindow::OnRender(renderTarget);
-	auto s = std::to_string(emulator.Cpu().ProgramCounter());
-	renderTarget.DrawText(s.c_str(), textFormat.Ptr(), D2D1::RectF(0.0f, 0.0f, 200.0f, 100.0f), brush.Ptr());
 	auto rect = D2D1::RectF(100.0f, 0.0f, 200.0f, 100.0f);
 	renderTarget.DrawBitmap(bitmap, rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 }
@@ -68,11 +66,9 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmEraseBackground(wParam, lParam);
 	case WM_UPDATE_EMULATOR:
 		registerWindow.Invalidate();
-		//assemblyWindow.UpdateList();
+		assemblyWindow.UpdateList();
 		memoryWindow.Invalidate();
 		subWindow.Invalidate();
-		//Invalidate();
-		//RedrawWindow(HWnd(), nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
 		UpdateWindow(HWnd());
 		waitingForUpdate = false;
 		return 0;

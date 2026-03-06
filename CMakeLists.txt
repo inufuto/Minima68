@@ -16,11 +16,11 @@ if(BUILD_FOR_PICO)
     # ====================================================================================
 
     include(platforms/pico/pico_sdk_import.cmake)
-    project(Minima85 C CXX ASM)
+    project(Minima68 C CXX ASM)
     set(MAIN_PROJECT_NAME ${PROJECT_NAME})
     pico_sdk_init()
 else()
-    project(Minima85 C CXX)
+    project(Minima68 C CXX)
     set(MAIN_PROJECT_NAME ${PROJECT_NAME})
 endif()
 

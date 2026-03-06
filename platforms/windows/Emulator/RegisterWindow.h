@@ -1,10 +1,10 @@
 #pragma once
-#include "ListWindow.h"
+#include "StatusWindow.h"
 #include "../../../core/AbtractEmulator.h"
 
 class RegisterHolder;
 
-class RegisterWindow : public ListWindow
+class RegisterWindow : public StatusWindow
 {
 private:
 	RegisterHolder* pRegisterHolder;
@@ -15,9 +15,7 @@ private:
 	int minWindowHeight;
 protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
-	int ItemCount() override { return pRegisterHolder->GetRegisterCount(); }
-	float ItemHeight() override { return lineHeight; }
-	void DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, int index, bool selected) override;
+	void OnRender(class ::RenderTarget& renderTarget) override;
 public:
 	explicit RegisterWindow(RegisterHolder* pRegisterHolder)
 		: pRegisterHolder(pRegisterHolder) {

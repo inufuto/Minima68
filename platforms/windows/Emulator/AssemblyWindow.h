@@ -7,6 +7,7 @@ class AssemblyWindow : public StatusWindow
 private:
 	const Cpu* pCpu;
 	const MemorySpace* pMemorySpace;
+	int maxBytesPerLine;
 	float lineHeight;
 	float addressWidth;
 	float valueWidth;
@@ -24,7 +25,7 @@ protected:
 private:
 	void BuildElements();
 public:
-	AssemblyWindow(const Cpu* pCpu, const MemorySpace* pMemorySpace) : pCpu(pCpu), pMemorySpace(pMemorySpace) {}
+	AssemblyWindow(const Cpu* pCpu, const MemorySpace* pMemorySpace, int maxBytesPerLine = 3) : pCpu(pCpu), pMemorySpace(pMemorySpace), maxBytesPerLine(maxBytesPerLine) {}
 	auto MinWindowWidth() const { return minWindowWidth; }
 	void UpdateList();
 };

@@ -2,11 +2,11 @@
 set(CORE_SOURCES
 	ClockSource.cpp
 
-	Cpu8085.cpp "Minima85.cpp" "AbtractEmulator.cpp")
+	 "Minima68.cpp" "AbtractEmulator.cpp" "Cpu6800.cpp")
 
 set(CORE_HEADERS
 	ClockSource.h
-   "MemorySpace.h" "Uncopyable.h" "Cpu8085.h" Minima85.h "AbtractEmulator.h")
+   "MemorySpace.h" "Uncopyable.h"  Minima68.h "AbtractEmulator.h" "Cpu6800.h")
 
 add_library(core STATIC ${CORE_SOURCES} ${CORE_HEADERS}
 )
