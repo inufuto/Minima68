@@ -183,30 +183,40 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	} },
 	{2 /* or 4 */,"BGE\tr",[](Cpu6800& cpu)
 	{
-		// 2c BGE
+		// 2c BGE (N XOR V = 0)
 		cpu.BranchIf([](const uint8_t cc) {
-			return (cc & Condition::Negative) == 0 || (cc & Condition::Overflow) == 0;
+			bool n = (cc & Condition::Negative) != 0;
+			bool v = (cc & Condition::Overflow) != 0;
+			return n == v;
 		});
 	}},
 	{2 /* or 4 */,"BLT\tr",[](Cpu6800& cpu)
 	{
-		// 2d BLT
+		// 2d BLT (N XOR V = 1)
 		cpu.BranchIf([](const uint8_t cc) {
-			return (cc & Condition::Negative) != 0 && (cc & Condition::Overflow) != 0;
+			bool n = (cc & Condition::Negative) != 0;
+			bool v = (cc & Condition::Overflow) != 0;
+			return n != v;
 		});
 	}},
 	{2 /* or 4 */,"BGT\tr",[](Cpu6800& cpu)
 	{
-		// 2e BGT
+		// 2e BGT (Z + (N XOR V) = 0)
 		cpu.BranchIf([](const uint8_t cc) {
-			return (cc & Condition::Zero) == 0 && ((cc & Condition::Negative) == 0 || (cc & Condition::Overflow) == 0);
+			bool z = (cc & Condition::Zero) != 0;
+			bool n = (cc & Condition::Negative) != 0;
+			bool v = (cc & Condition::Overflow) != 0;
+			return !z && (n == v);
 		});
 	}},
 	{2 /* or 4 */,"BLE\tr",[](Cpu6800& cpu)
 	{
-		// 2f BLE
+		// 2f BLE (Z + (N XOR V) = 1)
 		cpu.BranchIf([](const uint8_t cc) {
-			return (cc & Condition::Zero) != 0 || ((cc & Condition::Negative) != 0 && (cc & Condition::Overflow) != 0);
+			bool z = (cc & Condition::Zero) != 0;
+			bool n = (cc & Condition::Negative) != 0;
+			bool v = (cc & Condition::Overflow) != 0;
+			return z || (n != v);
 		});
 	} },
 	{4,"TSX",[](Cpu6800& cpu)
@@ -1220,7 +1230,12 @@ uint8_t Cpu6800::Subtract(const uint8_t left, const uint8_t right)
 uint8_t Cpu6800::SubtractWithCarry(uint8_t left, uint8_t right)
 {
 	auto carry = (cc & Condition::Carry) != 0 ? 1 : 0;
-	return Subtract(left, right - carry);
+	auto result = static_cast<uint8_t>(left - right - carry);
+	UpdateFlag(Condition::Carry, (static_cast<uint16_t>(right) + carry) > left);
+	UpdateFlag(Condition::Overflow, (left ^ right) & (left ^ result) & 0x80);
+	UpdateZeroFlagForByte(result);
+	UpdateNegativeFlagForByte(result);
+	return result;
 }
 
 uint8_t Cpu6800::Add(const uint8_t left, const uint8_t right)
@@ -1237,7 +1252,13 @@ uint8_t Cpu6800::Add(const uint8_t left, const uint8_t right)
 uint8_t Cpu6800::AddWithCarry(uint8_t left, uint8_t right)
 {
 	auto carry = (cc & Condition::Carry) != 0 ? 1 : 0;
-	return Add(left, right + carry);
+	auto result = static_cast<uint16_t>(left) + right + carry;
+	UpdateFlag(Condition::Carry, result > 0xff);
+	UpdateFlag(Condition::Overflow, ((left ^ right) & 0x80) == 0 && ((left ^ result) & 0x80) != 0);
+	UpdateZeroFlagForByte(result);
+	UpdateNegativeFlagForByte(result);
+	UpdateFlag(Condition::HalfCarry, ((left & 0x0f) + (right & 0x0f) + carry) > 0x0f);
+	return result;
 }
 
 uint8_t Cpu6800::And(const uint8_t left, const uint8_t right)
@@ -1282,7 +1303,7 @@ uint8_t Cpu6800::Increment(const uint8_t value)
 uint8_t Cpu6800::Negate(const uint8_t value)
 {
 	auto result = static_cast<uint8_t>(-value);
-	UpdateFlag(Condition::Carry, result == 0);
+	UpdateFlag(Condition::Carry, result != 0);
 	UpdateFlag(Condition::Overflow, value == 0x80);
 	UpdateZeroFlagForByte(result);
 	UpdateNegativeFlagForByte(result);
@@ -1319,7 +1340,7 @@ uint8_t Cpu6800::ShiftRightLogical(const uint8_t value)
 {
 	auto lowBit = value & 1;
 	auto result = static_cast<uint8_t>(value >> 1);
-	UpdateFlag(Condition::Carry | Condition::Overflow, lowBit != 0);
+	UpdateFlag(Condition::Carry, lowBit != 0);
 	UpdateOverflowFlagAfterShift();
 	UpdateZeroFlagForByte(result);
 	ClearFlag(Condition::Negative);
@@ -1416,24 +1437,28 @@ void Cpu6800::BranchToSubroutine()
 
 void Cpu6800::ReturnFromSubroutine()
 {
-	uint8_t low = Pull();
 	uint8_t high = Pull();
+	uint8_t low = Pull();
 	pc = MakeWord(high, low);
 }
 
 void Cpu6800::ReturnFromInterrupt()
 {
-	uint8_t flags = Pull();
-	cc = flags & 0b110111; // H flag is always cleared
-	uint8_t low = Pull();
-	uint8_t high = Pull();
-	pc = MakeWord(high, low);
+	cc = Pull() & 0b110111; // H flag is always cleared
+	b = Pull();
+	a = Pull();
+	uint8_t xh = Pull();
+	uint8_t xl = Pull();
+	x = MakeWord(xh, xl);
+	uint8_t pch = Pull();
+	uint8_t pcl = Pull();
+	pc = MakeWord(pch, pcl);
 }
 
 void Cpu6800::JumpToSubroutine(const uint16_t address)
 {
-	Push(LowByte(pc));
 	Push(HighByte(pc));
+	Push(LowByte(pc));
 	pc = address;
 }
 
@@ -1448,10 +1473,10 @@ void Cpu6800::Push(uint8_t value)
 }
 
 void Cpu6800::PushAll() {
-	Push(LowByte(pc));
 	Push(HighByte(pc));
-	Push(LowByte(x));
+	Push(LowByte(pc));
 	Push(HighByte(x));
+	Push(LowByte(x));
 	Push(a);
 	Push(b);
 	Push(cc | 0b11000000);
