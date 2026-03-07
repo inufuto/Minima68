@@ -33,6 +33,7 @@ void MasterClock::Start()
 {
 	QueryPerformanceCounter(&last);
 	running = true;
+	paused = false;
 	time = 0;
 	hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadProc, this, 0, nullptr));
 	if (hThread == nullptr) {
@@ -47,12 +48,14 @@ void MasterClock::Loop()
 		QueryPerformanceCounter(&now);
 		auto elapsed = static_cast<double>(now.QuadPart - last.QuadPart) / static_cast<double>(timerFrequency.QuadPart);
 		last = now;
-		auto cyclesToRun = static_cast<uint32_t>(targetFrequency * elapsed);
-		for (uint32_t i = 0; i < cyclesToRun; i++) {
-			OnClock(time);
-			++time;
+		if (!paused) {
+			auto cyclesToRun = static_cast<uint32_t>(targetFrequency * elapsed);
+			for (uint32_t i = 0; i < cyclesToRun; i++) {
+				OnClock(time);
+				++time;
+			}
 		}
-		pOwner->Invalidate();
+		pOwner->UpdateView();
 		Sleep(0);
 	}
 }

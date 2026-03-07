@@ -100,8 +100,10 @@ private:
 	void StoreWordExtended(uint16_t value);
 
 	void FetchInstruction();
+	void ExecuteInstruction();
 public:
-	explicit Cpu6800(MemorySpace* pMemorySpace);
+	Cpu6800(class ::Debugger* pDebugger, MemorySpace* pMemorySpace);
+
 	uint16_t LastInstructionAddress() const override { return currentInstructionPc; }
 	void Reset() override;
 	void OnClock(uint32_t time) override;

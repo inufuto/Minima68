@@ -1,6 +1,8 @@
 #include "MemoryWindow.h"
 
 #include <algorithm>
+
+#include "EmulatorWindow.h"
 #undef min
 #undef max
 
@@ -35,6 +37,10 @@ LRESULT MemoryWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmMouseWheel(wParam, lParam);
 	case WM_VSCROLL:
 		return OnWmVScroll(wParam, lParam);
+	case WM_SETFOCUS:
+		return OnWmSetFocus(wParam, lParam);
+	case WM_KILLFOCUS:
+		return OnWmKillFocus(wParam, lParam);
 	}
 	return StatusWindow::OnMessage(message, wParam, lParam);
 }
@@ -193,7 +199,9 @@ uint32_t MemoryWindow::AddressFromPoint(POINT point) const
 
 void MemoryWindow::OnLButtonDown(UINT flags, POINT point)
 {
-	SetFocus(HWnd());
+	if (GetFocus() != HWnd()) {
+		SetFocus();
+	}
 	isDragging = true;
 	SetCapture(HWnd());
 	selectedAddress = AddressFromPoint(point);
@@ -267,4 +275,10 @@ void MemoryWindow::OnVScroll(UINT scrollCode, UINT thumbPos, HWND hScrollBar)
 		UpdateScrollBar();
 		Invalidate();
 	}
+}
+
+void MemoryWindow::OnSetFocus(HWND hOldWnd)
+{
+	SendMessage(GetParent(), WM_SELECT_PANE, 0, reinterpret_cast<LPARAM>(HWnd()));
+	Invalidate();
 }

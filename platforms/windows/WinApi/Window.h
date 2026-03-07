@@ -42,6 +42,10 @@ protected:
 	virtual void OnPaint(DeviceContext& dc) {}
 	LRESULT OnWmEraseBackground(WPARAM wParam, LPARAM lParam);
 	virtual void OnEraseBackground(DeviceContext& dc) {}
+	LRESULT OnWmSetFocus(WPARAM wParam, LPARAM lParam);
+	virtual void OnSetFocus(HWND hOldWnd) {}
+	LRESULT OnWmKillFocus(WPARAM wParam, LPARAM lParam);
+	virtual void OnKillFocus(HWND hNewWnd) {}
 	LRESULT OnWmKeyDown(WPARAM wParam, LPARAM lParam);
 	virtual void OnKeyDown(UINT virtualKey, UINT flags) {}
 	LRESULT OnWmLButtonDown(WPARAM wParam, LPARAM lParam);
@@ -62,8 +66,10 @@ public:
 	void Create(HWND hParent, UINT id);
 	void Destroy() const;
 	void Move(int x, int y, UINT width, UINT height);
-	virtual void Invalidate();
+	void Invalidate() { InvalidateRect(hWnd, nullptr, TRUE); }
 	std::string GetText() const;
 	void SetText(LPCSTR text) const { ::SetWindowText(hWnd, text); }
 	void GetClientRect(RECT* pRect) const { ::GetClientRect(hWnd, pRect); }
+	HWND GetParent() const { return ::GetParent(hWnd); }
+	void SetFocus() const { ::SetFocus(hWnd); }
 };

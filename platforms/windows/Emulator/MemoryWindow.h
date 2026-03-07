@@ -32,6 +32,8 @@ protected:
 	void OnLButtonUp(UINT flags, POINT point) override;
 	void OnMouseWheel(UINT flags, short delta, POINT point) override;
 	void OnVScroll(UINT scrollCode, UINT thumbPos, HWND hScrollBar) override;
+	void OnSetFocus(HWND hOldWnd) override;
+	void OnKillFocus(HWND hNewWnd) override { Invalidate(); }
 public:
 	explicit MemoryWindow(const MemorySpace* pMemorySpace) : pMemorySpace(pMemorySpace) {}
 	MemoryWindow() = default;

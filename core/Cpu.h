@@ -15,10 +15,20 @@ struct AssemblyElement
 	std::string operand;
 };
 
-class Cpu : public ClockDestination, Uncopyable, public RegisterHolder
+class Debugger
 {
 public:
+	virtual void Pause() = 0;
+};
+
+class Cpu : public BreakpointHolder, public ClockDestination, public RegisterHolder
+{
+private:
+	Debugger* pDebugger;
+protected:
+	auto Debugger() const { return pDebugger; }
 public:
+	explicit Cpu(class Debugger* pDebugger) : pDebugger(pDebugger) {}
 	virtual ~Cpu() = default;
 	virtual void Reset() = 0;
 	virtual uint16_t LastInstructionAddress() const = 0;

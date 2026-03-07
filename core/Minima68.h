@@ -18,7 +18,7 @@ private:
 	private:
 		Minima68* pOwner;
 	public:
-		explicit Memory(Minima68* pOwner) : MemorySpace("Memory",0x10000), pOwner(pOwner) {}
+		explicit Memory(Minima68* pOwner) : MemorySpace("Memory", 0x10000), pOwner(pOwner) {}
 	public:
 		uint8_t Read(const uint16_t address) const override { return pOwner->ReadMemory(address); };
 		void Write(const uint16_t address, const uint8_t value) override { pOwner->WriteMemory(address, value); }
@@ -27,7 +27,7 @@ protected:
 	virtual uint8_t ReadMemory(uint16_t address) = 0;
 	virtual void WriteMemory(uint16_t address, uint8_t value) = 0;
 protected:
-	Minima68() : cpu(&memory), memory(this) {}
+	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
 	void Reset();
 public:
 	auto& Cpu() { return cpu; }

@@ -14,6 +14,7 @@ add_subdirectory(Emulator)
 set(SOURCES
     Main/WinMain.cpp
     Main/MainWindow.cpp
+    Main/ScreenWindow.cpp
     Main/resource.rc
 )
 
@@ -21,6 +22,7 @@ set(SOURCES
 set(HEADERS
     Main/resource.h
     Main/MainWindow.h
+    Main/ScreenWindow.h
 )
 
 # Create executable
@@ -29,6 +31,10 @@ add_executable(${MAIN_PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS})
 # Set resource compiler include directories
 if(WIN32)
     target_include_directories(${MAIN_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+    # Enable RC language and set include directories for resource compiler
+    enable_language(RC)
+    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /nologo")
 endif()
 
 # Windows linker settings

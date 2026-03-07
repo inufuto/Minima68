@@ -9,17 +9,18 @@ public:
 	class Owner
 	{
 	public:
-		virtual void Invalidate() = 0;
+		virtual void UpdateView() = 0;
 	};
 private:
 	double targetFrequency;
 private:
 	Owner* pOwner;
 	LARGE_INTEGER timerFrequency;
-	bool running;
 	LARGE_INTEGER last;
 	int32_t time;
 	HANDLE hThread;
+	bool running;
+	bool paused;
 private:
 	static unsigned __stdcall ThreadProc(void* pThis);
 public:
@@ -29,4 +30,6 @@ public:
 	void Start();
 	void Stop();
 	void Loop();
+	void Pause() { paused = true; }
+	void Resume() { paused = false; }
 };

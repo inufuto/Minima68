@@ -75,6 +75,18 @@ LRESULT Window::OnWmEraseBackground(WPARAM wParam, LPARAM lParam)
 	return 1;
 }
 
+LRESULT Window::OnWmSetFocus(WPARAM wParam, LPARAM lParam)
+{
+	OnSetFocus(reinterpret_cast<HWND>(wParam));
+	return 0;
+}
+
+LRESULT Window::OnWmKillFocus(WPARAM wParam, LPARAM lParam)
+{
+	OnKillFocus(reinterpret_cast<HWND>(wParam));
+	return 0;
+}
+
 LRESULT Window::OnWmKeyDown(WPARAM wParam, LPARAM lParam)
 {
 	OnKeyDown(static_cast<UINT>(wParam), static_cast<UINT>(lParam));
@@ -183,11 +195,6 @@ void Window::Destroy() const
 void Window::Move(int x, int y, UINT width, UINT height)
 {
 	MoveWindow(hWnd, x, y, width, height, TRUE);
-}
-
-void Window::Invalidate()
-{
-	InvalidateRect(HWnd(), nullptr, TRUE);
 }
 
 std::string Window::GetText() const

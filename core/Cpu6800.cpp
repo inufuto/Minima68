@@ -1612,13 +1612,17 @@ void Cpu6800::FetchInstruction()
 		return;
 	}
 	currentInstructionPc = pc;
+	if (Debugger() != nullptr && ContainsBreakpoint(pc)) {
+		Debugger()->Pause();
+		return;
+	}
 	uint8_t opcode = FetchByte();
 	pNextInstruction = &Instructions[opcode];
 	assert(pNextInstruction->clockCount != 0);
 	clockCountToExecute = pNextInstruction->clockCount;
 }
 
-Cpu6800::Cpu6800(MemorySpace* pMemorySpace) : pMemorySpace(pMemorySpace)
+Cpu6800::Cpu6800(::Debugger* pDebugger, MemorySpace* pMemorySpace) : Cpu(pDebugger),pMemorySpace(pMemorySpace)
 {
 	static_assert(std::size(Instructions) == 256, "Instructions array must have exactly 256 elements (0x00-0xFF)");
 }
@@ -1637,15 +1641,18 @@ void Cpu6800::Reset()
 	FetchInstruction();
 }
 
+void Cpu6800::ExecuteInstruction() {
+	auto pInstruction = pNextInstruction;
+	pInstruction->execute(*this);
+	if (pNextInstruction == pInstruction) {
+		FetchInstruction();
+	}
+}
+
 void Cpu6800::OnClock(uint32_t time)
 {
 	if (--clockCountToExecute == 0) {
-		auto pInstruction = pNextInstruction;
-
-		pInstruction->execute(*this);
-		if (pNextInstruction == pInstruction) {
-			FetchInstruction();
-		}
+		ExecuteInstruction();
 	}
 }
 

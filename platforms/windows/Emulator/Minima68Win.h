@@ -3,7 +3,7 @@
 #include "MasterClock.h"
 #include "../../../core/Minima68.h"
 
-class Minima68Win : public Minima68
+class Minima68Win : public Minima68, public Debugger
 {
 private:
 	MasterClock masterClock;
@@ -12,11 +12,12 @@ protected:
 	uint8_t ReadMemory(uint16_t address) override { return ram[address]; }
 	void WriteMemory(uint16_t address, uint8_t value) override;
 public:
-	explicit Minima68Win(MasterClock::Owner* pOwner) : masterClock(pOwner, MasterClockFrequency) {}
+	explicit Minima68Win(MasterClock::Owner* pOwner) : Minima68(this), masterClock(pOwner, MasterClockFrequency) {}
 	void Start();
-	static void LoadProgramFromFile(uint16_t address, const char* path);
 	void Stop() { masterClock.Stop(); }
+	void Pause() override { masterClock.Pause(); }
 #ifdef _DEBUG
 	void LoadProgramFromFile(const char* path);
 #endif
+	static void LoadProgramFromFile(uint16_t address, const char* path);
 };

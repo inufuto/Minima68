@@ -1,5 +1,7 @@
 #include "TitledPane.h"
 
+#include "EmulatorWindow.h"
+
 LRESULT TitledPane::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
@@ -11,6 +13,11 @@ LRESULT TitledPane::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmEraseBackground(wParam, lParam);
 	case WM_PAINT:
 		return OnWmPaint(wParam, lParam);
+	case WM_SETFOCUS:
+		return OnWmSetFocus(wParam, lParam);
+	case WM_SELECT_PANE:
+		SendMessage(GetParent(), WM_SELECT_PANE, 0, reinterpret_cast<LPARAM>(HWnd()));
+		return 0;
 	}
 	return Window::OnMessage(message, wParam, lParam);
 }
@@ -31,10 +38,6 @@ void TitledPane::OnSize(UINT width, UINT height)
 
 void TitledPane::OnEraseBackground(DeviceContext& dc)
 {
-	RECT rect;
-	GetClientRect(&rect);
-	HBRUSH hBrush = active ? GetSysColorBrush(COLOR_ACTIVECAPTION) : GetSysColorBrush(COLOR_INACTIVECAPTION);
-	FillRect(dc.Hdc(), &rect, hBrush);
 }
 
 void TitledPane::OnPaint(DeviceContext& dc)
@@ -43,6 +46,8 @@ void TitledPane::OnPaint(DeviceContext& dc)
 	RECT rect;
 	GetClientRect(&rect);
 	rect.bottom = rect.top + titleHeight;
+	HBRUSH hBrush = active ? GetSysColorBrush(COLOR_ACTIVECAPTION) : GetSysColorBrush(COLOR_INACTIVECAPTION);
+	FillRect(dc.Hdc(), &rect, hBrush);
 	auto oldColor = dc.SetTextColor(GetSysColor(active ? COLOR_CAPTIONTEXT : COLOR_INACTIVECAPTIONTEXT));
 	auto oldBkMode = dc.SetBackgroundMode(TRANSPARENT);
 	auto hOldFont = dc.Select(font);
@@ -52,11 +57,16 @@ void TitledPane::OnPaint(DeviceContext& dc)
 	dc.SetTextColor(oldColor);
 }
 
+void TitledPane::OnSetFocus(HWND hOldWnd)
+{
+	pChild->SetFocus();
+}
+
 void TitledPane::Active(bool active)
 {
 	this->active = active;
 	Invalidate();
 	if (pChild->HWnd() != nullptr) {
-		SetFocus(pChild->HWnd());
+		pChild->SetFocus();
 	}
 }
