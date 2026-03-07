@@ -1,6 +1,5 @@
 #include <windows.h>
 
-#include <string>
 #undef min
 #undef max
 #include "MainWindow.h"
@@ -148,6 +147,7 @@ bool MainWindow::UpdateMenuItem(HMENU hMenu, UINT id)
 	case ID_PREVIOUS_PANE:
 	case ID_EXIT:
 	case ID_RESET:
+	case ID_ADD_BREAKPOINT:
 		return true;
 	case ID_DEBUG_RESUME:
 	case ID_DEBUG_STEP:
@@ -198,6 +198,10 @@ void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 			UpdateView();
 		}
 		break;
+	case ID_ADD_BREAKPOINT:
+		if (AddBreakpoint(emulator.Cpu())) {
+			breakpointWindow.Invalidate();
+		}
 	default:
 		EmulatorWindow::OnCommand(id, notificationCode, hWnd);
 	}

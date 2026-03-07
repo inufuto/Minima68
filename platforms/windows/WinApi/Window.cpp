@@ -129,6 +129,12 @@ LRESULT Window::OnWmInitMenuPopup(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT Window::OnWmInitDialog(WPARAM wParam, LPARAM lParam)
+{
+	OnInitDialog();
+	return 0;
+}
+
 Window::~Window() {
 	if (hWnd != nullptr) {
 		Destroy();

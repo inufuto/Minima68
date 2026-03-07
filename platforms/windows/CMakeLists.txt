@@ -1,6 +1,12 @@
 ﻿cmake_minimum_required(VERSION 3.10)
 project(Minima80i)
 
+# Enable RC language for resource files
+if(WIN32)
+    enable_language(RC)
+    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /nologo")
+endif()
+
 # Add WinApi subdirectory
 add_subdirectory(WinApi)
 
@@ -16,7 +22,8 @@ set(SOURCES
     Main/MainWindow.cpp
     Main/ScreenWindow.cpp
     Main/resource.rc
-)
+    Emulator/emulator.rc
+ "Emulator/BreakpointDialog.cpp")
 
 # Header files
 set(HEADERS
@@ -30,11 +37,10 @@ add_executable(${MAIN_PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS})
 
 # Set resource compiler include directories
 if(WIN32)
-    target_include_directories(${MAIN_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-    # Enable RC language and set include directories for resource compiler
-    enable_language(RC)
-    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /nologo")
+    target_include_directories(${MAIN_PROJECT_NAME} PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/Emulator
+    )
 endif()
 
 # Windows linker settings

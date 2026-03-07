@@ -20,10 +20,10 @@ protected:
 class Window abstract : public CommandTarget
 {
 private:
-private:
 	static std::vector<Window*> pointers;
 	HWND hWnd;
 protected:
+	void Attach(HWND hWnd) { this->hWnd = hWnd; }
 	virtual LPCSTR ClassName();
 	virtual void Register();
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -60,6 +60,8 @@ protected:
 	virtual void OnVScroll(UINT scrollCode, UINT thumbPos, HWND hScrollBar) {}
 	LRESULT OnWmInitMenuPopup(WPARAM wParam, LPARAM lParam);
 	virtual void OnInitMenuPopup(HMENU hmenu, UINT index){}
+	LRESULT OnWmInitDialog(WPARAM wParam, LPARAM lParam);
+	virtual void OnInitDialog() {}
 public:
 	Window() { pointers.push_back(this); }
 	~Window() override;
@@ -74,4 +76,5 @@ public:
 	void GetClientRect(RECT* pRect) const { ::GetClientRect(hWnd, pRect); }
 	HWND GetParent() const { return ::GetParent(hWnd); }
 	void SetFocus() const { ::SetFocus(hWnd); }
+	BOOL Enable(BOOL enable) const { return ::EnableWindow(hWnd, enable); }
 };

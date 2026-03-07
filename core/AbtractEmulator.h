@@ -31,6 +31,7 @@ public:
 		}
 		return false;
 	}
+	void AddBreakpoint(uint16_t address) { breakpoints.push_back(address); }
 };
 
 class AbstractEmulator : public Uncopyable

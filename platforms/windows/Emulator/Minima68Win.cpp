@@ -24,12 +24,6 @@ void Minima68Win::Start()
 #ifdef _DEBUG
 	LoadProgramFromFile(0x100, "D:\\8bit\\Minima68\\test\\test.bin");
 	Cpu().Breakpoints().push_back(0x0100);
-	Cpu().Breakpoints().push_back(0x0200);
-	Cpu().Breakpoints().push_back(0x0200);
-	Cpu().Breakpoints().push_back(0x0200);
-	Cpu().Breakpoints().push_back(0x0200);
-	Cpu().Breakpoints().push_back(0x0200);
-	Cpu().Breakpoints().push_back(0x0200);
 #endif
 	Reset();
 	masterClock.Start();
