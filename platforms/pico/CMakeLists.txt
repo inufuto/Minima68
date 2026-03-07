@@ -6,7 +6,7 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(${MAIN_PROJECT_NAME} pico.cpp )
+add_executable(${MAIN_PROJECT_NAME} Main.cpp )
 
 pico_set_program_name(${MAIN_PROJECT_NAME} "${MAIN_PROJECT_NAME}")
 pico_set_program_version(${MAIN_PROJECT_NAME} "0.1")

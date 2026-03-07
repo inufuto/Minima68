@@ -65,7 +65,7 @@ void AssemblyWindow::BuildElements()
 	auto size = RenderTarget()->GetSize();
 	auto count = static_cast<int>(size.height / lineHeight);
 	elements.clear();
-	topAddress = pCpu->LastInstructionAddress();
+	topAddress = pCpu->CurrentInstructionAddress();
 	auto address = topAddress;
 	for (int i = 0; i < count; ++i) {
 		auto pElement = std::make_unique<AssemblyElement>();
@@ -79,7 +79,7 @@ void AssemblyWindow::UpdateList()
 {
 	auto size = RenderTarget()->GetSize();
 	auto count = static_cast<int>(size.height / lineHeight);
-	if (pCpu->LastInstructionAddress() != topAddress || count != static_cast<int>(elements.size())) {
+	if (pCpu->CurrentInstructionAddress() != topAddress || count != static_cast<int>(elements.size())) {
 		BuildElements();
 		Invalidate();
 	}

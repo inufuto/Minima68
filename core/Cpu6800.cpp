@@ -1135,7 +1135,7 @@ const Cpu6800::RegisterView Cpu6800::RegisterViews[] = {
 	[](Cpu6800& cpu, const uint16_t value) { cpu.x = value; }
 	},
 	{ "PC",2,
-	[](const Cpu6800& cpu) { return cpu.pc; },
+	[](const Cpu6800& cpu) { return cpu.currentInstructionPc; },
 	[](Cpu6800& cpu, const uint16_t value) { cpu.pc = value; }
 	},
 	{ "SP",2,
@@ -1616,8 +1616,8 @@ void Cpu6800::FetchInstruction()
 	pNextInstruction = &Instructions[opcode];
 	assert(pNextInstruction->clockCount != 0);
 	clockCountToExecute = pNextInstruction->clockCount;
-	if (Debugger() != nullptr && ContainsBreakpoint(pc)) {
-		Debugger()->Pause();
+	if (GetDebugger() != nullptr && GetDebugger()->PauseRequired(this, currentInstructionPc)) {
+		GetDebugger()->Pause();
 		return;
 	}
 }
@@ -1730,4 +1730,11 @@ void Cpu6800::BuildAssemblyElement(uint16_t address, AssemblyElement* pElement) 
 			}
 		}
 	}
+}
+
+uint16_t Cpu6800::CurrentInstructionSize()
+{
+	AssemblyElement element;
+	BuildAssemblyElement(currentInstructionPc, &element);
+	return element.size;
 }

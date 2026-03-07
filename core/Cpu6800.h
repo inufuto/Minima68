@@ -104,7 +104,7 @@ private:
 public:
 	Cpu6800(class ::Debugger* pDebugger, MemorySpace* pMemorySpace);
 
-	uint16_t LastInstructionAddress() const override { return currentInstructionPc; }
+	uint16_t CurrentInstructionAddress() const override { return currentInstructionPc; }
 	void Reset() override;
 	void OnClock(uint32_t time) override;
 	int GetRegisterCount() const override;
@@ -113,4 +113,5 @@ public:
 	uint16_t ReadRegister(int index) const override;
 	void WriteRegister(int index, uint16_t value) override;
 	void BuildAssemblyElement(uint16_t address, AssemblyElement* pElement) const override;
+	uint16_t CurrentInstructionSize();
 };

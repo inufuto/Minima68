@@ -29,6 +29,8 @@
 #define ID_DEBUG_RESUME                 40005
 #define ID_FILE_RESET                   40006
 #define ID_RESET                        40007
+#define ID_DEBUG_STEP                   40008
+#define ID_DEBUG_NEXT                   40009
 
 // Next default values for new objects
 // 
@@ -36,7 +38,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        101
-#define _APS_NEXT_COMMAND_VALUE         40008
+#define _APS_NEXT_COMMAND_VALUE         40013
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

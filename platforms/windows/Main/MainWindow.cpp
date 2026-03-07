@@ -110,38 +110,6 @@ void MainWindow::OnEraseBackground(DeviceContext& dc)
 	dc.FillRect(&rect, GetSysColorBrush(COLOR_ACTIVEBORDER));
 }
 
-void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
-{
-	switch (id) {
-	case ID_EXIT:
-		SendMessage(HWnd(), WM_CLOSE, 0, 0);
-		break;
-	case ID_NEXT_PANE:
-		SelectPane((selectedPaneIndex + 1) % std::size(selectablePanes));
-		break;
-	case ID_PREVIOUS_PANE:
-		SelectPane((selectedPaneIndex - 1 + std::size(selectablePanes)) % std::size(selectablePanes));
-		break;
-	case ID_DEBUG_RESUME:
-		if (emulator.Paused()) {
-			emulator.Resume();
-			UpdateView();
-		}
-		break;
-	case ID_DEBUG_PAUSE:
-		if (!emulator.Paused()) {
-			emulator.Pause();
-			UpdateView();
-		}
-		break;
-	case ID_RESET:
-		emulator.Reset();
-		break;
-	default:
-		EmulatorWindow::OnCommand(id, notificationCode, hWnd);
-	}
-}
-
 LRESULT MainWindow::OnWmSelectPane(WPARAM wParam, LPARAM lParam)
 {
 	OnSelectPane(reinterpret_cast<HWND>(lParam));
@@ -182,9 +150,55 @@ bool MainWindow::UpdateMenuItem(HMENU hMenu, UINT id)
 	case ID_RESET:
 		return true;
 	case ID_DEBUG_RESUME:
+	case ID_DEBUG_STEP:
+	case ID_DEBUG_NEXT:
 		return emulator.Paused();
 	case ID_DEBUG_PAUSE:
 		return !emulator.Paused();
 	}
 	return false;
+}
+
+void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
+{
+	switch (id) {
+	case ID_EXIT:
+		SendMessage(HWnd(), WM_CLOSE, 0, 0);
+		break;
+	case ID_NEXT_PANE:
+		SelectPane((selectedPaneIndex + 1) % std::size(selectablePanes));
+		break;
+	case ID_PREVIOUS_PANE:
+		SelectPane((selectedPaneIndex - 1 + std::size(selectablePanes)) % std::size(selectablePanes));
+		break;
+	case ID_DEBUG_RESUME:
+		if (emulator.Paused()) {
+			emulator.Resume();
+			UpdateView();
+		}
+		break;
+	case ID_DEBUG_PAUSE:
+		if (!emulator.Paused()) {
+			emulator.Pause();
+			UpdateView();
+		}
+		break;
+	case ID_RESET:
+		emulator.Reset();
+		break;
+	case ID_DEBUG_STEP:
+		if (emulator.Paused()) {
+			emulator.ExecuteStep();
+			UpdateView();
+		}
+		break;
+	case ID_DEBUG_NEXT:
+		if (emulator.Paused()) {
+			emulator.ExecuteToNext();
+			UpdateView();
+		}
+		break;
+	default:
+		EmulatorWindow::OnCommand(id, notificationCode, hWnd);
+	}
 }

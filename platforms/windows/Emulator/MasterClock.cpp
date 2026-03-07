@@ -51,6 +51,7 @@ void MasterClock::Loop()
 		if (!paused) {
 			auto cyclesToRun = static_cast<uint32_t>(targetFrequency * elapsed);
 			for (uint32_t i = 0; i < cyclesToRun; i++) {
+				if (paused) break;
 				OnClock(time);
 				++time;
 			}

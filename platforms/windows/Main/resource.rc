@@ -36,6 +36,8 @@ BEGIN
     BEGIN
         MENUITEM "&Pause\tCtrl+P",              ID_DEBUG_PAUSE
         MENUITEM "&Resume\tF5",                 ID_DEBUG_RESUME
+        MENUITEM "&Step\tF11",                  ID_DEBUG_STEP
+        MENUITEM "&Next\tF10",                  ID_DEBUG_NEXT
     END
 END
 
@@ -53,6 +55,8 @@ BEGIN
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREVIOUS_PANE,       VIRTKEY, SHIFT, NOINVERT
     "R",            ID_RESET,               VIRTKEY, CONTROL, NOINVERT
+    VK_F11,         ID_DEBUG_STEP,          VIRTKEY, NOINVERT
+    VK_F10,         ID_DEBUG_NEXT,          VIRTKEY, NOINVERT
 END
 
 
