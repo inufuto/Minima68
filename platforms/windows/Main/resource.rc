@@ -17,6 +17,10 @@ IDR_MAIN MENU
         MENUITEM "&Reset", ID_RESET
         MENUITEM "E&xit", ID_EXIT
     }
+    POPUP "&Edit"
+    {
+        MENUITEM "&Delete\tDel", ID_DELETE
+    }
     POPUP "&Debug"
     {
         MENUITEM "&Pause\tCtrl+P", ID_DEBUG_PAUSE
@@ -39,6 +43,7 @@ IDR_MAIN ACCELERATORS
     "R", ID_RESET, NOINVERT, CONTROL, VIRTKEY
     VK_F11, ID_DEBUG_STEP, NOINVERT, VIRTKEY
     VK_F10, ID_DEBUG_NEXT, NOINVERT, VIRTKEY
+    VK_DELETE, ID_DELETE, NOINVERT, VIRTKEY
 }
 
 101 PNG "res/Png_101.png"

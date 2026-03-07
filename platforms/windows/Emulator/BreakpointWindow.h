@@ -5,7 +5,7 @@
 class BreakpointWindow : public ListWindow
 {
 private:
-	Cpu* pCpu;
+	BreakpointHolder* pHolder;
 private:
 	FLOAT itemHeight;
 protected:
@@ -17,6 +17,8 @@ protected:
 
 	void DrawItem(::RenderTarget& renderTarget, D2D_RECT_F& rect, int index, bool selected) override;
 public:
-	explicit BreakpointWindow(Cpu* pCpu) : pCpu(pCpu) {}
+	explicit BreakpointWindow(BreakpointHolder* pHolder) : pHolder(pHolder) {}
 	auto ItemHeightInPixels() const { return DipToPixel(itemHeight); }
+	bool CanDeleteSelected() const;
+	void DeleteSelected();
 };

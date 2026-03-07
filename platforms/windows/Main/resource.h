@@ -18,6 +18,7 @@
 #define ID_RESET                            40007
 #define ID_DEBUG_STEP                       40008
 #define ID_DEBUG_NEXT                       40009
+#define ID_DELETE 						   40010
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

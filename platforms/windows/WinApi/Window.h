@@ -12,8 +12,6 @@ class CommandTarget abstract :public Uncopyable
 {
 public:
 	virtual ~CommandTarget() = default;
-
-protected:
 	virtual void OnCommand(UINT id, UINT notificationCode, HWND hWnd) {}
 };
 

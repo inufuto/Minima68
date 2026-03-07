@@ -155,8 +155,9 @@ bool MainWindow::UpdateMenuItem(HMENU hMenu, UINT id)
 		return emulator.Paused();
 	case ID_DEBUG_PAUSE:
 		return !emulator.Paused();
+	case ID_DELETE:
+		return breakpointWindow.CanDeleteSelected();
 	}
-	return false;
 }
 
 void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
@@ -202,6 +203,8 @@ void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 		if (AddBreakpoint(emulator.Cpu())) {
 			breakpointWindow.Invalidate();
 		}
+	case ID_DELETE:
+		breakpointWindow.DeleteSelected();
 	default:
 		EmulatorWindow::OnCommand(id, notificationCode, hWnd);
 	}
