@@ -58,6 +58,8 @@ protected:
 	virtual void OnMouseWheel(UINT flags, short delta, POINT point) {}
 	LRESULT OnWmVScroll(WPARAM wParam, LPARAM lParam);
 	virtual void OnVScroll(UINT scrollCode, UINT thumbPos, HWND hScrollBar) {}
+	LRESULT OnWmInitMenuPopup(WPARAM wParam, LPARAM lParam);
+	virtual void OnInitMenuPopup(HMENU hmenu, UINT index){}
 public:
 	Window() { pointers.push_back(this); }
 	~Window() override;

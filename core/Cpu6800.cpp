@@ -1612,14 +1612,14 @@ void Cpu6800::FetchInstruction()
 		return;
 	}
 	currentInstructionPc = pc;
-	if (Debugger() != nullptr && ContainsBreakpoint(pc)) {
-		Debugger()->Pause();
-		return;
-	}
 	uint8_t opcode = FetchByte();
 	pNextInstruction = &Instructions[opcode];
 	assert(pNextInstruction->clockCount != 0);
 	clockCountToExecute = pNextInstruction->clockCount;
+	if (Debugger() != nullptr && ContainsBreakpoint(pc)) {
+		Debugger()->Pause();
+		return;
+	}
 }
 
 Cpu6800::Cpu6800(::Debugger* pDebugger, MemorySpace* pMemorySpace) : Cpu(pDebugger),pMemorySpace(pMemorySpace)

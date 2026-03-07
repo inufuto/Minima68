@@ -21,7 +21,9 @@ LRESULT ApplicationWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		return OnWmClose(wParam, lParam);
 	case WM_DESTROY:
-		return Window::OnWmDestroy(wParam, lParam);
+		return OnWmDestroy(wParam, lParam);
+	case WM_INITMENUPOPUP:
+		return OnWmInitMenuPopup(wParam, lParam);
 	}
 	return Window::OnMessage(message, wParam, lParam);
 }
@@ -84,6 +86,17 @@ void ApplicationWindow::Show(int nCmdShow) const
 void ApplicationWindow::OnDestroy()
 {
 	PostQuitMessage(0);
+}
+
+void ApplicationWindow::OnInitMenuPopup(HMENU hmenu, UINT index)
+{
+	auto hSubMenu = GetSubMenu(hMenu, index);
+	auto count = GetMenuItemCount(hSubMenu);
+	for (auto i = 0; i < count; ++i) {
+		auto id = GetMenuItemID(hSubMenu, i);
+		auto enabled= UpdateMenuItem(hSubMenu, id);
+		EnableMenuItem(hSubMenu, id, enabled ? MF_ENABLED : MF_GRAYED);
+	}
 }
 
 

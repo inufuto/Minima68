@@ -27,6 +27,7 @@ public:
 	explicit MasterClock(Owner* pOwner, double targetFrequency);
 	~MasterClock() override;
 	int32_t Time() const { return time; }
+	bool Paused() const { return paused; }
 	void Start();
 	void Stop();
 	void Loop();

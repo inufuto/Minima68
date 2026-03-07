@@ -123,6 +123,12 @@ LRESULT Window::OnWmVScroll(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT Window::OnWmInitMenuPopup(WPARAM wParam, LPARAM lParam)
+{
+	OnInitMenuPopup(reinterpret_cast<HMENU>(wParam), LOWORD(lParam));
+	return 0;
+}
+
 Window::~Window() {
 	if (hWnd != nullptr) {
 		Destroy();

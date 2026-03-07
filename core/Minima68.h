@@ -28,10 +28,10 @@ protected:
 	virtual void WriteMemory(uint16_t address, uint8_t value) = 0;
 protected:
 	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
-	void Reset();
 public:
 	auto& Cpu() { return cpu; }
 	const auto& Cpu() const { return cpu; }
+	void Reset();
 	int RegisterHolderCount() const override { return 1; }
 	const RegisterHolder* RegisterHolderAt(int index) const override { return &cpu; }
 	int MemorySpaceCount() const override { return 2; }

@@ -16,8 +16,10 @@ protected:
 	using Window::OnWmClose;
 	void OnClose() override;
 	void OnDestroy() override;
-	auto LayoutRegistry();
+	void OnInitMenuPopup(HMENU hmenu, UINT index) override;
+	virtual bool UpdateMenuItem(HMENU hMenu, UINT id) { return false;}
 
+	auto LayoutRegistry();
 	virtual void SaveLayout();
 	virtual void SaveLayout(const Registry& registry);
 	virtual void RestoreLayout();

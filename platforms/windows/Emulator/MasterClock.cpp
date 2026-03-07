@@ -15,6 +15,7 @@ MasterClock::MasterClock(Owner* pOwner, double targetFrequency) :
 
 MasterClock::~MasterClock() {
 	Stop();
+	paused = false;
 }
 
 void MasterClock::Stop()
@@ -33,7 +34,6 @@ void MasterClock::Start()
 {
 	QueryPerformanceCounter(&last);
 	running = true;
-	paused = false;
 	time = 0;
 	hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadProc, this, 0, nullptr));
 	if (hThread == nullptr) {

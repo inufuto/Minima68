@@ -16,6 +16,8 @@ public:
 	void Start();
 	void Stop() { masterClock.Stop(); }
 	void Pause() override { masterClock.Pause(); }
+	void Resume() { masterClock.Resume(); }
+	bool Paused() const { return masterClock.Paused(); }
 #ifdef _DEBUG
 	void LoadProgramFromFile(const char* path);
 #endif

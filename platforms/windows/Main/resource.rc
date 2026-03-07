@@ -29,11 +29,13 @@ IDR_MAIN MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "E&xit",                       ID_FILE_EXIT
+        MENUITEM "&Reset",                      ID_RESET
+        MENUITEM "E&xit",                       ID_EXIT
     END
     POPUP "&Debug"
     BEGIN
         MENUITEM "&Pause\tCtrl+P",              ID_DEBUG_PAUSE
+        MENUITEM "&Resume\tF5",                 ID_DEBUG_RESUME
     END
 END
 
@@ -46,9 +48,11 @@ END
 IDR_MAIN ACCELERATORS
 BEGIN
     "P",            ID_DEBUG_PAUSE,         VIRTKEY, CONTROL, NOINVERT
-    VK_F4,          ID_FILE_EXIT,           VIRTKEY, ALT, NOINVERT
+    VK_F5,          ID_DEBUG_RESUME,        VIRTKEY, NOINVERT
+    VK_F4,          ID_EXIT,                VIRTKEY, ALT, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
-    VK_F6,          ID_PREVIOUS_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_F6,          ID_PREVIOUS_PANE,       VIRTKEY, SHIFT, NOINVERT
+    "R",            ID_RESET,               VIRTKEY, CONTROL, NOINVERT
 END
 
 

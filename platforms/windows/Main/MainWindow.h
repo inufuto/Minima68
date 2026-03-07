@@ -36,6 +36,7 @@ protected:
 	void OnCommand(UINT id, UINT notificationCode, HWND hWnd) override;
 	LRESULT OnWmSelectPane(WPARAM wParam, LPARAM lParam);
 	void OnSelectPane(HWND hPane);
+	bool UpdateMenuItem(HMENU hMenu, UINT id) override;
 public:
 	MainWindow();
 };

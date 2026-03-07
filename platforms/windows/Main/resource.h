@@ -22,10 +22,13 @@
 #define VK_F10                          0x79
 #define VK_F11                          0x7A
 #define VK_F12                          0x7B
-#define ID_FILE_EXIT                    40001
+#define ID_EXIT                         40001
 #define ID_DEBUG_PAUSE                  40002
 #define ID_NEXT_PANE                    40003
-#define ID_PREVIOUS_PANE                    40004
+#define ID_PREVIOUS_PANE                40004
+#define ID_DEBUG_RESUME                 40005
+#define ID_FILE_RESET                   40006
+#define ID_RESET                        40007
 
 // Next default values for new objects
 // 
@@ -33,7 +36,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        101
-#define _APS_NEXT_COMMAND_VALUE         40005
+#define _APS_NEXT_COMMAND_VALUE         40008
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
