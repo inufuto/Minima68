@@ -1,24 +1,24 @@
 #include <process.h>
-#include "MasterClock.h"
+#include "PrimaryClock.h"
 
-unsigned MasterClock::ThreadProc(void* pThis)
+unsigned PrimaryClock::ThreadProc(void* pThis)
 {
-	static_cast<MasterClock*>(pThis)->Loop();
+	static_cast<PrimaryClock*>(pThis)->Loop();
 	return 0;
 }
 
-MasterClock::MasterClock(Owner* pOwner, double targetFrequency) :
+PrimaryClock::PrimaryClock(Owner* pOwner, double targetFrequency) :
 	pOwner(pOwner), targetFrequency(targetFrequency), running(false), hThread(nullptr), time(0)
 {
 	QueryPerformanceFrequency(&timerFrequency);
 }
 
-MasterClock::~MasterClock() {
+PrimaryClock::~PrimaryClock() {
 	Stop();
 	paused = false;
 }
 
-void MasterClock::Stop()
+void PrimaryClock::Stop()
 {
 	if (running) {
 		running = false;
@@ -30,9 +30,10 @@ void MasterClock::Stop()
 	}
 }
 
-void MasterClock::Start()
+void PrimaryClock::Start()
 {
 	QueryPerformanceCounter(&last);
+	paused = false;
 	running = true;
 	time = 0;
 	hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadProc, this, 0, nullptr));
@@ -41,7 +42,7 @@ void MasterClock::Start()
 	}
 }
 
-void MasterClock::Loop()
+void PrimaryClock::Loop()
 {
 	while (running) {
 		LARGE_INTEGER now;

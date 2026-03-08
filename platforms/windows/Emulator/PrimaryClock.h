@@ -3,7 +3,7 @@
 #include <windows.h>
 #include "../../../core/ClockSource.h"
 
-class MasterClock : public ClockSource
+class PrimaryClock : public ClockSource
 {
 public:
 	class Owner
@@ -24,8 +24,8 @@ private:
 private:
 	static unsigned __stdcall ThreadProc(void* pThis);
 public:
-	explicit MasterClock(Owner* pOwner, double targetFrequency);
-	~MasterClock() override;
+	explicit PrimaryClock(Owner* pOwner, double targetFrequency);
+	~PrimaryClock() override;
 	int32_t Time() const { return time; }
 	bool Paused() const { return paused; }
 	void Start();

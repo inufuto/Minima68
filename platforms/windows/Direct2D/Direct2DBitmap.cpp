@@ -16,3 +16,12 @@ void Direct2DBitmap::CreatePng(class RenderTarget& renderTarget, UINT resourceId
 	wicBitmap.CreatePng(resourceId);
 	Create(renderTarget, wicBitmap);
 }
+
+void Direct2DBitmap::Create(RenderTarget& renderTarget, UINT width, UINT height)
+{
+	auto bitmapProperties = D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE));
+	HRESULT result = renderTarget->CreateBitmap(D2D1::SizeU(width, height), nullptr, 0, &bitmapProperties, &pBitmap);
+	if (FAILED(result)) {
+		throw ApiException(result);
+	}
+}

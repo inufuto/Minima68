@@ -7,7 +7,7 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(${MAIN_PROJECT_NAME} 
-        Main.cpp MasterClock.cpp Minima68Pico.cpp
+        Main.cpp PrimaryClock.cpp Minima68Pico.cpp
         Color.cpp Ntsc.cpp
         test.cpp
 )

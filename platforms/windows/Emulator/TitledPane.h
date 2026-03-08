@@ -19,7 +19,8 @@ protected:
 	void OnSetFocus(HWND hOldWnd) override;
 public:
 	explicit TitledPane(Window* pChild) : pChild(pChild) {}
+	Window* Child() const { return pChild; }
+	int TitleHeight() const { return titleHeight; }
 	bool Active() const { return active; }
 	void Active(bool active);
-	int TitleHeight() const { return titleHeight; }
 };

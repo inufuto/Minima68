@@ -5,12 +5,13 @@
 void Minima68Win::Start()
 {
 	mode = Normal;
-	masterClock.AddDestination(&Cpu());
+	primaryClock.AddDestination(&Cpu());
 #ifdef _DEBUG
+	ZeroMemory(Ram(), 0xff00);
 	LoadProgramFromFile(0x100, "D:\\8bit\\Minima68\\test\\test.bin");
 #endif
 	Reset();
-	masterClock.Start();
+	primaryClock.Start();
 }
 
 #ifdef _DEBUG
@@ -45,6 +46,11 @@ void Minima68Win::ExecuteToNext()
 	nextProgramCounter = Cpu().CurrentInstructionAddress() + Cpu().CurrentInstructionSize();
 	mode = Next;
 	Resume();
+}
+
+void Minima68Win::SetColor(int index, uint8_t r, uint8_t g, uint8_t b) {
+	assert(index >= 0 && index < ColorCount);
+	colors[index] = { b, g, r, 0xff };
 }
 
 void Minima68Win::LoadProgramFromFile(uint16_t address, const char* path) {

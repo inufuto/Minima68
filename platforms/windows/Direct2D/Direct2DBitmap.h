@@ -9,6 +9,8 @@ private:
 	ComPtr<ID2D1Bitmap> pBitmap;
 public:
 	ID2D1Bitmap* Ptr() const { return pBitmap; }
+	ID2D1Bitmap* operator->() const { return pBitmap; }
 	void Create(class RenderTarget& renderTarget, WicBitmap& wicBitmap);
 	void CreatePng(class RenderTarget& renderTarget, UINT resourceId);
+	void Create(RenderTarget& renderTarget, UINT width, UINT height);
 };

@@ -7,7 +7,7 @@
 #include "TitledPane.h"
 #include "EmulatorWindow.h"
 
-class MainWindow : public EmulatorWindow, public MasterClock::Owner
+class MainWindow : public EmulatorWindow, public PrimaryClock::Owner
 {
 private:
 	Minima68Win emulator;
@@ -20,7 +20,7 @@ private:
 	MemoryWindow memoryWindow{ emulator.MemorySpaceAt(0) };
 	TitledPane memoryPane{ &memoryWindow };
 	ScreenWindow screenWindow;
-	TitledPane screenPane{ &screenWindow };
+	ScreenPane screenPane{ &screenWindow };
 	TitledPane* selectablePanes[3]{ &breakpointPane, &memoryPane,&screenPane };
 	int selectedPaneIndex;
 	bool waitingForUpdate;

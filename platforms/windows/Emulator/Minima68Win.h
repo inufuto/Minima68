@@ -1,30 +1,44 @@
 #pragma once
 
-#include "MasterClock.h"
+#include "PrimaryClock.h"
 #include "../../../core/Minima68.h"
+#include "../../../core/Video.h"
 
 class Minima68Win : public Minima68, public Debugger
 {
 private:
-	MasterClock masterClock;
+	PrimaryClock primaryClock;
+private:
 	enum Mode
 	{
 		Normal, Step, Next
 	} mode;
 	uint16_t lastInstructionAddress;
 	uint16_t nextProgramCounter;
+	union Color
+	{
+		struct {
+			uint8_t b,g,r,a;
+		};
+		uint32_t dword;
+	} colors[ColorCount];
 public:
-	explicit Minima68Win(MasterClock::Owner* pOwner) : Minima68(this), masterClock(pOwner, MasterClockFrequency) {}
+	explicit Minima68Win(PrimaryClock::Owner* pOwner) : Minima68(this), primaryClock(pOwner, PrimaryClockFrequency) {}
+	const auto& ClockSource() const { return primaryClock; }
+	auto& ClockSource() { return primaryClock; }
 	void Start();
-	void Stop() { masterClock.Stop(); }
-	void Pause() override { masterClock.Pause(); }
-	void Resume() { masterClock.Resume(); }
-	bool Paused() const { return masterClock.Paused(); }
+	void Stop() { primaryClock.Stop(); }
+	void Pause() override { primaryClock.Pause(); }
+	void Resume() { primaryClock.Resume(); }
+	bool Paused() const { return primaryClock.Paused(); }
 	bool PauseRequired(const ::Cpu* pCpu, uint16_t address) override;
 	void ExecuteStep();
 	void ExecuteToNext();
+
+	void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) override;
+	uint32_t ColorAt(int index) const { assert(index >= 0 && index < ColorCount); return colors[index].dword; }
 #ifdef _DEBUG
 	void LoadProgramFromFile(const char* path);
 #endif
-	static void LoadProgramFromFile(uint16_t address, const char* path);
+	void LoadProgramFromFile(uint16_t address, const char* path);
 };

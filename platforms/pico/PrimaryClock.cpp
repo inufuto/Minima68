@@ -1,7 +1,7 @@
 #include "pico/stdlib.h"
-#include "MasterClock.h"
+#include "PrimaryClock.h"
 
-void MasterClock::Run()
+void PrimaryClock::Run()
 {
     time = 0;
     auto last = time_us_64();

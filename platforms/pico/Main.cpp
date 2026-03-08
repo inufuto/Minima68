@@ -5,8 +5,6 @@
 #include "Minima68Pico.h"
 #include "Ntsc.h"
 
-Minima68Pico emulator;
-
 int main()
 {
     stdio_init_all();

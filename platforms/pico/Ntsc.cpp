@@ -33,10 +33,8 @@ static volatile int fieldYMod;
 static volatile uint8_t* pStatusRow;
 static volatile int statusYMod;
 
-uint8_t offsetX = 0;
-uint8_t offsetY = 0;
-const auto TileMap = Minima68::Ram() + TileMapAddress;
-const auto TilePattern = Minima68::Ram() + TilePatternAddress;
+const auto TileMap = emulator.Ram() + TileMapAddress;
+const auto TilePattern = emulator.Ram() + TilePatternAddress;
 
 static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
 {
@@ -75,8 +73,8 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
         static uint8_t lineBuffer[XResolution];
         if (raster == VSyncRasterCount + BlankingRasterCount) {
             currentY = 0;
-            pFieldRow = TileMap + (offsetY / TileHeight) * VramWidth;
-            fieldYMod = offsetY % TileHeight;
+            pFieldRow = TileMap + (emulator.ScrollY() / TileHeight) * VramWidth;
+            fieldYMod = emulator.ScrollY() % TileHeight;
             pStatusRow = TileMap + FieldAreaWidth;
             statusYMod = 0;
         }
@@ -84,8 +82,8 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
             auto pLine = lineBuffer;
             {
                 // Field area
-                auto pTile = pFieldRow + offsetX / TileWidth;
-                auto xMod = offsetX % TileWidth;
+                auto pTile = pFieldRow + emulator.ScrollX() / TileWidth;
+                auto xMod = emulator.ScrollX() % TileWidth;
                 auto tile = *pTile++;
                 auto pPattern = TilePattern + 
                     (static_cast<uint16_t>(tile) * TilePatternSize) +
@@ -262,35 +260,17 @@ static void InitializePwmDma()
 	dma_channel_start(dmaChannels[0]);
 }
 
-
-static const uint8_t PaletteValues[] = {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00,
-	0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00,
-	0xff, 0xff, 0xff, 0xff, 0x00, 0xff, 0xff, 0xff,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x00,
-	0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00,
-	0x80, 0x80, 0x80, 0x80, 0x00, 0x80, 0x80, 0x80,
-};
-
-void InitializeColors(const uint8_t* pPaletteValues)
-{
-    auto pSource = pPaletteValues;
-    for (auto i = 0; i < ColorCount; ++i) {
-        auto r = *pSource++;
-        auto g = *pSource++;
-        auto b = *pSource++;
-		colors[i].SetRgb(r, g, b);
-	}
-}
-
 void InitNtsc()
 {
     // for (auto& sprite : SpriteAttributes) {
     //     sprite.y = YResolution;
     // }
-    InitializeColors(PaletteValues);
-    offsetX = offsetY = 2;
     set_sys_clock_khz(Config::SystemClock, true);
     InitializePwmDma();
 }
 
+void SetColor(int index, uint8_t r, uint8_t g, uint8_t b)
+{
+    assert(index < ColorCount);
+    colors[index].SetRgb(r, g, b);
+}

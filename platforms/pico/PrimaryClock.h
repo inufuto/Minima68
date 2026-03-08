@@ -1,12 +1,12 @@
 
 #include "../core/ClockSource.h"
 
-class MasterClock : public ClockSource
+class PrimaryClock : public ClockSource
 {
 private:
     double targetFrequency;
     int32_t time;
 public:
-    MasterClock(double targetFrequency) : targetFrequency(targetFrequency){}
+    PrimaryClock(double targetFrequency) : targetFrequency(targetFrequency){}
     void Run();
 };

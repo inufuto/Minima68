@@ -1,11 +1,12 @@
 #include "../core/Minima68.h"
-#include "MasterClock.h"
+#include "PrimaryClock.h"
 
-class Minima68Pico : public Minima68
+extern class Minima68Pico : public Minima68
 {
 private:
-    MasterClock masterClock;
+    PrimaryClock primaryClock;
 public:
-    Minima68Pico() : Minima68(), masterClock(MasterClockFrequency) {}
+    Minima68Pico() : Minima68(), primaryClock(PrimaryClockFrequency) {}
     void Run();
-};
+    void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) override;
+} emulator;

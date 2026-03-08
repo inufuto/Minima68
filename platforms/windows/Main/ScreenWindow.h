@@ -1,21 +1,36 @@
 #pragma once
 #include "Direct2DBitmap.h"
 #include "Minima68Win.h"
+#include "TitledPane.h"
 #include "../Direct2D/RenderTargetWindow.h"
+
+class ScreenPane : public TitledPane
+{
+protected:
+	void OnSize(UINT width, UINT height) override;
+public:
+	explicit ScreenPane(Window* pChild) : TitledPane(pChild) {}
+};
 
 class ScreenWindow : public RenderTargetWindow
 {
 private:
-	TextFormat textFormat;
-	SolidColorBrush brush;
-	Direct2DBitmap bitmap;
+	static constexpr double ScreenRefreshRate = 60.0;
 	Minima68Win& emulator;
+	Direct2DBitmap screenBitmap;
+	uint32_t screen[XResolution * YResolution];
+	uint8_t* pTileMap = emulator.Ram() + TileMapAddress;
+	uint8_t* pTilePattern = emulator.Ram() + TilePatternAddress;
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
+	void OnPaint(DeviceContext& dc) override;
 	void OnRender(class RenderTarget& renderTarget) override;
 	void OnLButtonDown(UINT flags, POINT point) override { SetFocus(); }
 	void OnSetFocus(HWND hOldWnd) override;
+private:
+	uint32_t ColorAt(uint8_t index) const { assert(index < ColorCount); return emulator.ColorAt(index); }
+	void UpdateScreenBitmap();
 public:
 	explicit ScreenWindow(Minima68Win& emulator) : emulator(emulator) {}
 };

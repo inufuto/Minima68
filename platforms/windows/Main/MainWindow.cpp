@@ -41,7 +41,7 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		registerWindow.Invalidate();
 		assemblyWindow.UpdateList();
 		memoryWindow.Invalidate();
-		screenWindow.Invalidate();
+		//screenWindow.Invalidate();
 		UpdateWindow(HWnd());
 		waitingForUpdate = false;
 		return 0;
