@@ -158,6 +158,7 @@ bool MainWindow::UpdateMenuItem(HMENU hMenu, UINT id)
 	case ID_DELETE:
 		return breakpointWindow.CanDeleteSelected();
 	}
+	return EmulatorWindow::UpdateMenuItem(hMenu, id);
 }
 
 void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
@@ -205,6 +206,7 @@ void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 		}
 	case ID_DELETE:
 		breakpointWindow.DeleteSelected();
+		break;
 	default:
 		EmulatorWindow::OnCommand(id, notificationCode, hWnd);
 	}

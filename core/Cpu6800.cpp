@@ -912,10 +912,10 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	} },
 	{ 6,Undefined,Nop }, // cc
 	{ 6,Undefined,Nop }, // cd
-	{3,"LDS\t#w",[](Cpu6800& cpu)
+	{3,"LDX\t#w",[](Cpu6800& cpu)
 	{
-		// ce LDS #w
-		cpu.UpdateFlagsForWord(cpu.sp = cpu.FetchWord());
+		// ce LDX #w
+		cpu.UpdateFlagsForWord(cpu.x = cpu.FetchWord());
 	}},
 	{ 6,Undefined,Nop }, // cf
 	{3,"SUBB\tb",[](Cpu6800& cpu)
@@ -1717,8 +1717,8 @@ void Cpu6800::BuildAssemblyElement(uint16_t address, AssemblyElement* pElement) 
 				break;
 			}
 			case 'w': {
-				auto low = pMemorySpace->Read(address + 1);
-				auto high = pMemorySpace->Read(address + 2);
+				auto high = pMemorySpace->Read(address + 1);
+				auto low = pMemorySpace->Read(address + 2);
 				char wordBuffer[6];
 				snprintf(wordBuffer, sizeof(wordBuffer), "$%04X", MakeWord(high, low));
 				pElement->operand += wordBuffer;

@@ -11,6 +11,7 @@ public:
 public:
 	static constexpr double MasterClockFrequency = 8'000'000;
 private:
+	static uint8_t ram[0x10000];
 	Cpu6800 cpu;
 private:
 	class Memory : public MemorySpace
@@ -24,11 +25,12 @@ private:
 		void Write(const uint16_t address, const uint8_t value) override { pOwner->WriteMemory(address, value); }
 	} memory;
 protected:
-	virtual uint8_t ReadMemory(uint16_t address) = 0;
-	virtual void WriteMemory(uint16_t address, uint8_t value) = 0;
+	uint8_t ReadMemory(uint16_t address) { return ram[address]; }
+	void WriteMemory(uint16_t address, uint8_t value) { ram[address] = value; }
 protected:
 	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
 public:
+	static uint8_t* Ram() { return ram; }
 	auto& Cpu() { return cpu; }
 	const auto& Cpu() const { return cpu; }
 	void Reset();

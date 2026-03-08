@@ -7,16 +7,12 @@ class Minima68Win : public Minima68, public Debugger
 {
 private:
 	MasterClock masterClock;
-	static uint8_t ram[0x10000];
 	enum Mode
 	{
 		Normal, Step, Next
 	} mode;
 	uint16_t lastInstructionAddress;
 	uint16_t nextProgramCounter;
-protected:
-	uint8_t ReadMemory(uint16_t address) override { return ram[address]; }
-	void WriteMemory(uint16_t address, uint8_t value) override;
 public:
 	explicit Minima68Win(MasterClock::Owner* pOwner) : Minima68(this), masterClock(pOwner, MasterClockFrequency) {}
 	void Start();
