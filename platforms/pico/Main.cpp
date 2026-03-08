@@ -4,10 +4,12 @@
 
 #include "Minima68Pico.h"
 #include "Ntsc.h"
+#include "SoundChannel.h"
 
 int main()
 {
     stdio_init_all();
     InitNtsc();
+    InitSound();
     emulator.Run();
 }

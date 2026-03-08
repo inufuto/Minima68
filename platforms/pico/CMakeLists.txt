@@ -9,6 +9,7 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 add_executable(${MAIN_PROJECT_NAME} 
         Main.cpp PrimaryClock.cpp Minima68Pico.cpp
         Color.cpp Ntsc.cpp
+        SoundChannel.cpp
         test.cpp
 )
 

@@ -4,8 +4,6 @@
 
 class SoundChannel : public Uncopyable
 {
-public:
-	static constexpr auto MaxVolume = 63;
 private:
 	WindowsAudioClient audioClient;
 	HANDLE hThread;
@@ -39,11 +37,11 @@ private:
 protected:
 	void Write(float* pBuffer, UINT32 framesToWrite) override;
 public:
-	void Start() override;
 	explicit ToneChannel(const uint8_t* pSourceSamples) : pSourceSamples(pSourceSamples)
 	{
 		UpdateSamples();
 	}
+	void Start() override;
 };
 
 class EffectChannel : public SoundChannel

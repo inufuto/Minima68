@@ -8,10 +8,17 @@ const uint8_t PianoWave[] = {
 	0,9,25,33,32,36,50,65,
 	74,84,104,128,150,172,204,238,
 };
+const uint8_t Lead2Wave[] = {
+	203,160,75,22,17,23,17,10,
+	11,10,6,4,4,3,0,0,
+	2,0,0,3,4,4,6,10,
+	11,10,17,23,17,22,75,160,
+};
+
 
 Minima68Win::Minima68Win(PrimaryClock::Owner* pOwner): 
 	Minima68(this), primaryClock(pOwner, PrimaryClockFrequency),
-channel(PianoWave)
+channel(Lead2Wave)
 {}
 
 void Minima68Win::Start()

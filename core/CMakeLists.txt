@@ -8,7 +8,7 @@ set(CORE_HEADERS
 	ClockSource.h
    "MemorySpace.h" "Uncopyable.h"  Minima68.h "AbtractEmulator.h" "Cpu6800.h"
    "Video.h"
- "MemoryMap.h")
+ "MemoryMap.h" "Sound.h")
 
 add_library(core STATIC ${CORE_SOURCES} ${CORE_HEADERS}
 )

@@ -9,6 +9,7 @@
 #include "../../core/Video.h"
 #include "Minima68Pico.h"
 #include "Config.h"
+#include "MemoryMap.h"
 #include "Color.h"
 
 static volatile uint32_t TimerCount = 0;
@@ -254,6 +255,7 @@ static void InitializePwmDma()
         mask |= InterruptBit(dmaChannels[i]);
     }
     dma_set_irq0_channel_mask_enabled(mask ,true);
+    irq_set_priority(DMA_IRQ_0, 0x20);
 	irq_set_exclusive_handler(DMA_IRQ_0, Handler);
 	irq_set_enabled(DMA_IRQ_0, true);
     currentRaster = 0;
