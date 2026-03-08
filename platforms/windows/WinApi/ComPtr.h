@@ -39,6 +39,13 @@ public:
 		}
 	}
 
+	static void Call(HRESULT hr)
+	{
+		if (FAILED(hr)) {
+			throw ApiException(hr);
+		}
+	}
+
 	void CoCreateInstance(REFCLSID rclsid)
 	{
 		assert(p == NULL);

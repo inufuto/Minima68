@@ -18,8 +18,3 @@ static constexpr auto XResolution = TileWidth * (FieldWindowWidth + StatusAreaWi
 static constexpr auto YResolution = TileHeight * VideoWindowHeight;
 static constexpr auto SpriteRangeX = TileWidth * FieldWindowWidth;
 static constexpr auto SpriteRangeY = YResolution;
-
-constexpr auto TilePatternAddress = 0xe000;
-constexpr auto TileMapAddress = 0xf000;
-constexpr auto PaletteAddress = 0xf800;
-constexpr auto VideoModeAddress = 0xf820;

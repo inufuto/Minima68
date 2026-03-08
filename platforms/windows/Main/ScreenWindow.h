@@ -1,8 +1,9 @@
 #pragma once
 #include "Direct2DBitmap.h"
+#include "MemoryMap.h"
 #include "Minima68Win.h"
 #include "TitledPane.h"
-#include "../Direct2D/RenderTargetWindow.h"
+#include "RenderTargetWindow.h"
 
 class ScreenPane : public TitledPane
 {

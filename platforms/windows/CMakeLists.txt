@@ -1,7 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.10)
-project(Minima80i)
-
-# Enable RC language for resource files
+﻿# Enable RC language for resource files
 if(WIN32)
     enable_language(RC)
     set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /nologo")
@@ -16,6 +13,9 @@ add_subdirectory(Direct2D)
 # Add Emulator subdirectory
 add_subdirectory(Emulator)
 
+# Add Audio subdirectory
+add_subdirectory(Audio)
+
 # Source files
 set(SOURCES
     Main/WinMain.cpp
@@ -23,7 +23,7 @@ set(SOURCES
     Main/ScreenWindow.cpp
     Main/resource.rc
     Emulator/emulator.rc
- "Emulator/BreakpointDialog.cpp")
+ )
 
 # Header files
 set(HEADERS
@@ -50,6 +50,7 @@ if(WIN32)
         WinApi
         Direct2D      
         Emulator
+        Audio
         user32
         gdi32
         shell32

@@ -2,10 +2,23 @@
 
 #include <string>
 
+const uint8_t PianoWave[] = {
+	254,238,204,172,150,128,104,84,
+	74,65,50,36,32,33,25,9,
+	0,9,25,33,32,36,50,65,
+	74,84,104,128,150,172,204,238,
+};
+
+Minima68Win::Minima68Win(PrimaryClock::Owner* pOwner): 
+	Minima68(this), primaryClock(pOwner, PrimaryClockFrequency),
+channel(PianoWave)
+{}
+
 void Minima68Win::Start()
 {
 	mode = Normal;
 	primaryClock.AddDestination(&Cpu());
+	channel.Start();
 #ifdef _DEBUG
 	ZeroMemory(Ram(), 0xff00);
 	LoadProgramFromFile(0x100, "D:\\8bit\\Minima68\\test\\test.bin");

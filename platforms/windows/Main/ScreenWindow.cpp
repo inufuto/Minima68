@@ -1,8 +1,6 @@
 #include <windows.h>
 #include "ScreenWindow.h"
-#include "Direct2DBrush.h"
 #include "EmulatorWindow.h"
-#include "resource.h"
 #include "../../core/Video.h"
 
 constexpr auto ScreenWidth = XResolution * 2;
