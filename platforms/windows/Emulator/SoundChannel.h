@@ -23,40 +23,30 @@ public:
 extern SoundThread SoundThread;
 
 
-class SoundChannel : public Uncopyable
-{
-protected:
-	static float ToFloat(uint8_t b);
-public:
-	//void SourceSamples(const uint8_t* pSamples) { this->pSourceSamples = pSamples; }
-	//auto SourceSampleAt(int index) const { return pSourceSamples[index]; }
-	////void SourceChanged() { sourceChanged = true; }
-	//float Volume() const { return volume; }
-};
-
-class ToneChannel : public SoundChannel
+class ToneChannel : public Uncopyable
 {
 private:
-	const uint8_t* pSourceSamples;
+	const uint8_t* pSourceSamples = nullptr;
 	float samples[ToneSampleCount];
 	uint16_t frequency;
-	float volume = 1.0f;
+	float volume = 0.0f;
 	double phase = 0;
 	double step;
 	bool sourceChanged = true;
 protected:
 	void UpdateSamples();
 public:
-	void SourceSamples(const uint8_t* pSamples) { this->pSourceSamples = pSamples; }
-	void Frequency(uint16_t frequency);
+	void SetSourceSamples(const uint8_t* pSamples);
+	void SetFrequency(uint16_t frequency);
+	void SetVolume(float volume) { this->volume = volume; }
 	float Sample();
 };
 
-class EffectChannel : public SoundChannel
+class EffectChannel : public Uncopyable
 {
 private:
 	const uint8_t* pSourceSamples;
 	float samples[EffectSampleCount];
 };
 
-extern void StartSound();
+extern ToneChannel ToneChannels[ToneChannelCount];

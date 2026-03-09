@@ -1,7 +1,8 @@
-#include <cstring>
 #include "Minima68.h"
-#include "Video.h"
+
 #include "MemoryMap.h"
+#include "Sound.h"
+#include "Video.h"
 
 const uint8_t PianoWave[] = {
 	254,238,204,172,150,128,104,84,
@@ -21,12 +22,35 @@ const uint8_t BassWave[] = {
 	55,50,35,18,5,0,5,18,
 	35,56,81,110,145,183,219,245,
 };
-const uint8_t ZeroWave[] = {
-	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
-	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
-	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
-	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
-};
+
+extern const uint8_t TestCode[];
+
+inline uint16_t LoadWord(const uint8_t* p)
+{
+	return MakeWord(p[0], p[1]);
+}
+
+void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
+{
+	pOwner->WriteMemory(address, value);
+	if (address >= ToneSampleAddress && address < ToneSampleAddress + ToneChannelCount * 2) {
+		auto index = (address - ToneSampleAddress) / 2;
+		auto sampleAddress = LoadWord(pOwner->Ram() + ToneSampleAddress + index * 2);
+		pOwner->SetToneSample(index, pOwner->Ram() + sampleAddress);
+	}
+	else if (address >= FrequencyAddress && address < FrequencyAddress + ToneChannelCount * 2) {
+		auto index = (address - FrequencyAddress) / 2;
+		auto frequency = LoadWord(pOwner->Ram() + FrequencyAddress + index * 2);
+		pOwner->SetToneFrequency(index, frequency);
+	}
+	else if (address >= VolumeAddress && address < VolumeAddress + ToneChannelCount * 2) {
+		if ((address - VolumeAddress) % 2 == 0) {
+			auto index = address - VolumeAddress;
+			auto volume = pOwner->Ram()[address];
+			pOwner->SetToneVolume(index, volume);
+		}
+	}
+}
 
 void Minima68::Reset()
 {
@@ -51,8 +75,9 @@ void Minima68::Reset()
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
-	memcpy(Ram() + ShortWaveAddress, PianoWave, 32);
-	memcpy(Ram() + ShortWaveAddress + 32, Lead2Wave, 32);
-	memcpy(Ram() + ShortWaveAddress + 64, BassWave, 32);
+		memcpy(Ram() + 0x100, TestCode, 0x2000);
+	//memcpy(Ram() + ShortWaveAddress, PianoWave, 32);
+	//memcpy(Ram() + ShortWaveAddress + 32, Lead2Wave, 32);
+	//memcpy(Ram() + ShortWaveAddress + 64, BassWave, 32);
 	cpu.Reset();
 }

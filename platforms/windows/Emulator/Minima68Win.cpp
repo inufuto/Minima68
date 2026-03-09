@@ -25,16 +25,11 @@ void Minima68Win::Start()
 {
 	mode = Normal;
 	primaryClock.AddDestination(&Cpu());
-#ifdef _DEBUG
-	ZeroMemory(Ram(), 0xff00);
-	LoadProgramFromFile(0x100, "D:\\8bit\\Minima68\\test\\test.bin");
-#endif
 	SoundThread.Start(this);
 	Reset();
 	primaryClock.Start();
 }
 
-#ifdef _DEBUG
 bool Minima68Win::PauseRequired(const ::Cpu* pCpu, uint16_t address)
 {
 	switch (mode) {
@@ -73,15 +68,20 @@ void Minima68Win::SetColor(int index, uint8_t r, uint8_t g, uint8_t b) {
 	colors[index] = { b, g, r, 0xff };
 }
 
-void Minima68Win::LoadProgramFromFile(uint16_t address, const char* path) {
-	FILE* file;
-	fopen_s(&file, path, "rb");
-	if (file) {
-		fseek(file, 0, SEEK_END);
-		auto size = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		fread(Ram() + address, 1, size, file);
-		fclose(file);
-	}
+void Minima68Win::SetToneSample(int index, const uint8_t* pSample)
+{
+	assert(index >= 0 && index < ToneSampleCount);
+	ToneChannels[index].SetSourceSamples(pSample);
 }
-#endif
+
+void Minima68Win::SetToneFrequency(int index, uint16_t frequency)
+{
+	assert(index >= 0 && index < ToneSampleCount);
+	ToneChannels[index].SetFrequency(frequency);
+}
+
+void Minima68Win::SetToneVolume(int index, uint8_t volume)
+{
+	assert(index >= 0 && index < ToneSampleCount);
+	ToneChannels[index].SetVolume(volume / 255.0f);
+}

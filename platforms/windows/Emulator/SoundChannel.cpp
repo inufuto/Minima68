@@ -2,7 +2,6 @@
 
 #include "SoundChannel.h"
 #include "Minima68Win.h"
-#include "../../../core/MemoryMap.h"
 
 ToneChannel ToneChannels[ToneChannelCount];
 class SoundThread SoundThread;
@@ -16,14 +15,14 @@ unsigned SoundThread::ThreadProc(void* pThis)
 void SoundThread::Start(Minima68Win* pEmulator)
 {
 	audioClient.Create();
-	auto pSourceSamples = pEmulator->Ram() + ShortWaveAddress;
-	for (auto& channel : ToneChannels) {
-		channel.SourceSamples(pSourceSamples);
-		pSourceSamples += ToneSampleCount;
-	}
-	ToneChannels[0].Frequency(440);
-	ToneChannels[1].Frequency(440 * 2);
-	ToneChannels[2].Frequency(440 / 2);
+	//auto pSourceSamples = pEmulator->Ram() + ShortWaveAddress;
+	//for (auto& channel : ToneChannels) {
+	//	channel.SourceSamples(pSourceSamples);
+	//	pSourceSamples += ToneSampleCount;
+	//}
+	//ToneChannels[0].SetFrequency(440);
+	//ToneChannels[1].SetFrequency(440 * 2);
+	//ToneChannels[2].SetFrequency(440 / 2);
 
 	running = true;
 	hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadProc, this, 0, nullptr));
@@ -99,7 +98,7 @@ void SoundThread::Loop() const
 }
 
 
-float SoundChannel::ToFloat(uint8_t b)
+inline float ToFloat(uint8_t b)
 {
 	return (static_cast<int>(b) - 128) / 128.0f;
 }
@@ -108,12 +107,23 @@ float SoundChannel::ToFloat(uint8_t b)
 
 void ToneChannel::UpdateSamples()
 {
-	for (int i = 0; i < ToneSampleCount; ++i) {
-		samples[i] = ToFloat(pSourceSamples[i]);
+	if (pSourceSamples != nullptr) {
+		for (int i = 0; i < ToneSampleCount; ++i) {
+			samples[i] = ToFloat(pSourceSamples[i]);
+		}
+	}
+	else {
+		ZeroMemory(samples, sizeof(samples));
 	}
 }
 
-void ToneChannel::Frequency(uint16_t frequency)
+void ToneChannel::SetSourceSamples(const uint8_t* pSamples)
+{
+	this->pSourceSamples = pSamples;
+	sourceChanged = true;
+}
+
+void ToneChannel::SetFrequency(uint16_t frequency)
 {
 	this->frequency = frequency;
 	step = static_cast<double>(frequency * ToneSampleCount) / SoundThread.SampleRate();
@@ -125,7 +135,7 @@ float ToneChannel::Sample()
 		sourceChanged = false;
 		UpdateSamples();
 	}
-	auto sample = samples[static_cast<int>(phase)] *volume;
+	auto sample = samples[static_cast<int>(phase)] * volume;
 	phase += step;
 	if (phase >= ToneSampleCount) {
 		phase -= ToneSampleCount;

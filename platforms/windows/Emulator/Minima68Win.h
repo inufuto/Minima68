@@ -38,8 +38,8 @@ public:
 
 	void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) override;
 	uint32_t ColorAt(int index) const { assert(index >= 0 && index < ColorCount); return colors[index].dword; }
-#ifdef _DEBUG
-	void LoadProgramFromFile(const char* path);
-#endif
-	void LoadProgramFromFile(uint16_t address, const char* path);
+
+	void SetToneSample(int index, const uint8_t* pSample) override;
+	void SetToneFrequency(int index, uint16_t frequency) override;
+	void SetToneVolume(int index, uint8_t volume) override;
 };
