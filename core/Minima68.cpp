@@ -1,3 +1,4 @@
+#include <cstring>
 #include "Minima68.h"
 
 #include "MemoryMap.h"

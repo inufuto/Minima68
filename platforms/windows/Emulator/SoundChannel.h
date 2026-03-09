@@ -29,7 +29,7 @@ private:
 	const uint8_t* pSourceSamples = nullptr;
 	float samples[ToneSampleCount];
 	uint16_t frequency;
-	float volume = 0.0f;
+	uint8_t volume = 0;
 	double phase = 0;
 	double step;
 	bool sourceChanged = true;
@@ -38,7 +38,7 @@ protected:
 public:
 	void SetSourceSamples(const uint8_t* pSamples);
 	void SetFrequency(uint16_t frequency);
-	void SetVolume(float volume) { this->volume = volume; }
+	void SetVolume(uint8_t volume) { this->volume = volume; }
 	float Sample();
 };
 

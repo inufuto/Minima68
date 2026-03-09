@@ -8,11 +8,12 @@
 #include "Sound.h"
 
 static constexpr auto ReferenceToneFrequency = 440.0;
+static constexpr auto PwmWrap = 0x100;
 static constexpr auto PwmDivision =
     (Config::SystemClock * 1000.0) /
-    (ReferenceToneFrequency * ToneSampleCount * SoundChannel::PwmWrap);
+    (ReferenceToneFrequency * ToneSampleCount * PwmWrap);
 static constexpr auto PwmSampleRate =
-    (Config::SystemClock * 1000.0) / (PwmDivision * SoundChannel::PwmWrap);
+    (Config::SystemClock * 1000.0) / (PwmDivision * PwmWrap);
 
 void ToneChannel::SetFrequency(uint16_t frequency)
 {
@@ -23,7 +24,7 @@ void ToneChannel::SetFrequency(uint16_t frequency)
 
 uint8_t ToneChannel::Sample()
 {
-    auto sample = SampleAt(static_cast<int>(phase)) * Volume() / MaxVolume;
+    auto sample = pSamples[static_cast<int>(phase)] * volume / MaxVolume;
     phase += step;
     if (phase >= ToneSampleCount) {
         phase -= ToneSampleCount;
@@ -50,14 +51,14 @@ static void PwmHandler()
 
 void InitSound()
 {
-    {
-        auto pSourceSamples = emulator.Ram() + ShortWaveAddress;
-        for (auto& channel : toneChannels) {
-            channel.Samples(pSourceSamples);
-            pSourceSamples += ToneSampleCount;
-        }
-    }
-    toneChannels[0].SetFrequency(440);
+    // {
+    //     auto pSourceSamples = emulator.Ram() + ShortWaveAddress;
+    //     for (auto& channel : toneChannels) {
+    //         channel.Samples(pSourceSamples);
+    //         pSourceSamples += ToneSampleCount;
+    //     }
+    // }
+    // toneChannels[0].SetFrequency(440);
     
     gpio_set_function(Config::Gpio::Sound, GPIO_FUNC_PWM);
     auto pwmSlice = pwm_gpio_to_slice_num(Config::Gpio::Sound);
@@ -65,13 +66,13 @@ void InitSound()
     auto pwmConfig = pwm_get_default_config();
     pwm_init(pwmSlice, &pwmConfig, true);
     pwm_set_clkdiv(pwmSlice, PwmDivision);
-    pwm_set_wrap(pwmSlice, SoundChannel::PwmWrap - 1);
+    pwm_set_wrap(pwmSlice, PwmWrap - 1);
 
     pwm_set_gpio_level(Config::Gpio::Sound, 0);
 
     pwm_clear_irq(pwmSlice);
     pwm_set_irq_enabled(pwmSlice, true);
-    irq_set_priority(PWM_IRQ_WRAP, 0x40);
+    irq_set_priority(PWM_IRQ_WRAP, 0x80);
     irq_set_exclusive_handler(PWM_IRQ_WRAP, PwmHandler);
     irq_set_enabled(PWM_IRQ_WRAP, true);
 }

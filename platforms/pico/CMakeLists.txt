@@ -10,7 +10,6 @@ add_executable(${MAIN_PROJECT_NAME}
         Main.cpp PrimaryClock.cpp Minima68Pico.cpp
         Color.cpp Ntsc.cpp
         SoundChannel.cpp
-        test.cpp
 )
 
 pico_set_program_name(${MAIN_PROJECT_NAME} "${MAIN_PROJECT_NAME}")
