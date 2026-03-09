@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../core/Minima68.h"
 #include "PrimaryClock.h"
 

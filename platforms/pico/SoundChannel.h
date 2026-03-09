@@ -20,8 +20,6 @@ public:
 
 class ToneChannel : public SoundChannel
 {
-public:
-	static constexpr auto SampleCount = 32;
 private:
 	double step;
 	double phase = 0;

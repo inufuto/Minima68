@@ -5,11 +5,12 @@
 #include "SoundChannel.h"
 #include "Minima68Pico.h"
 #include "MemoryMap.h"
+#include "Sound.h"
 
 static constexpr auto ReferenceToneFrequency = 440.0;
 static constexpr auto PwmDivision =
     (Config::SystemClock * 1000.0) /
-    (ReferenceToneFrequency * ToneChannel::SampleCount * SoundChannel::PwmWrap);
+    (ReferenceToneFrequency * ToneSampleCount * SoundChannel::PwmWrap);
 static constexpr auto PwmSampleRate =
     (Config::SystemClock * 1000.0) / (PwmDivision * SoundChannel::PwmWrap);
 
@@ -17,15 +18,15 @@ void ToneChannel::SetFrequency(uint16_t frequency)
 {
     // step is advanced once per PWM interrupt (sample rate), so convert Hz to
     // phase increment by (frequency * waveform_samples) / sample_rate.
-    step = static_cast<double>(frequency) * SampleCount / PwmSampleRate;
+    step = static_cast<double>(frequency) * ToneSampleCount / PwmSampleRate;
 }
 
 uint8_t ToneChannel::Sample()
 {
     auto sample = SampleAt(static_cast<int>(phase)) * Volume() / MaxVolume;
     phase += step;
-    if (phase >= SampleCount) {
-        phase -= SampleCount;
+    if (phase >= ToneSampleCount) {
+        phase -= ToneSampleCount;
     }
     return sample;
 }
@@ -53,12 +54,11 @@ void InitSound()
         auto pSourceSamples = emulator.Ram() + ShortWaveAddress;
         for (auto& channel : toneChannels) {
             channel.Samples(pSourceSamples);
-            pSourceSamples += ToneChannel::SampleCount;
+            pSourceSamples += ToneSampleCount;
         }
     }
     toneChannels[0].SetFrequency(440);
-    // toneChannels[0].Samples(PianoWave);
-
+    
     gpio_set_function(Config::Gpio::Sound, GPIO_FUNC_PWM);
     auto pwmSlice = pwm_gpio_to_slice_num(Config::Gpio::Sound);
 

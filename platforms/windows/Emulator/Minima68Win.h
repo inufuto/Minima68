@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PrimaryClock.h"
-#include "SoundChannel.h"
 #include "../../../core/Minima68.h"
 #include "../../../core/Video.h"
 #include "../Audio/WindowsAudioClient.h"
@@ -24,7 +23,6 @@ private:
 		};
 		uint32_t dword;
 	} colors[ColorCount];
-	ToneChannel channel;
 public:
 	explicit Minima68Win(PrimaryClock::Owner* pOwner);
 	const auto& ClockSource() const { return primaryClock; }

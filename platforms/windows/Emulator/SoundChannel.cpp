@@ -1,21 +1,30 @@
-#include "SoundChannel.h"
-
 #include <process.h>
 
-float SoundChannel::ToFloat(uint8_t b)
-{
-	return (static_cast<int>(b) - 128) / 128.0f;
-}
+#include "SoundChannel.h"
+#include "Minima68Win.h"
+#include "../../../core/MemoryMap.h"
 
-unsigned SoundChannel::ThreadProc(void* pThis)
+ToneChannel ToneChannels[ToneChannelCount];
+class SoundThread SoundThread;
+
+unsigned SoundThread::ThreadProc(void* pThis)
 {
-	static_cast<SoundChannel*>(pThis)->Loop();
+	static_cast<SoundThread*>(pThis)->Loop();
 	return 0;
 }
 
-void SoundChannel::Start()
+void SoundThread::Start(Minima68Win* pEmulator)
 {
 	audioClient.Create();
+	auto pSourceSamples = pEmulator->Ram() + ShortWaveAddress;
+	for (auto& channel : ToneChannels) {
+		channel.SourceSamples(pSourceSamples);
+		pSourceSamples += ToneSampleCount;
+	}
+	ToneChannels[0].Frequency(440);
+	ToneChannels[1].Frequency(440 * 2);
+	ToneChannels[2].Frequency(440 / 2);
+
 	running = true;
 	hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadProc, this, 0, nullptr));
 	if (hThread == nullptr) {
@@ -23,7 +32,7 @@ void SoundChannel::Start()
 	}
 }
 
-void SoundChannel::Stop()
+void SoundThread::Stop()
 {
 	if (running) {
 		running = false;
@@ -35,56 +44,91 @@ void SoundChannel::Stop()
 	}
 }
 
-void SoundChannel::Loop()
+void SoundThread::Loop() const
 {
+	HRESULT result;
 	ComPtr<IAudioRenderClient> pRenderClient;
 	{
 		IAudioRenderClient* p;
-		audioClient->GetService(__uuidof(IAudioRenderClient), reinterpret_cast<void**>(&p));
+		result = audioClient->GetService(__uuidof(IAudioRenderClient), reinterpret_cast<void**>(&p));
+		if (FAILED(result)) {
+			throw ApiException(result);
+		}
 		pRenderClient.Attach(p);
 	}
 	UINT32 bufferSize;
-	audioClient->GetBufferSize(&bufferSize);
-	audioClient->Start();
+	result = audioClient->GetBufferSize(&bufferSize);
+	if (FAILED(result)) {
+		throw ApiException(result);
+	}
+	result = audioClient->Start();
+	if (FAILED(result)) {
+		throw ApiException(result);
+	}
 	while (running) {
 		UINT32 padding;
-		audioClient->GetCurrentPadding(&padding);
+		result = audioClient->GetCurrentPadding(&padding);
+		if (FAILED(result)) {
+			throw ApiException(result);
+		}
 		auto framesToWrite = bufferSize - padding;
-		if (framesToWrite>0) {
-			BYTE* pBuffer;
-			pRenderClient->GetBuffer(framesToWrite, &pBuffer);
-			Write(reinterpret_cast<float*>(pBuffer), framesToWrite);
-			pRenderClient->ReleaseBuffer(framesToWrite, 0);
+		if (framesToWrite > 0) {
+			float* pBuffer;
+			result = pRenderClient->GetBuffer(framesToWrite, reinterpret_cast<BYTE**>(&pBuffer));
+			if (FAILED(result)) {
+				throw ApiException(result);
+			}
+			auto frameCount = framesToWrite;
+			while (frameCount > 0) {
+				float sum = 0;
+				for (auto& channel : ToneChannels) {
+					sum += channel.Sample();
+				}
+				auto average = sum / (ToneChannelCount + 1);
+				*pBuffer++ = average;
+				*pBuffer++ = average;
+				--frameCount;
+			}
+			result = pRenderClient->ReleaseBuffer(framesToWrite, 0);
+			if (FAILED(result)) {
+				throw ApiException(result);
+			}
 		}
 		Sleep(0);
 	}
 }
 
+
+float SoundChannel::ToFloat(uint8_t b)
+{
+	return (static_cast<int>(b) - 128) / 128.0f;
+}
+
+
+
 void ToneChannel::UpdateSamples()
 {
-	for (int i = 0; i < SampleCount; ++i) {
-		//samples[i] = (static_cast<int>(pSourceSamples[i]) - 128) / 128.0f;
+	for (int i = 0; i < ToneSampleCount; ++i) {
 		samples[i] = ToFloat(pSourceSamples[i]);
 	}
 }
 
-void ToneChannel::Write(float* pBuffer, UINT32 framesToWrite)
+void ToneChannel::Frequency(uint16_t frequency)
 {
-	while (framesToWrite > 0) {
-		auto sample = samples[static_cast<int>(phase)] * Volume();
-		phase += step;
-		if (phase >= SampleCount) {
-			phase -= SampleCount;
-		}
-		*pBuffer++ = sample;
-		*pBuffer++ = sample;
-		--framesToWrite;
-	}
+	this->frequency = frequency;
+	step = static_cast<double>(frequency * ToneSampleCount) / SoundThread.SampleRate();
 }
 
-void ToneChannel::Start()
+float ToneChannel::Sample()
 {
-	SoundChannel::Start();
-	phase = 0;
-	step = static_cast<double>(frequency * SampleCount) / SampleRate();
+	if (sourceChanged) {
+		sourceChanged = false;
+		UpdateSamples();
+	}
+	auto sample = samples[static_cast<int>(phase)] *volume;
+	phase += step;
+	if (phase >= ToneSampleCount) {
+		phase -= ToneSampleCount;
+	}
+	return sample;
 }

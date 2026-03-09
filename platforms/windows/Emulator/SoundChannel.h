@@ -1,53 +1,62 @@
 #pragma once
 
 #include "../Audio/WindowsAudioClient.h"
+#include "../../../core/Sound.h"
 
-class SoundChannel : public Uncopyable
+class Minima68Win;
+
+class SoundThread : public Uncopyable
 {
 private:
 	WindowsAudioClient audioClient;
-	HANDLE hThread;
+	HANDLE hThread = nullptr;
 	bool running;
-	float volume = 0.5f;
 private:
 	static unsigned __stdcall ThreadProc(void* pThis);
+	void Loop() const;
+public:
+	~SoundThread() override { Stop(); }
+	auto SampleRate() const { return audioClient.SampleRate(); }
+	virtual void Start(Minima68Win* pEmulator);
+	void Stop();
+};
+extern SoundThread SoundThread;
+
+
+class SoundChannel : public Uncopyable
+{
 protected:
 	static float ToFloat(uint8_t b);
-	auto SampleRate() const { return audioClient.SampleRate(); }
 public:
-	~SoundChannel() override { Stop(); }
-	float Volume() const { return volume; }
-	virtual void Start();
-	void Stop();
-	virtual void Write(float* pBuffer, UINT32 framesToWrite) = 0;
-	void Loop();
+	//void SourceSamples(const uint8_t* pSamples) { this->pSourceSamples = pSamples; }
+	//auto SourceSampleAt(int index) const { return pSourceSamples[index]; }
+	////void SourceChanged() { sourceChanged = true; }
+	//float Volume() const { return volume; }
 };
 
 class ToneChannel : public SoundChannel
 {
 private:
-	static constexpr auto SampleCount = 32;
 	const uint8_t* pSourceSamples;
-	float samples[SampleCount];
-	uint16_t frequency = 440;
+	float samples[ToneSampleCount];
+	uint16_t frequency;
+	float volume = 1.0f;
+	double phase = 0;
 	double step;
-	double phase;
-private:
-	void UpdateSamples();
+	bool sourceChanged = true;
 protected:
-	void Write(float* pBuffer, UINT32 framesToWrite) override;
+	void UpdateSamples();
 public:
-	explicit ToneChannel(const uint8_t* pSourceSamples) : pSourceSamples(pSourceSamples)
-	{
-		UpdateSamples();
-	}
-	void Start() override;
+	void SourceSamples(const uint8_t* pSamples) { this->pSourceSamples = pSamples; }
+	void Frequency(uint16_t frequency);
+	float Sample();
 };
 
 class EffectChannel : public SoundChannel
 {
 private:
-	static constexpr auto SampleCount = 128;
 	const uint8_t* pSourceSamples;
-	float samples[SampleCount];
+	float samples[EffectSampleCount];
 };
+
+extern void StartSound();

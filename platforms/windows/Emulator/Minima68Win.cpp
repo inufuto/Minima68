@@ -1,6 +1,7 @@
-#include "Minima68Win.h"
-
 #include <string>
+
+#include "Minima68Win.h"
+#include "SoundChannel.h"
 
 const uint8_t PianoWave[] = {
 	254,238,204,172,150,128,104,84,
@@ -17,19 +18,18 @@ const uint8_t Lead2Wave[] = {
 
 
 Minima68Win::Minima68Win(PrimaryClock::Owner* pOwner): 
-	Minima68(this), primaryClock(pOwner, PrimaryClockFrequency),
-channel(Lead2Wave)
+	Minima68(this), primaryClock(pOwner, PrimaryClockFrequency)
 {}
 
 void Minima68Win::Start()
 {
 	mode = Normal;
 	primaryClock.AddDestination(&Cpu());
-	channel.Start();
 #ifdef _DEBUG
 	ZeroMemory(Ram(), 0xff00);
 	LoadProgramFromFile(0x100, "D:\\8bit\\Minima68\\test\\test.bin");
 #endif
+	SoundThread.Start(this);
 	Reset();
 	primaryClock.Start();
 }

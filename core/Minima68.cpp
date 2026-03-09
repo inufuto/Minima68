@@ -1,5 +1,32 @@
+#include <cstring>
 #include "Minima68.h"
 #include "Video.h"
+#include "MemoryMap.h"
+
+const uint8_t PianoWave[] = {
+	254,238,204,172,150,128,104,84,
+	74,65,50,36,32,33,25,9,
+	0,9,25,33,32,36,50,65,
+	74,84,104,128,150,172,204,238,
+};
+const uint8_t Lead2Wave[] = {
+	203,160,75,22,17,23,17,10,
+	11,10,6,4,4,3,0,0,
+	2,0,0,3,4,4,6,10,
+	11,10,17,23,17,22,75,160,
+};
+const uint8_t BassWave[] = {
+	254,245,219,183,145,110,81,56,
+	35,18,5,0,5,18,35,50,
+	55,50,35,18,5,0,5,18,
+	35,56,81,110,145,183,219,245,
+};
+const uint8_t ZeroWave[] = {
+	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
+	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
+	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
+	0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
+};
 
 void Minima68::Reset()
 {
@@ -24,5 +51,8 @@ void Minima68::Reset()
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
+	memcpy(Ram() + ShortWaveAddress, PianoWave, 32);
+	memcpy(Ram() + ShortWaveAddress + 32, Lead2Wave, 32);
+	memcpy(Ram() + ShortWaveAddress + 64, BassWave, 32);
 	cpu.Reset();
 }
