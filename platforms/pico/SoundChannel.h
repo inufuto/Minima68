@@ -19,8 +19,9 @@ class ToneChannel : public Uncopyable
 private:
 	const uint8_t* pSamples = nullptr;
     uint8_t volume = MaxVolume;
-	double step;
-	double phase = 0;
+    uint32_t phaseDelta = 0;
+    int32_t phaseError = 0;
+    uint8_t sampleIndex = 0;
 public:
     void SetSamples(const uint8_t* pSamples) { this->pSamples = pSamples; }
     void SetFrequency(uint16_t frequency);

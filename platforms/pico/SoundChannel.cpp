@@ -14,21 +14,26 @@ static constexpr auto PwmDivision =
     (ReferenceToneFrequency * ToneSampleCount * PwmWrap);
 static constexpr auto PwmSampleRate =
     (Config::SystemClock * 1000.0) / (PwmDivision * PwmWrap);
+static constexpr int32_t PwmSampleRateInt = static_cast<int32_t>(PwmSampleRate + 0.5);
 
 void ToneChannel::SetFrequency(uint16_t frequency)
 {
-    // step is advanced once per PWM interrupt (sample rate), so convert Hz to
-    // phase increment by (frequency * waveform_samples) / sample_rate.
-    step = static_cast<double>(frequency) * ToneSampleCount / PwmSampleRate;
+    phaseDelta = static_cast<uint32_t>(frequency) * ToneSampleCount;
 }
 
 uint8_t ToneChannel::Sample()
 {
-    auto sample = pSamples[static_cast<int>(phase)] * volume / MaxVolume;
-    phase += step;
-    if (phase >= ToneSampleCount) {
-        phase -= ToneSampleCount;
+    auto sample = pSamples[sampleIndex] * volume / MaxVolume;
+
+    phaseError -= static_cast<int32_t>(phaseDelta);
+    while (phaseError < 0) {
+        phaseError += PwmSampleRateInt;
+        ++sampleIndex;
+        if (sampleIndex >= ToneSampleCount) {
+            sampleIndex = 0;
+        }
     }
+
     return sample;
 }
 
