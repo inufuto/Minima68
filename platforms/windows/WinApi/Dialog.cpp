@@ -32,8 +32,7 @@ LRESULT Dialog::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 
 void Dialog::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 {
-	switch (id)
-	{
+	switch (id) {
 	case IDOK:
 		OnOk();
 		return;
@@ -47,7 +46,7 @@ void Dialog::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 
 INT_PTR Dialog::ShowModal(HWND hParent)
 {
-	auto result = DialogBoxParam(HInstance, MAKEINTRESOURCE(id), hParent, Dialog::DlgProc, reinterpret_cast<LPARAM>(this));
+	auto result = DialogBoxParam(HInstance, MAKEINTRESOURCE(id), hParent, DlgProc, reinterpret_cast<LPARAM>(this));
 	if (result == -1) {
 		throw ApiException();
 	}

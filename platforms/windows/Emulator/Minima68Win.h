@@ -8,6 +8,7 @@
 class Minima68Win : public Minima68, public Debugger
 {
 private:
+	static constexpr double ScreenRefreshRate = 60*2;
 	PrimaryClock primaryClock;
 private:
 	enum Mode
@@ -19,16 +20,29 @@ private:
 	union Color
 	{
 		struct {
-			uint8_t b,g,r,a;
+			uint8_t b, g, r, a;
 		};
 		uint32_t dword;
 	} colors[ColorCount];
+	class VideoClockSource : public SecondaryClockSource
+	{
+	public:
+		explicit VideoClockSource() : SecondaryClockSource(ScreenRefreshRate / PrimaryClockFrequency) {}
+	} videoClockSource;
+	class VSync : public ClockDestination, public Uncopyable
+	{
+	private:
+		Minima68Win* pOwner;
+	public:
+		explicit VSync(Minima68Win* pOwner) : pOwner(pOwner) {}
+		void OnClock(uint32_t time) override { pOwner->MakeInterrupt(); }
+	} vsync;
 public:
 	explicit Minima68Win(PrimaryClock::Owner* pOwner);
 	const auto& ClockSource() const { return primaryClock; }
 	auto& ClockSource() { return primaryClock; }
 	void Start();
-	void Stop() { primaryClock.Stop(); }
+	void Stop();
 	void Pause() override { primaryClock.Pause(); }
 	void Resume() { primaryClock.Resume(); }
 	bool Paused() const { return primaryClock.Paused(); }

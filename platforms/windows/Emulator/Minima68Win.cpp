@@ -18,16 +18,25 @@ const uint8_t Lead2Wave[] = {
 
 
 Minima68Win::Minima68Win(PrimaryClock::Owner* pOwner): 
-	Minima68(this), primaryClock(pOwner, PrimaryClockFrequency)
-{}
+	Minima68(this), primaryClock(pOwner, PrimaryClockFrequency), vsync(this)
+{
+	videoClockSource.AddDestination(&vsync);
+	primaryClock.AddDestination(&Cpu());
+	primaryClock.AddDestination(&videoClockSource);
+}
 
 void Minima68Win::Start()
 {
 	mode = Normal;
-	primaryClock.AddDestination(&Cpu());
-	SoundThread.Start(this);
 	Reset();
+	SoundThread.Start(this);
 	primaryClock.Start();
+}
+
+void Minima68Win::Stop()
+{
+	SoundThread.Stop();
+	primaryClock.Stop();
 }
 
 bool Minima68Win::PauseRequired(const ::Cpu* pCpu, uint16_t address)

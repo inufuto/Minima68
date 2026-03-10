@@ -132,7 +132,7 @@ LRESULT Window::OnWmInitMenuPopup(WPARAM wParam, LPARAM lParam)
 LRESULT Window::OnWmInitDialog(WPARAM wParam, LPARAM lParam)
 {
 	OnInitDialog();
-	return 0;
+	return TRUE;
 }
 
 Window::~Window() {

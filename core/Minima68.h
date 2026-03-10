@@ -5,7 +5,7 @@
 #include "AbtractEmulator.h"
 #include "Cpu6800.h"
 
-class Minima68 : AbstractEmulator
+class Minima68 : public AbstractEmulator
 {
 public:
 	uint16_t StartAddress = 0x0100;
@@ -26,11 +26,11 @@ private:
 		void Write(const uint16_t address, const uint8_t value) override;
 	} memory;
 	uint8_t scrollX;
-private:
 	uint8_t scrollY;
 protected:
 	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
 
+	void MakeInterrupt() { cpu.MakeInterrupt(); }
 	uint8_t ReadMemory(uint16_t address) const { return ram[address]; }
 	void WriteMemory(uint16_t address, uint8_t value) { ram[address] = value; }
 	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;

@@ -58,12 +58,12 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{2,"CLI",[](Cpu6800& cpu)
 	{
 		// 0e CLI
-		cpu.ClearFlag(Condition::InterruptDisable);
+		cpu.ClearFlag(Condition::InterruptMask);
 	}},
 	{2,"SEI",[](Cpu6800& cpu)
 	{
 		// 0f SEI
-		cpu.SetFlag(Condition::InterruptDisable);
+		cpu.SetFlag(Condition::InterruptMask);
 	}},
 	{2,"SBA",[](Cpu6800& cpu)
 	{
@@ -848,7 +848,11 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 		// bc CPX w
 		cpu.CompareX(cpu.LoadExtended());
 	}},
-	{ 6,Undefined,Nop }, // bd
+	{ 9,"JSR\tw",[](Cpu6800& cpu)
+	{
+		// bd JSR w
+		cpu.JumpToSubroutine(cpu.FetchWord());
+	} },
 	{5,"LDS\tw",[](Cpu6800& cpu)
 	{
 		// be LDS w
@@ -978,7 +982,7 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{4,"LDX\tb",[](Cpu6800& cpu)
 	{
 		// de LDX b
-		cpu.UpdateFlagsForWord(cpu.x = cpu.FetchWord());
+		cpu.UpdateFlagsForWord(cpu.x = cpu.LoadWordDirect());
 	}},
 	{5,"STX\tb",[](Cpu6800& cpu)
 	{
@@ -1457,8 +1461,8 @@ void Cpu6800::ReturnFromInterrupt()
 
 void Cpu6800::JumpToSubroutine(const uint16_t address)
 {
-	Push(HighByte(pc));
 	Push(LowByte(pc));
+	Push(HighByte(pc));
 	pc = address;
 }
 
@@ -1473,10 +1477,10 @@ void Cpu6800::Push(uint8_t value)
 }
 
 void Cpu6800::PushAll() {
-	Push(HighByte(pc));
 	Push(LowByte(pc));
-	Push(HighByte(x));
+	Push(HighByte(pc));
 	Push(LowByte(x));
+	Push(HighByte(x));
 	Push(a);
 	Push(b);
 	Push(cc | 0b11000000);
@@ -1488,9 +1492,10 @@ void Cpu6800::WaitForInterrupt()
 	halted = true;
 }
 
-void Cpu6800::Interrupt(const int16_t vectorAddress)
+void Cpu6800::Interrupt(const uint16_t vectorAddress)
 {
 	PushAll();
+	SetFlag(Condition::InterruptMask);
 	uint8_t high = pMemorySpace->Read(vectorAddress);
 	uint8_t low = pMemorySpace->Read(vectorAddress + 1);
 	pc = MakeWord(high, low);
@@ -1607,6 +1612,14 @@ void Cpu6800::StoreWordExtended(uint16_t value)
 
 void Cpu6800::FetchInstruction()
 {
+	if (interrupted) {
+		interrupted = false;
+		halted = false;
+		Interrupt(0xfff8); // interrupt vector is at 0xfff8 for 6800
+		FetchInstruction();
+		clockCountToExecute = 7; // interrupt handling takes 7 cycles before the next instruction is fetched
+		return;
+	}
 	if (halted) {
 		clockCountToExecute = 1;
 		return;
@@ -1631,13 +1644,14 @@ void Cpu6800::Reset()
 {
 	a = b = 0;
 	x = 0;
-	cc = 0b11000000; // I and H flags are set after reset
+	cc = 0b11110000; // I and H flags are set after reset
 	{
 		auto high = pMemorySpace->Read(0xfffe);
 		auto low = pMemorySpace->Read(0xffff);
 		pc = MakeWord(high, low);
 	}
 	halted = false;
+	interrupted = false;
 	FetchInstruction();
 }
 
@@ -1653,6 +1667,13 @@ void Cpu6800::OnClock(uint32_t time)
 {
 	if (--clockCountToExecute == 0) {
 		ExecuteInstruction();
+	}
+}
+
+void Cpu6800::MakeInterrupt()
+{
+	if ((cc & Condition::InterruptMask) == 0) {
+		interrupted = true;
 	}
 }
 

@@ -11,7 +11,7 @@ private:
 		static constexpr uint8_t Overflow = 1 << 1;
 		static constexpr uint8_t Zero = 1 << 2;
 		static constexpr uint8_t Negative = 1 << 3;
-		static constexpr uint8_t InterruptDisable = 1 << 4;
+		static constexpr uint8_t InterruptMask = 1 << 4;
 		static constexpr uint8_t HalfCarry = 1 << 5;
 	};
 	struct Instruction {
@@ -34,6 +34,7 @@ private:
 	const Instruction* pNextInstruction;
 	int clockCountToExecute;
 	bool halted;
+	bool interrupted;
 	uint16_t currentInstructionPc;
 private:
 	void SetFlag(const uint8_t flag) { cc |= flag; }
@@ -81,7 +82,7 @@ private:
 	void Push(uint8_t value);
 	void PushAll();
 	void WaitForInterrupt();
-	void Interrupt(int16_t vectorAddress);
+	void Interrupt(uint16_t vectorAddress);
 
 	uint16_t IndexedAddress();
 	void OperateMemory(uint16_t address, const std::function<uint8_t(uint8_t)>& operation) const;
@@ -107,6 +108,7 @@ public:
 	uint16_t CurrentInstructionAddress() const override { return currentInstructionPc; }
 	void Reset() override;
 	void OnClock(uint32_t time) override;
+	void MakeInterrupt();
 	int GetRegisterCount() const override;
 	const char* GetRegisterName(int index) const override;
 	int GetRegisterSize(int index) const override;

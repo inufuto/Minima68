@@ -16,7 +16,6 @@ public:
 class ScreenWindow : public RenderTargetWindow
 {
 private:
-	static constexpr double ScreenRefreshRate = 60.0;
 	Minima68Win& emulator;
 	Direct2DBitmap screenBitmap;
 	uint32_t screen[XResolution * YResolution];

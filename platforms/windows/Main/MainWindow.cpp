@@ -26,6 +26,15 @@ void MainWindow::UpdateView()
 	}
 }
 
+void MainWindow::ReDraw() {
+	registerWindow.Invalidate();
+	assemblyWindow.UpdateList();
+	memoryWindow.Invalidate();
+	//screenWindow.Invalidate();
+	UpdateWindow(HWnd());
+	waitingForUpdate = false;
+}
+
 LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
@@ -38,12 +47,7 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_ERASEBKGND:
 		return OnWmEraseBackground(wParam, lParam);
 	case WM_UPDATE_EMULATOR:
-		registerWindow.Invalidate();
-		assemblyWindow.UpdateList();
-		memoryWindow.Invalidate();
-		//screenWindow.Invalidate();
-		UpdateWindow(HWnd());
-		waitingForUpdate = false;
+		ReDraw();
 		return 0;
 	case WM_SELECT_PANE:
 		return OnWmSelectPane(wParam, lParam);

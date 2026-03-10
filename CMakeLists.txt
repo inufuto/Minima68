@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Project: Minima68 Emulator
 # オプションでターゲットを切り替え
 option(BUILD_FOR_PICO "Build for Raspberry Pi Pico" ON)
 
@@ -32,4 +33,6 @@ if(BUILD_FOR_PICO)
     add_subdirectory(platforms/pico)
 else()
     add_subdirectory(platforms/windows)
+    # Set startup project for Visual Studio
+    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${MAIN_PROJECT_NAME})
 endif()

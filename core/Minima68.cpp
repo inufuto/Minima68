@@ -34,6 +34,14 @@ inline uint16_t LoadWord(const uint8_t* p)
 void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 {
 	pOwner->WriteMemory(address, value);
+	if (address >= PaletteAddress && address < PaletteAddress + ColorCount * 3) {
+		auto index = (address - PaletteAddress) / 3;
+		auto p = pOwner->Ram() + PaletteAddress + index * 3;
+		auto r = *p++;
+		auto g = *p++;
+		auto b = *p++;
+		pOwner->SetColor(index, r, g, b);
+	}
 	if (address >= ToneSampleAddress && address < ToneSampleAddress + ToneChannelCount * 2) {
 		auto index = (address - ToneSampleAddress) / 2;
 		auto sampleAddress = LoadWord(pOwner->Ram() + ToneSampleAddress + index * 2);
@@ -55,23 +63,23 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 
 void Minima68::Reset()
 {
-	static const uint8_t PaletteValues[] = {
-		0x00, 0x00, 0x00, 0x55, 0x00, 0xff, 0xff, 0x00,
-		0x00, 0xff, 0xbb, 0xff, 0x00, 0xff, 0x00, 0x00,
-		0xff, 0xff, 0xff, 0xff, 0x00, 0xff, 0xff, 0xff,
-		0x00, 0x00, 0x00, 0x99, 0x44, 0x44, 0xff, 0xbb,
-		0x55, 0xbb, 0x55, 0x55, 0x00, 0x55, 0x00, 0x00,
-		0x55, 0xbb, 0xff, 0xff, 0x55, 0xbb, 0xbb, 0xbb,
-	};
-	{
-		auto pSource = PaletteValues;
-		for (auto i = 0; i < ColorCount; ++i) {
-			auto r = *pSource++;
-			auto g = *pSource++;
-			auto b = *pSource++;
-			SetColor(i, r, g, b);
-		}
-	}
+	//static const uint8_t PaletteValues[] = {
+	//	0x00, 0x00, 0x00, 0x55, 0x00, 0xff, 0xff, 0x00,
+	//	0x00, 0xff, 0xbb, 0xff, 0x00, 0xff, 0x00, 0x00,
+	//	0xff, 0xff, 0xff, 0xff, 0x00, 0xff, 0xff, 0xff,
+	//	0x00, 0x00, 0x00, 0x99, 0x44, 0x44, 0xff, 0xbb,
+	//	0x55, 0xbb, 0x55, 0x55, 0x00, 0x55, 0x00, 0x00,
+	//	0x55, 0xbb, 0xff, 0xff, 0x55, 0xbb, 0xbb, 0xbb,
+	//};
+	//{
+	//	auto pSource = PaletteValues;
+	//	for (auto i = 0; i < ColorCount; ++i) {
+	//		auto r = *pSource++;
+	//		auto g = *pSource++;
+	//		auto b = *pSource++;
+	//		SetColor(i, r, g, b);
+	//	}
+	//}
 	scrollX = scrollY = 2;
 
 	WriteMemory(0xfffe, HighByte(StartAddress));

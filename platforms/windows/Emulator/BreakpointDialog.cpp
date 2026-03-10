@@ -26,7 +26,6 @@ void BreakpointDialog::OnInitDialog()
 	addressEdit.Subclass(GetDlgItem(HWnd(), IDC_ADDRESS));
 	okButton.Subclass(GetDlgItem(HWnd(), IDOK));
 	OnChangeAddress();
-	addressEdit.SetFocus();
 }
 
 void BreakpointDialog::OnCommand(UINT id, UINT notificationCode, HWND hWnd)

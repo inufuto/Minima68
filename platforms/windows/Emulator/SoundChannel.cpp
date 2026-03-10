@@ -15,15 +15,6 @@ unsigned SoundThread::ThreadProc(void* pThis)
 void SoundThread::Start(Minima68Win* pEmulator)
 {
 	audioClient.Create();
-	//auto pSourceSamples = pEmulator->Ram() + ShortWaveAddress;
-	//for (auto& channel : ToneChannels) {
-	//	channel.SourceSamples(pSourceSamples);
-	//	pSourceSamples += ToneSampleCount;
-	//}
-	//ToneChannels[0].SetFrequency(440);
-	//ToneChannels[1].SetFrequency(440 * 2);
-	//ToneChannels[2].SetFrequency(440 / 2);
-
 	running = true;
 	hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadProc, this, 0, nullptr));
 	if (hThread == nullptr) {
@@ -94,6 +85,10 @@ void SoundThread::Loop() const
 			}
 		}
 		Sleep(0);
+	}
+	result = audioClient->Stop();
+	if (FAILED(result)) {
+		throw ApiException(result);
 	}
 }
 

@@ -27,6 +27,7 @@ private:
 private:
 	void SelectPane(int index);
 	void UpdateView();
+	void ReDraw();
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
