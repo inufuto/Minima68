@@ -56,15 +56,6 @@ static void PwmHandler()
 
 void InitSound()
 {
-    // {
-    //     auto pSourceSamples = emulator.Ram() + ShortWaveAddress;
-    //     for (auto& channel : toneChannels) {
-    //         channel.Samples(pSourceSamples);
-    //         pSourceSamples += ToneSampleCount;
-    //     }
-    // }
-    // toneChannels[0].SetFrequency(440);
-    
     gpio_set_function(Config::Gpio::Sound, GPIO_FUNC_PWM);
     auto pwmSlice = pwm_gpio_to_slice_num(Config::Gpio::Sound);
 

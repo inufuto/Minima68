@@ -83,5 +83,5 @@ void Minima68Win::SetToneFrequency(int index, uint16_t frequency)
 void Minima68Win::SetToneVolume(int index, uint8_t volume)
 {
 	assert(index >= 0 && index < ToneSampleCount);
-	ToneChannels[index].SetVolume(volume / 255.0f);
+	ToneChannels[index].SetVolume(volume);
 }

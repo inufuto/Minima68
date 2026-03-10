@@ -30,16 +30,11 @@ void WindowsAudioClient::Create()
 	
 	WAVEFORMATEXTENSIBLE waveFormat;
 	CopyMemory(&waveFormat.Format, pWaveFormat, sizeof(WAVEFORMATEXTENSIBLE));
-	//waveFormat.Format.cbSize = pWaveFormat->cbSize;
-	//waveFormat.Format.wFormatTag = WAVE_FORMAT_PCM;
+	waveFormat.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
 	waveFormat.Format.nChannels = 2;
-	//waveFormat.Format.nSamplesPerSec = 44100;
-	//waveFormat.Format.wBitsPerSample = 32;
-	//waveFormat.Format.nBlockAlign = waveFormat.Format.nChannels * waveFormat.Format.wBitsPerSample / 8;
-	//waveFormat.Format.nAvgBytesPerSec = waveFormat.Format.nSamplesPerSec * waveFormat.Format.nBlockAlign;
 	waveFormat.SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
 
-	result = pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, REFTIMES_PER_SEC * 3, 0, &waveFormat.Format, nullptr);
+	result = pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, REFTIMES_PER_SEC * 1, 0, &waveFormat.Format, nullptr);
 	if (FAILED(result)) {
 		throw ApiException(result);
 	}

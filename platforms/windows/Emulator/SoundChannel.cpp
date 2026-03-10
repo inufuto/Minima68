@@ -135,7 +135,7 @@ float ToneChannel::Sample()
 		sourceChanged = false;
 		UpdateSamples();
 	}
-	auto sample = samples[static_cast<int>(phase)] * volume;
+	auto sample = samples[static_cast<int>(phase)] * volume / MaxVolume;
 	phase += step;
 	if (phase >= ToneSampleCount) {
 		phase -= ToneSampleCount;
