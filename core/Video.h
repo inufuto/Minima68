@@ -13,8 +13,12 @@ constexpr auto TileWidth = 4;
 constexpr auto TileHeight = 8;
 constexpr auto TileWidthInBytes = TileWidth / DotsPerByte;
 constexpr auto TilePatternSize = TileWidthInBytes * TileHeight;
+constexpr auto SpriteWidth = TileWidth * 2;
+constexpr auto SpriteHeight = TileHeight * 2;
 
-static constexpr auto XResolution = TileWidth * WindowWidth;
-static constexpr auto YResolution = TileHeight * VramHeight;
-static constexpr auto SpriteRangeX = TileWidth * WindowWidth;
-static constexpr auto SpriteRangeY = TileHeight * FiledAreaHeight;
+constexpr auto XResolution = TileWidth * WindowWidth;
+constexpr auto YResolution = TileHeight * VramHeight;
+constexpr auto SpriteRangeX = TileWidth * WindowWidth;
+constexpr auto SpriteRangeY = TileHeight * FiledAreaHeight;
+constexpr auto SpriteCount = 64;
+constexpr auto MaxHorizontalSpriteCount = 16;

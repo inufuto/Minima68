@@ -35,6 +35,8 @@ static volatile int xModLeft;
 
 const auto TileMap = emulator.Ram() + TileMapAddress;
 const auto TilePattern = emulator.Ram() + TilePatternAddress;
+const auto SpriteAttributes = emulator.Ram() + SpriteAttributeAddress;
+const auto SpritePattern = emulator.Ram() + SpritePatternAddress;
 
 static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
 {
@@ -119,39 +121,39 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
             }
         }
         {
-            // auto horizontalCount = 0;
-            // auto pSprite = SpriteAttributes + SpriteCount;
-            // for (auto i = 0; i < SpriteCount; ++i) {
-            //     --pSprite;
-            //     uint8_t yOffset = currentY - pSprite->y;
-            //     if (yOffset < SpriteHeight) {
-            //         uint8_t x = pSprite->x;
-            //         auto pPattern = SpritePattern +
-            //             (static_cast<uint16_t>(pSprite->pattern) << 6);
-            //         pPattern += yOffset << 2;
-            //         for (auto j = 0; j < SpriteWidth / 2; ++j) {
-            //             auto b = *pPattern; //0x44; //
-            //             if (x < XResolution) {
-            //                 auto dot = b >> 4;
-            //                 if (dot != 0) {
-            //                     lineBuffer[x] = dot;
-            //                 }
-            //             }
-            //             ++x;
-            //             if (x < XResolution) {
-            //                 auto dot = b & 0x0f;
-            //                 if (dot != 0) {
-            //                     lineBuffer[x] = dot;
-            //                 }
-            //             }
-            //             ++x;
-            //             ++pPattern;
-            //         }
-            //         if (++horizontalCount >= MaxHorizontalSpriteCount) {
-            //             break;
-            //         }
-            //     }
-            // }
+            auto horizontalCount = 0;
+            auto pSprite = SpriteAttributes + SpriteCount;
+            for (auto i = 0; i < SpriteCount; ++i) {
+                --pSprite;
+                uint8_t yOffset = currentY - pSprite[0]; // y
+                if (yOffset < SpriteHeight) {
+                    uint8_t x = pSprite[1]; // x
+                    auto pPattern = SpritePattern +
+                        (static_cast<uint16_t>(pSprite[2]) << 6); // pattern
+                    pPattern += yOffset << 2;
+                    for (auto j = 0; j < SpriteWidth / 2; ++j) {
+                        auto b = *pPattern; //0x44; //
+                        if (x < XResolution) {
+                            auto dot = b >> 4;
+                            if (dot != 0) {
+                                lineBuffer[x] = dot;
+                            }
+                        }
+                        ++x;
+                        if (x < XResolution) {
+                            auto dot = b & 0x0f;
+                            if (dot != 0) {
+                                lineBuffer[x] = dot;
+                            }
+                        }
+                        ++x;
+                        ++pPattern;
+                    }
+                    if (++horizontalCount >= MaxHorizontalSpriteCount) {
+                        break;
+                    }
+                }
+            }
         }
         {
             auto pLine = lineBuffer;

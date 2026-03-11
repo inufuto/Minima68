@@ -63,22 +63,46 @@ void ScreenWindow::OnSetFocus(HWND hOldWnd)
 void ScreenWindow::UpdateScreenBitmap()
 {
 	auto pScreen = screen;
-	auto pFieldRow = pTileMap + emulator.ScrollY() / TileHeight * VramWidth;
-	auto fieldYMod = emulator.ScrollY() % TileHeight;
-	auto pStatusRow = pTileMap + FieldAreaWidth;
-	auto statusYMod = 0;
-	for (auto y = 0; y < YResolution; y++) {
-		{
-			// Field area
-			auto pTile = pFieldRow + emulator.ScrollX() / TileWidth;
-			auto xMod = emulator.ScrollX() % TileWidth;
+	{
+		// Status area
+		auto pTile = pTileMap;
+		for (auto tileY = 0; tileY < StatusAreaHeight; tileY++) {
+			for (auto tileX = 0; tileX < WindowWidth; ++tileX) {
+				auto tile = *pTile++;
+				auto pPattern = pTilePattern + static_cast<uint16_t>(tile) * TilePatternSize;
+				for (auto y = 0; y < TileHeight; ++y) {
+					for (auto i = 0; i < TileWidthInBytes; ++i) {
+						auto patternByte = *pPattern++;
+						*pScreen++ = ColorAt(patternByte >> 4);
+						*pScreen++ = ColorAt(patternByte & 0x0f);
+					}
+					pScreen += (XResolution - TileWidth);
+				}
+				pScreen += TileWidth - XResolution * TileHeight;
+			}
+			pScreen += XResolution * TileHeight - TileWidth * WindowWidth;
+			pTile += VramWidth - WindowWidth;
+		}
+	}
+	{
+		// Field area
+		uint8_t scrollY = emulator.ScrollY();
+		uint8_t scrollX = emulator.ScrollX();
+		auto pTileRow = pTileMap + VramWidth * StatusAreaHeight +
+			scrollY / TileHeight * VramWidth +
+			scrollX / TileWidth;
+		auto yMod = scrollY % TileHeight;
+		auto xModLeft = scrollX % TileWidth;
+		for (auto y = 0; y < YResolution - TileHeight * StatusAreaHeight; y++) {
+			auto pTile = pTileRow;
+			auto xMod = xModLeft;
 			auto tile = *pTile++;
 			auto pPattern = pTilePattern +
 				(static_cast<uint16_t>(tile) * TilePatternSize) +
-				(fieldYMod * TileWidthInBytes) +
+				yMod * TileWidthInBytes +
 				xMod / DotsPerByte;
 			auto patternByte = *pPattern++;
-			for (auto x = 0; x < FieldWindowWidth * TileWidth; ++x) {
+			for (auto x = 0; x < XResolution; ++x) {
 				if ((xMod % DotsPerByte) == 0) {
 					*pScreen++ = ColorAt(patternByte >> 4);
 				}
@@ -90,34 +114,15 @@ void ScreenWindow::UpdateScreenBitmap()
 					tile = *pTile++;
 					pPattern = pTilePattern +
 						(static_cast<uint16_t>(tile) * TilePatternSize) +
-						(fieldYMod * TileWidthInBytes);
+						yMod * TileWidthInBytes;
 				}
 				if ((xMod % DotsPerByte) == 0) {
 					patternByte = *pPattern++;
 				}
 			}
-			if (++fieldYMod >= TileHeight) {
-				pFieldRow += VramWidth;
-				fieldYMod = 0;
-			}
-		}
-		{
-			// Status area
-			auto pTile = pStatusRow;
-			for (auto tileX = 0; tileX < StatusAreaWidth; ++tileX) {
-				auto tile = *pTile++;
-				auto pPattern = pTilePattern +
-					(static_cast<uint16_t>(tile) * TilePatternSize) +
-					(statusYMod * TileWidthInBytes);
-				for (auto i = 0; i < TileWidthInBytes; ++i) {
-					auto patternByte = *pPattern++;
-					*pScreen++ = ColorAt(patternByte >> 4);
-					*pScreen++ = ColorAt(patternByte & 0x0f);
-				}
-			}
-			if (++statusYMod >= TileHeight) {
-				pStatusRow += VramWidth;
-				statusYMod = 0;
+			if (++yMod >= TileHeight) {
+				pTileRow += VramWidth;
+				yMod = 0;
 			}
 		}
 	}
