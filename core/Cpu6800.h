@@ -98,6 +98,7 @@ private:
 	void StoreWordIndexed(uint16_t value);
 	uint8_t LoadExtended();
 	void StoreExtended(uint8_t value);
+	uint16_t LoadWordExtended();
 	void StoreWordExtended(uint16_t value);
 
 	void FetchInstruction();

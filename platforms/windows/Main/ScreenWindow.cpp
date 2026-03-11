@@ -63,7 +63,7 @@ void ScreenWindow::OnSetFocus(HWND hOldWnd)
 void ScreenWindow::UpdateScreenBitmap()
 {
 	auto pScreen = screen;
-	auto pFieldRow = pTileMap + emulator.ScrollY() * VramWidth;
+	auto pFieldRow = pTileMap + emulator.ScrollY() / TileHeight * VramWidth;
 	auto fieldYMod = emulator.ScrollY() % TileHeight;
 	auto pStatusRow = pTileMap + FieldAreaWidth;
 	auto statusYMod = 0;

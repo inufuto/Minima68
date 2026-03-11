@@ -1,7 +1,9 @@
 #pragma once
 
-constexpr auto TilePatternAddress = 0xe000;
-constexpr auto TileMapAddress = 0xf000;
+constexpr auto TilePatternAddress = 0xd000;
+constexpr auto TileMapAddress = 0xe000;
+constexpr auto SpritePatternAddress = 0xed00;
+constexpr auto SpriteAttributeAddress = 0xfd00;
 constexpr auto PaletteAddress = 0xff00;
 
 constexpr auto EffectSampleAddress = 0xff40;

@@ -856,7 +856,7 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{5,"LDS\tw",[](Cpu6800& cpu)
 	{
 		// be LDS w
-		cpu.UpdateFlagsForWord(cpu.sp = cpu.LoadExtended());
+		cpu.UpdateFlagsForWord(cpu.sp = cpu.LoadWordExtended());
 	}},
 	{5,"STS\tw",[](Cpu6800& cpu)
 	{
@@ -1116,7 +1116,7 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
   { 6,"LDX\tw",[](Cpu6800& cpu)
   {
 		// fe LDX w
-		cpu.UpdateFlagsForWord(cpu.x = cpu.LoadExtended());
+		cpu.UpdateFlagsForWord(cpu.x = cpu.LoadWordExtended());
 	} },
 	{ 6,"STX\tw",[](Cpu6800& cpu)
 	{
@@ -1560,7 +1560,9 @@ void Cpu6800::StoreWordDirect(const uint16_t value)
 uint8_t Cpu6800::LoadIndexed()
 {
 	auto address = IndexedAddress();
-	return pMemorySpace->Read(address);
+	uint8_t value = pMemorySpace->Read(address);
+	UpdateFlagsForByte(value);
+	return value;
 }
 
 void Cpu6800::StoreIndexed(const uint8_t value)
@@ -1600,6 +1602,16 @@ void Cpu6800::StoreExtended(const uint8_t value)
 	auto address = FetchWord();
 	pMemorySpace->Write(address, value);
 	UpdateFlagsForByte(value);
+}
+
+uint16_t Cpu6800::LoadWordExtended()
+{
+	auto address = FetchWord();
+	auto high = pMemorySpace->Read(address);
+	auto low = pMemorySpace->Read(address + 1);
+	uint16_t word = MakeWord(high, low);
+	UpdateFlagsForWord(word);
+	return word;
 }
 
 void Cpu6800::StoreWordExtended(uint16_t value)

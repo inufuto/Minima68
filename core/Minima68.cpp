@@ -39,7 +39,7 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 		auto p = pOwner->Ram() + PaletteAddress + index * 3;
 		auto r = *p++;
 		auto g = *p++;
-		auto b = *p++;
+		auto b = *p;
 		pOwner->SetColor(index, r, g, b);
 	}
 	if (address >= ToneSampleAddress && address < ToneSampleAddress + ToneChannelCount * 2) {
