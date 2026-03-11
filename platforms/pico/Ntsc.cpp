@@ -29,10 +29,9 @@ static int dmaChannels[DmaChannelCount];
 static uint16_t dmaBuffer[DmaChannelCount][SamplesPerRaster] __attribute__ ((aligned (4)));
 static volatile uint16_t currentRaster;
 static volatile int currentY;
-static volatile uint8_t* pFieldRow;
-static volatile int fieldYMod;
-static volatile uint8_t* pStatusRow;
-static volatile int statusYMod;
+static volatile uint8_t* pTileRow;
+static volatile int yMod;
+static volatile int xModLeft;
 
 const auto TileMap = emulator.Ram() + TileMapAddress;
 const auto TilePattern = emulator.Ram() + TilePatternAddress;
@@ -74,110 +73,115 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
         static uint8_t lineBuffer[XResolution];
         if (raster == VSyncRasterCount + BlankingRasterCount) {
             currentY = 0;
-            pFieldRow = TileMap + (emulator.ScrollY() / TileHeight) * VramWidth;
-            fieldYMod = emulator.ScrollY() % TileHeight;
-            pStatusRow = TileMap + FieldAreaWidth;
-            statusYMod = 0;
+            pTileRow = TileMap;
+            yMod = xModLeft = 0;
+        }
+        else if (raster == VSyncRasterCount + BlankingRasterCount + TileHeight * StatusAreaHeight) {
+            auto scrollY = emulator.ScrollY();
+            auto scrollX = emulator.ScrollX();
+            pTileRow = TileMap + VramWidth * StatusAreaHeight +
+                 (scrollY / TileHeight) * VramWidth +
+                  (scrollX / TileWidth);
+            yMod = scrollY % TileHeight;
+            xModLeft = scrollX % TileWidth;
         }
         {
             auto pLine = lineBuffer;
-            {
-                // Field area
-                auto pTile = pFieldRow + emulator.ScrollX() / TileWidth;
-                auto xMod = emulator.ScrollX() % TileWidth;
-                auto tile = *pTile++;
-                auto pPattern = TilePattern + 
-                    (static_cast<uint16_t>(tile) * TilePatternSize) +
-                    (fieldYMod * TileWidthInBytes) +
-                     xMod / DotsPerByte;
-                auto patternByte = *pPattern++;
-                for (auto x = 0; x < FieldWindowWidth * TileWidth; ++x) {
-                    if ((xMod % DotsPerByte) == 0) {
-                        *pLine++ = patternByte >> 4;
-                    }
-                    else {
-                        *pLine++ = patternByte & 0x0f;
-                    }
-                    if (++xMod >= TileWidth) {
-                        xMod = 0;
-                        tile = *pTile++;
-                        pPattern = TilePattern +
-                            (static_cast<uint16_t>(tile) * TilePatternSize) +
-                            (fieldYMod * TileWidthInBytes);
-                    }
-                    if ((xMod % DotsPerByte) == 0) {
-                        patternByte = *pPattern++;
-                    }
+            auto pTile = pTileRow;
+            auto xMod = xModLeft;
+            auto tile = *pTile++;
+            auto pPattern = TilePattern + 
+                (static_cast<uint16_t>(tile) * TilePatternSize) +
+                (yMod * TileWidthInBytes) +
+                xMod / DotsPerByte;
+            auto patternByte = *pPattern++;
+            for (auto x = 0; x < XResolution; ++x) {
+                if ((xMod % DotsPerByte) == 0) {
+                    *pLine++ = patternByte >> 4;
                 }
-                if (++fieldYMod >= TileHeight) {
-                    pFieldRow += VramWidth;
-                    fieldYMod = 0;
+                else {
+                    *pLine++ = patternByte & 0x0f;
                 }
-            }
-            {
-                // Status area
-                auto pTile = pStatusRow;
-                for (auto tileX = 0; tileX < StatusAreaWidth; ++tileX) {
-                    auto tile = *pTile++;
-                    auto pPattern = TilePattern +
+                if (++xMod >= TileWidth) {
+                    xMod = 0;
+                    tile = *pTile++;
+                    pPattern = TilePattern +
                         (static_cast<uint16_t>(tile) * TilePatternSize) +
-                        (statusYMod * TileWidthInBytes);
-                    for (auto i = 0; i < TileWidthInBytes; ++i) {
-                        auto patternByte = *pPattern++;
-                        *pLine++ = patternByte >> 4;
-                        *pLine++ = patternByte & 0x0f;
-                    }
+                        (yMod * TileWidthInBytes);
                 }
-                if (++statusYMod >= TileHeight) {
-                    pStatusRow += VramWidth;
-                    statusYMod = 0;
+                if ((xMod % DotsPerByte) == 0) {
+                    patternByte = *pPattern++;
                 }
             }
+            if (++yMod >= TileHeight) {
+                pTileRow += VramWidth;
+                yMod = 0;
+            }
         }
-        // {
-        //     auto horizontalCount = 0;
-        //     auto pSprite = SpriteAttributes + MaxSpriteCount;
-        //     for (auto i = 0; i < MaxSpriteCount; ++i) {
-        //         --pSprite;
-        //         uint8_t yOffset = currentY - pSprite->y;
-        //         if (yOffset < SpriteHeight) {
-        //             uint8_t x = pSprite->x;
-        //             auto pPattern = SpritePattern +
-        //                 (static_cast<uint16_t>(pSprite->pattern) << 6);
-        //             pPattern += yOffset << 2;
-        //             for (auto j = 0; j < SpriteWidth / 2; ++j) {
-        //                 auto b = *pPattern; //0x44; //
-        //                 if (x < XResolution) {
-        //                     auto dot = b >> 4;
-        //                     if (dot != 0) {
-        //                         lineBuffer[x] = dot;
-        //                     }
-        //                 }
-        //                 ++x;
-        //                 if (x < XResolution) {
-        //                     auto dot = b & 0x0f;
-        //                     if (dot != 0) {
-        //                         lineBuffer[x] = dot;
-        //                     }
-        //                 }
-        //                 ++x;
-        //                 ++pPattern;
-        //             }
-        //             if (++horizontalCount >= MaxHorizontalSpriteCount) {
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
+        {
+            // auto horizontalCount = 0;
+            // auto pSprite = SpriteAttributes + SpriteCount;
+            // for (auto i = 0; i < SpriteCount; ++i) {
+            //     --pSprite;
+            //     uint8_t yOffset = currentY - pSprite->y;
+            //     if (yOffset < SpriteHeight) {
+            //         uint8_t x = pSprite->x;
+            //         auto pPattern = SpritePattern +
+            //             (static_cast<uint16_t>(pSprite->pattern) << 6);
+            //         pPattern += yOffset << 2;
+            //         for (auto j = 0; j < SpriteWidth / 2; ++j) {
+            //             auto b = *pPattern; //0x44; //
+            //             if (x < XResolution) {
+            //                 auto dot = b >> 4;
+            //                 if (dot != 0) {
+            //                     lineBuffer[x] = dot;
+            //                 }
+            //             }
+            //             ++x;
+            //             if (x < XResolution) {
+            //                 auto dot = b & 0x0f;
+            //                 if (dot != 0) {
+            //                     lineBuffer[x] = dot;
+            //                 }
+            //             }
+            //             ++x;
+            //             ++pPattern;
+            //         }
+            //         if (++horizontalCount >= MaxHorizontalSpriteCount) {
+            //             break;
+            //         }
+            //     }
+            // }
+        }
         {
             auto pLine = lineBuffer;
+            auto mod = 0;
             p += HStartPosition;
-            for (auto i = 0; i < XResolution; ++i) {
-                const auto& color = colors[*pLine++];
-                *p++ = color.Values()[0];
-                *p++ = color.Values()[1];
-                *p++ = color.Values()[2];
-                *p++ = color.Values()[3];
+            for (auto i = 0; i < XResolution / 4; ++i) {
+                const auto& color0 = colors[*pLine++];
+                *p++ = color0.Values()[0];
+                *p++ = color0.Values()[1];
+                *p++ = color0.Values()[2];
+                *p++ = color0.Values()[3];
+                *p++ = color0.Values()[0];
+                const auto& color1 = colors[*pLine++];
+                *p++ = color1.Values()[1];
+                *p++ = color1.Values()[2];
+                *p++ = color1.Values()[3];
+                *p++ = color1.Values()[0];
+                *p++ = color1.Values()[1];
+                const auto& color2 = colors[*pLine++];
+                *p++ = color2.Values()[2];
+                *p++ = color2.Values()[3];
+                *p++ = color2.Values()[0];
+                *p++ = color2.Values()[1];
+                *p++ = color2.Values()[2];
+                const auto& color3 = colors[*pLine++];
+                *p++ = color3.Values()[3];
+                *p++ = color3.Values()[0];
+                *p++ = color3.Values()[1];
+                *p++ = color3.Values()[2];
+                *p++ = color3.Values()[3];
             }
         }
         ++currentY;
@@ -187,7 +191,7 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
         raster == VSyncRasterCount + BlankingRasterCount + YResolution + 1
     ) {
         p += HStartPosition;
-        for (auto i = 0; i < XResolution * 4; ++i) {
+        for (auto i = 0; i < XResolution * 5; ++i) {
             *p++ = 2;
         }
     }
@@ -250,7 +254,7 @@ static void InitializePwmDma()
             dmaBuffer[i],
             SamplesPerRaster,
             false);
-        memset(dmaBuffer[i], SamplesPerRaster * sizeof(uint16_t), 0);
+        memset(dmaBuffer[i],0 , SamplesPerRaster * sizeof(uint16_t));
         MakeDmaBuffer(dmaBuffer[i], i);
         mask |= InterruptBit(dmaChannels[i]);
     }
