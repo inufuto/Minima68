@@ -1,5 +1,8 @@
-#include "pico/stdlib.h"
-#include "PrimaryClock.h"
+#include <pico/stdlib.h>
+#include <tusb.h>
+#include <hid.h>
+// #include "PrimaryClock.h"
+#include "Minima68Pico.h"
 
 void PrimaryClock::Run()
 {
@@ -13,6 +16,9 @@ void PrimaryClock::Run()
         for (uint32_t i = 0; i < cyclesToRun; i++) {
             OnClock(time);
             ++time;
+            if ((i & 0x0fff) == 0) {
+                tuh_task();
+            }
         }
     }
 }

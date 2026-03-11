@@ -56,4 +56,7 @@ public:
 	void SetToneSample(int index, const uint8_t* pSample) override;
 	void SetToneFrequency(int index, uint16_t frequency) override;
 	void SetToneVolume(int index, uint8_t volume) override;
+
+	void SetJoistickBit(uint8_t bit) { Ram()[JoystickAddress] |= bit; }
+	void ClearJoistickBit(uint8_t bit) { Ram()[JoystickAddress] &= ~bit; }
 };

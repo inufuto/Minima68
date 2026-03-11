@@ -1,17 +1,31 @@
 #include <cstring>
-#include "Minima68.h"
+#include <tusb.h>
+#include <hid.h>
+
 #include "Minima68Pico.h"
 #include "Ntsc.h"
 #include "MemoryMap.h"
+#include "Joystick.h"
 #include "SoundChannel.h"
 
 Minima68Pico emulator;
 
 void Minima68Pico::Run()
 {
+    tusb_init();
+    InitButtons();
     primaryClock.AddDestination(&Cpu());
     Reset();
     primaryClock.Run();
+}
+
+uint8_t Minima68Pico::ReadMemory(uint16_t address) const
+{
+    auto value = Minima68::ReadMemory(address);
+    if (address == JoystickAddress) {
+        value |= ReadButtons();
+    }
+    return value;
 }
 
 void Minima68Pico::SetColor(int index, uint8_t r, uint8_t g, uint8_t b)

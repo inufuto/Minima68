@@ -2,21 +2,30 @@
 #include "ScreenWindow.h"
 #include "EmulatorWindow.h"
 #include "../../core/Video.h"
+#include "../../core/Joystick.h"
 
 constexpr auto ScreenWidth = XResolution * 2 * 115 / 100;
 constexpr auto ScreenHeight = YResolution;
 
+void ScreenPane::OnCreate(CREATESTRUCT* pCreateStruct)
+{
+	TitledPane::OnCreate(pCreateStruct);
+	xMargin = GetSystemMetrics(SM_CXFRAME) * 2;
+	yMargin = GetSystemMetrics(SM_CYFRAME) * 2;
+}
+
 void ScreenPane::OnSize(UINT width, UINT height)
 {
-	auto maxHeight = height - TitleHeight();
-	auto targetWidth = width;
-	auto targetHeight = width * ScreenHeight / ScreenWidth;
+	auto maxHeight = height - TitleHeight() - yMargin * 2;
+	auto maxWidth = width - xMargin * 2;
+	auto targetWidth = maxWidth;
+	auto targetHeight = maxWidth * ScreenHeight / ScreenWidth;
 	if (targetHeight > maxHeight) {
 		targetHeight = maxHeight;
 		targetWidth = maxHeight * ScreenWidth / ScreenHeight;
 	}
-	auto x = (width - targetWidth) / 2;
-	auto y = TitleHeight() + (maxHeight - targetHeight) / 2;
+	auto x = (maxWidth - targetWidth) / 2 + xMargin;
+	auto y = TitleHeight() + (maxHeight - targetHeight) / 2 + yMargin;
 	Child()->Move(x, y, targetWidth, targetHeight);
 }
 
@@ -31,6 +40,10 @@ LRESULT ScreenWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmLButtonDown(wParam, lParam);
 	case WM_SETFOCUS:
 		return OnWmSetFocus(wParam, lParam);
+	case WM_KEYDOWN:
+		return OnWmKeyDown(wParam, lParam);
+	case WM_KEYUP:
+		return OnWmKeyUp(wParam, lParam);
 	}
 	return RenderTargetWindow::OnMessage(message, wParam, lParam);
 }
@@ -58,6 +71,37 @@ void ScreenWindow::OnRender(::RenderTarget& renderTarget)
 void ScreenWindow::OnSetFocus(HWND hOldWnd)
 {
 	SendMessage(GetParent(), WM_SELECT_PANE, 0, reinterpret_cast<LPARAM>(HWnd()));
+}
+
+void ScreenWindow::OnKeyDown(UINT virtualKey, UINT flags)
+{
+	emulator.SetJoistickBit(ToBit(virtualKey));
+}
+
+void ScreenWindow::OnKeyUp(UINT virtualKey, UINT flags)
+{
+	emulator.ClearJoistickBit(ToBit(virtualKey));
+}
+
+uint8_t ScreenWindow::ToBit(UINT virtualKey)
+{
+	static const struct {
+		UINT virtualKey;
+		uint8_t bit;
+	} mapping[] = {
+		{ VK_UP, Joystick::Up },
+		{ VK_DOWN, Joystick::Down },
+		{ VK_LEFT, Joystick::Left },
+		{ VK_RIGHT, Joystick::Right },
+		{ 'Z', Joystick::Button0 },
+		{ 'X', Joystick::Button1 },
+	};
+	for (const auto& m : mapping) {
+		if (virtualKey == m.virtualKey) {
+			return m.bit;
+		}
+	}
+	return 0;
 }
 
 void ScreenWindow::UpdateScreenBitmap()

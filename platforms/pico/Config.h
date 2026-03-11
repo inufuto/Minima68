@@ -7,5 +7,12 @@ public:
     public:
         static constexpr auto Video = 15;
         static constexpr auto Sound = 28;
+
+        static constexpr auto UpButton = 8;
+        static constexpr auto LeftButton = 9;
+        static constexpr auto RightButton = 20;
+        static constexpr auto DownButton = 21;
+        static constexpr auto Button1 = 22;
+        static constexpr auto Button0 = 26;
     };
 };

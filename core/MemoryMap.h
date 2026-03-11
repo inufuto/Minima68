@@ -12,3 +12,5 @@ constexpr auto EffectSampleAddress = 0xff40;
 constexpr auto ToneSampleAddress = 0xff42;
 constexpr auto FrequencyAddress = 0xff48;
 constexpr auto VolumeAddress = 0xff4e;
+
+constexpr auto JoystickAddress = 0xff80;

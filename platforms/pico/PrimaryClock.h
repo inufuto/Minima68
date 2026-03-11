@@ -1,4 +1,4 @@
-
+#pragma
 #include "../core/ClockSource.h"
 
 class PrimaryClock : public ClockSource

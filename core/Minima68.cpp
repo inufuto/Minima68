@@ -1,6 +1,7 @@
 #include <cstring>
 #include "Minima68.h"
 
+#include "Joystick.h"
 #include "MemoryMap.h"
 #include "Sound.h"
 #include "Video.h"
@@ -29,6 +30,15 @@ extern const uint8_t TestCode[];
 inline uint16_t LoadWord(const uint8_t* p)
 {
 	return MakeWord(p[0], p[1]);
+}
+
+uint8_t Minima68::Memory::Read(const uint16_t address) const
+{
+	uint8_t value = pOwner->ReadMemory(address);
+	if (address == JoystickAddress) {
+		value &= Joystick::All;
+	}
+	return value;
 }
 
 void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
@@ -81,6 +91,7 @@ void Minima68::Reset()
 	//	}
 	//}
 	ram[ScrollXAddress] = ram[ScrollYAddress] = 0;
+	ram[JoystickAddress] = 0;
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));

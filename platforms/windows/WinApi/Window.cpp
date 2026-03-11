@@ -93,6 +93,12 @@ LRESULT Window::OnWmKeyDown(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT Window::OnWmKeyUp(WPARAM wParam, LPARAM lParam)
+{
+	OnKeyUp(static_cast<UINT>(wParam), static_cast<UINT>(lParam));
+	return 0;
+}
+
 LRESULT Window::OnWmLButtonDown(WPARAM wParam, LPARAM lParam)
 {
 	OnLButtonDown(static_cast<UINT>(wParam), { (GET_X_LPARAM(lParam)), (GET_Y_LPARAM(lParam)) });

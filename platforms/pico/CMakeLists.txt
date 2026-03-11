@@ -10,6 +10,7 @@ add_executable(${MAIN_PROJECT_NAME}
         Main.cpp PrimaryClock.cpp Minima68Pico.cpp
         Color.cpp Ntsc.cpp
         SoundChannel.cpp
+        Joystick.cpp
 )
 
 pico_set_program_name(${MAIN_PROJECT_NAME} "${MAIN_PROJECT_NAME}")
@@ -26,6 +27,9 @@ target_link_libraries(${MAIN_PROJECT_NAME}
 # Add the standard include files to the build
 target_include_directories(${MAIN_PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+    ${PICO_SDK_PATH}/lib/tinyusb/src
+    ${PICO_SDK_PATH}/lib/tinyusb/src/class/hid
+    ${PICO_SDK_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
 )
 
 # Add any user requested libraries
@@ -35,7 +39,9 @@ target_link_libraries(${MAIN_PROJECT_NAME}
         hardware_pwm
         hardware_clocks
         hardware_irq
-        )
+    tinyusb_host
+    tinyusb_board
+)
 
 pico_add_extra_outputs(${MAIN_PROJECT_NAME})
 

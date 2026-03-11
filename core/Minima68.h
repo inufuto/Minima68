@@ -4,6 +4,7 @@
 
 #include "AbtractEmulator.h"
 #include "Cpu6800.h"
+#include "MemoryMap.h"
 
 class Minima68 : public AbstractEmulator
 {
@@ -22,14 +23,14 @@ private:
 	public:
 		explicit Memory(Minima68* pOwner) : MemorySpace("Memory", 0x10000), pOwner(pOwner) {}
 	public:
-		uint8_t Read(const uint16_t address) const override { return pOwner->ReadMemory(address); };
+		uint8_t Read(const uint16_t address) const override;;
 		void Write(const uint16_t address, const uint8_t value) override;
 	} memory;
 protected:
 	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
 
-	uint8_t ReadMemory(uint16_t address) const { return ram[address & 0xffff]; }
-	void WriteMemory(uint16_t address, uint8_t value) { ram[address & 0xffff] = value; }
+	virtual uint8_t ReadMemory(uint16_t address) const { return ram[address & 0xffff]; }
+	virtual void WriteMemory(uint16_t address, uint8_t value) { ram[address & 0xffff] = value; }
 	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;
 public:
 	uint8_t* Ram() { return ram; }
