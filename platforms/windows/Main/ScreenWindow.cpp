@@ -3,7 +3,7 @@
 #include "EmulatorWindow.h"
 #include "../../core/Video.h"
 
-constexpr auto ScreenWidth = XResolution * 2;
+constexpr auto ScreenWidth = XResolution * 2 * 115 / 100;
 constexpr auto ScreenHeight = YResolution;
 
 void ScreenPane::OnSize(UINT width, UINT height)
@@ -124,6 +124,48 @@ void ScreenWindow::UpdateScreenBitmap()
 				pTileRow += VramWidth;
 				yMod = 0;
 			}
+		}
+	}
+	{
+		// Sprites
+		auto pScreenRow = screen + XResolution * TileHeight * StatusAreaHeight;
+		for (auto y = 0; y < SpriteRangeY; ++y) {
+			auto horizontalCount = 0;
+			auto pSprite = pSpriteAttributes + SpriteCount;
+			for (auto i = 0; i < SpriteCount; ++i) {
+				--pSprite;
+				uint8_t yOffset = y - pSprite->y;
+				if (yOffset < SpriteHeight) {
+					uint8_t x = pSprite->x;
+					auto pPattern = pSpritePattern +
+						(static_cast<uint16_t>(pSprite->pattern) * SpritePatternSize);
+					pPattern += yOffset * SpriteWidth / DotsPerByte;
+					auto pScreenDot = pScreenRow + x;
+					for (auto j = 0; j < SpriteWidth / DotsPerByte; ++j) {
+						auto patternByte = *pPattern++;
+						if (x < XResolution) {
+							auto dot = patternByte >> 4;
+							if (dot != 0) {
+								*pScreenDot = ColorAt(dot);
+							}
+						}
+						++pScreenDot;
+						++x;
+						if (x < XResolution) {
+							auto dot = patternByte & 0x0f;
+							if (dot != 0) {
+								*pScreenDot = ColorAt(dot);
+							}
+						}
+						++pScreenDot;
+						++x;
+					}
+					if (++horizontalCount >= MaxHorizontalSpriteCount) {
+						break;
+					}
+				}
+			}
+			pScreenRow += XResolution;
 		}
 	}
 	screenBitmap->CopyFromMemory(nullptr, screen, XResolution * sizeof(uint32_t));

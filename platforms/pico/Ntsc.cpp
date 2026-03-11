@@ -13,7 +13,6 @@
 #include "Color.h"
 
 static volatile uint32_t TimerCount = 0;
-static void SoundHandler() {}
 
 static constexpr auto DmaChannelCount = 2;
 static constexpr auto SamplesPerRaster = 908; // 227 * 4
@@ -219,7 +218,7 @@ static void Handler()
     if (++currentRaster == RasterCount) {
         currentRaster = 0;
         ++TimerCount;
-        SoundHandler();
+        emulator.MakeInterrupt();
     }
 }
 
@@ -270,9 +269,6 @@ static void InitializePwmDma()
 
 void InitNtsc()
 {
-    // for (auto& sprite : SpriteAttributes) {
-    //     sprite.y = YResolution;
-    // }
     set_sys_clock_khz(Config::SystemClock, true);
     InitializePwmDma();
 }

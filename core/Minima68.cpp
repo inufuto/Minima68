@@ -80,7 +80,7 @@ void Minima68::Reset()
 	//		SetColor(i, r, g, b);
 	//	}
 	//}
-	scrollX = scrollY = 2;
+	ram[ScrollXAddress] = ram[ScrollYAddress] = 0;
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
@@ -89,4 +89,14 @@ void Minima68::Reset()
 	//memcpy(Ram() + ShortWaveAddress + 32, Lead2Wave, 32);
 	//memcpy(Ram() + ShortWaveAddress + 64, BassWave, 32);
 	cpu.Reset();
+}
+
+uint8_t Minima68::ScrollX() const
+{
+	return ram[ScrollXAddress];
+}
+
+uint8_t Minima68::ScrollY() const
+{
+	return ram[ScrollYAddress];
 }

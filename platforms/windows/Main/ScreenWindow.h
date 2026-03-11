@@ -21,6 +21,8 @@ private:
 	uint32_t screen[XResolution * YResolution];
 	uint8_t* pTileMap = emulator.Ram() + TileMapAddress;
 	uint8_t* pTilePattern = emulator.Ram() + TilePatternAddress;
+	uint8_t* pSpritePattern = emulator.Ram() + SpritePatternAddress;
+	SpriteAttribute* pSpriteAttributes = reinterpret_cast<SpriteAttribute*>(emulator.Ram() + SpriteAttributeAddress);
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;

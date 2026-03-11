@@ -25,23 +25,21 @@ private:
 		uint8_t Read(const uint16_t address) const override { return pOwner->ReadMemory(address); };
 		void Write(const uint16_t address, const uint8_t value) override;
 	} memory;
-	uint8_t scrollX;
-	uint8_t scrollY;
 protected:
 	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
 
-	void MakeInterrupt() { cpu.MakeInterrupt(); }
-	uint8_t ReadMemory(uint16_t address) const { return ram[address]; }
-	void WriteMemory(uint16_t address, uint8_t value) { ram[address] = value; }
+	uint8_t ReadMemory(uint16_t address) const { return ram[address & 0xffff]; }
+	void WriteMemory(uint16_t address, uint8_t value) { ram[address & 0xffff] = value; }
 	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;
 public:
 	uint8_t* Ram() { return ram; }
 	auto& Cpu() { return cpu; }
 	const auto& Cpu() const { return cpu; }
 	void Reset();
+	void MakeInterrupt() { cpu.MakeInterrupt(); }
 
-	uint8_t ScrollX() const { return scrollX; }
-	uint8_t ScrollY() const { return scrollY; }
+	uint8_t ScrollX() const;
+	uint8_t ScrollY() const;
 
 	int RegisterHolderCount() const override { return 1; }
 	const RegisterHolder* RegisterHolderAt(int index) const override { return &cpu; }
