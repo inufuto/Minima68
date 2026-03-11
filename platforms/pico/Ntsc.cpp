@@ -34,7 +34,7 @@ static volatile int xModLeft;
 
 const auto TileMap = emulator.Ram() + TileMapAddress;
 const auto TilePattern = emulator.Ram() + TilePatternAddress;
-const auto SpriteAttributes = emulator.Ram() + SpriteAttributeAddress;
+const auto SpriteAttributes = reinterpret_cast<SpriteAttribute*>(emulator.Ram() + SpriteAttributeAddress);
 const auto SpritePattern = emulator.Ram() + SpritePatternAddress;
 
 static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
@@ -120,18 +120,19 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
             }
         }
         {
+            auto fieldY = currentY - StatusAreaHeight * TileHeight;
             auto horizontalCount = 0;
             auto pSprite = SpriteAttributes + SpriteCount;
             for (auto i = 0; i < SpriteCount; ++i) {
                 --pSprite;
-                uint8_t yOffset = currentY - pSprite[0]; // y
+                uint8_t yOffset = fieldY - pSprite->y;
                 if (yOffset < SpriteHeight) {
-                    uint8_t x = pSprite[1]; // x
+                    uint8_t x = pSprite->x;
                     auto pPattern = SpritePattern +
-                        (static_cast<uint16_t>(pSprite[2]) << 6); // pattern
-                    pPattern += yOffset << 2;
-                    for (auto j = 0; j < SpriteWidth / 2; ++j) {
-                        auto b = *pPattern; //0x44; //
+                        (static_cast<uint16_t>(pSprite->pattern) * SpritePatternSize);
+                    pPattern += yOffset * SpriteWidth / DotsPerByte;
+                    for (auto j = 0; j < SpriteWidth / DotsPerByte; ++j) {
+                        auto b = *pPattern;
                         if (x < XResolution) {
                             auto dot = b >> 4;
                             if (dot != 0) {
