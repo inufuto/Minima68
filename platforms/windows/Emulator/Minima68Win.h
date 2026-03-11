@@ -8,7 +8,7 @@
 class Minima68Win : public Minima68, public Debugger
 {
 private:
-	static constexpr double ScreenRefreshRate = 60*2;
+	static constexpr double ScreenRefreshRate = 60;
 	PrimaryClock primaryClock;
 private:
 	enum Mode

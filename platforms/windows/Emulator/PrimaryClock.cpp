@@ -44,6 +44,9 @@ void PrimaryClock::Start()
 
 void PrimaryClock::Loop()
 {
+	const double updateInterval = 1.0 / 60.0; // 60FPS
+	double timeSinceLastUpdate = 0.0;
+
 	while (running) {
 		LARGE_INTEGER now;
 		QueryPerformanceCounter(&now);
@@ -57,7 +60,11 @@ void PrimaryClock::Loop()
 				++time;
 			}
 		}
-		pOwner->UpdateView();
-		Sleep(0);
+		timeSinceLastUpdate += elapsed;
+		if (timeSinceLastUpdate >= updateInterval) {
+			pOwner->UpdateView();
+			timeSinceLastUpdate -= updateInterval;
+		}
+		Sleep(1);
 	}
 }

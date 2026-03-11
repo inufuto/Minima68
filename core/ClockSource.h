@@ -24,10 +24,10 @@ class SecondaryClockSource : public ClockSource, public ClockDestination
 {
 private:
 	double frequencyRatio;
+	double accumulatedTime;
 public:
-	explicit SecondaryClockSource(double frequencyRatio) : frequencyRatio(frequencyRatio) {}
+	explicit SecondaryClockSource(double frequencyRatio) : frequencyRatio(frequencyRatio), accumulatedTime(0) {}
 	void OnClock(uint32_t time) override {
-		static double accumulatedTime = 0;
 		accumulatedTime += frequencyRatio;
 		while (accumulatedTime >= 1.0) {
 			ClockSource::OnClock(time);
