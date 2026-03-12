@@ -889,9 +889,9 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 		// c5 BITB #b
 		cpu.And(cpu.b, cpu.FetchByte());
 	}},
-	{2,"LDB\t#b",[](Cpu6800& cpu)
+	{2,"LDAB\t#b",[](Cpu6800& cpu)
 	{
-		// c6 LDB #b
+		// c6 LDAB #b
 		cpu.b = cpu.Load(cpu.FetchByte());
 	}},
 	{ 6,Undefined,Nop }, // c7
@@ -948,14 +948,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 		// d5 BITB b
 		cpu.And(cpu.b, cpu.LoadDirect());
 	}},
-	{3,"LDB\tb",[](Cpu6800& cpu)
+	{3,"LDAB\tb",[](Cpu6800& cpu)
 	{
-		// d6 LDB b
+		// d6 LDAB b
 		cpu.b = cpu.LoadDirect();
 	}},
-	{4,"STB\tb",[](Cpu6800& cpu)
+	{4,"STAB\tb",[](Cpu6800& cpu)
 	{
-		// d7 STB b
+		// d7 STAB b
 		cpu.StoreDirect(cpu.b);
 	} },
 	{3,"EORB\tb",[](Cpu6800& cpu)
@@ -1015,14 +1015,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 		// e5 BITB b,X
 		cpu.And(cpu.b, cpu.LoadIndexed());
 	}},
-	{5,"LDB\tb,X",[](Cpu6800& cpu)
+	{5,"LDAB\tb,X",[](Cpu6800& cpu)
 	{
-		// e6 LDB b,X
+		// e6 LDAB b,X
 		cpu.b = cpu.LoadIndexed();
 	}},
-	{6,"STB\tb,X",[](Cpu6800& cpu)
+	{6,"STAB\tb,X",[](Cpu6800& cpu)
 	{
-		// e7 STB b,X
+		// e7 STAB b,X
 		cpu.StoreIndexed(cpu.b);
 	} },
 	{5,"EORB\tb,X",[](Cpu6800& cpu)
@@ -1082,14 +1082,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 		// f5 BITB w
 		cpu.And(cpu.b, cpu.LoadExtended());
 	}},
-	{4,"LDB\tw",[](Cpu6800& cpu)
+	{4,"LDAB\tw",[](Cpu6800& cpu)
 	{
-		// f6 LDB w
+		// f6 LDAB w
 		cpu.b = cpu.LoadExtended();
 	}},
-	{5,"STB\tw",[](Cpu6800& cpu)
+	{5,"STAB\tw",[](Cpu6800& cpu)
 	{
-		// f7 STB w
+		// f7 STAB w
 		cpu.StoreExtended(cpu.b);
 	} },
 	{4,"EORB\tw",[](Cpu6800& cpu)

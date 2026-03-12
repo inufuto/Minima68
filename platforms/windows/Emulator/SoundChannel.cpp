@@ -194,6 +194,9 @@ float EffectChannel::Sample()
 		int index = static_cast<int>(phase);
 		auto sample = samples[index % EffectSampleCount] * volume / MaxVolume;
 		phase += step;
+		if (phase >= EffectSampleCount) {
+			phase -= EffectSampleCount;
+		}
 		return sample;
 	}
 	return 0;

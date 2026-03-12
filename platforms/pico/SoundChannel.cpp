@@ -62,7 +62,7 @@ void EffectChannel::SetRate(uint8_t rate)
 
 uint8_t EffectChannel::Sample()
 {
-    if (volume > 0) {
+    if (volume > 0 && rate != 0) {
         auto sample = pSamples[sampleIndex] * volume / MaxVolume;
 
         // Playback time is proportional to rate and becomes 1 second at rate=255.
@@ -74,7 +74,7 @@ uint8_t EffectChannel::Sample()
             ++sampleIndex;
             if (sampleIndex >= EffectSampleCount) {
                 sampleIndex = 0;
-                volume = 0;
+                // volume = 0;
             }
         }
         return sample;

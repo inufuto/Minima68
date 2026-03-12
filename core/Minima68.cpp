@@ -86,13 +86,14 @@ void Minima68::Reset()
 	//}
 	ram[ScrollXAddress] = ram[ScrollYAddress] = 0;
 	ram[JoystickAddress] = 0;
+	for (auto i = 0; i < ToneChannelCount; ++i) {
+		SetToneVolume(i, 0);
+	}
+	SetEffectVolume(0);
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
 		memcpy(Ram() + 0x100, TestCode, 0x2000);
-	//memcpy(Ram() + ShortWaveAddress, PianoWave, 32);
-	//memcpy(Ram() + ShortWaveAddress + 32, Lead2Wave, 32);
-	//memcpy(Ram() + ShortWaveAddress + 64, BassWave, 32);
 	cpu.Reset();
 }
 
