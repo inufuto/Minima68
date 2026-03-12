@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <pico/stdlib.h>
 #include <hardware/pwm.h>
 
@@ -21,6 +22,11 @@ void ToneChannel::SetFrequency(uint16_t frequency)
     phaseDelta = static_cast<uint32_t>(frequency) * ToneSampleCount;
 }
 
+void ToneChannel::SetVolume(uint8_t volume)
+{
+    this->volume = std::min(static_cast<int>(volume), MaxVolume);
+}
+
 uint8_t ToneChannel::Sample()
 {
     auto sample = pSamples[sampleIndex] * volume / MaxVolume;
@@ -37,8 +43,48 @@ uint8_t ToneChannel::Sample()
     return sample;
 }
 
+void EffectChannel::SetVolume(uint8_t volume)
+{
+    this->volume = std::min(static_cast<int>(volume), MaxVolume);
+    if ((volume & 0x80) != 0) {
+        phase = 0;
+        sampleIndex = 0;
+    }
+}
+
+void EffectChannel::SetRate(uint8_t rate)
+{
+    this->rate = rate;
+    if (rate == 0) {
+        volume = 0;
+    }
+}
+
+uint8_t EffectChannel::Sample()
+{
+    if (volume > 0) {
+        auto sample = pSamples[sampleIndex] * volume / MaxVolume;
+
+        // Playback time is proportional to rate and becomes 1 second at rate=255.
+        static constexpr uint32_t EffectPhasePerSecond = EffectSampleCount * 255;
+        phase += EffectPhasePerSecond;
+        const uint32_t threshold = static_cast<uint32_t>(rate) * PwmSampleRateInt;
+        while (phase >= threshold) {
+            phase -= threshold;
+            ++sampleIndex;
+            if (sampleIndex >= EffectSampleCount) {
+                sampleIndex = 0;
+                volume = 0;
+            }
+        }
+        return sample;
+    }
+    return 0;
+}
+
 
 ToneChannel toneChannels[ToneChannelCount];
+EffectChannel effectChannel;
 
 static void PwmHandler()
 {
@@ -49,6 +95,7 @@ static void PwmHandler()
     for (auto& channel : toneChannels) {
         sum += channel.Sample();
     }
+    sum += effectChannel.Sample();
     auto level = sum / (ToneChannelCount + 1);
     pwm_set_gpio_level(Config::Gpio::Sound, level);
 }

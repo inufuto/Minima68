@@ -47,3 +47,18 @@ void Minima68Pico::SetToneVolume(int index, uint8_t volume)
 {
     toneChannels[index].SetVolume(volume);
 }
+
+void Minima68Pico::SetEffectSample(uint8_t *pSamples)
+{
+    effectChannel.SetSamples(pSamples);
+}
+
+void Minima68Pico::SetEffectRate(uint8_t rate)
+{
+    effectChannel.SetRate(rate);
+}
+
+void Minima68Pico::SetEffectVolume(uint8_t volume)
+{
+    effectChannel.SetVolume(volume);
+}
