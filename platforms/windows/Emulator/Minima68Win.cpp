@@ -1,5 +1,3 @@
-#include <string>
-
 #include "Minima68Win.h"
 #include "SoundChannel.h"
 
@@ -93,4 +91,19 @@ void Minima68Win::SetToneVolume(int index, uint8_t volume)
 {
 	assert(index >= 0 && index < ToneSampleCount);
 	ToneChannels[index].SetVolume(volume);
+}
+
+void Minima68Win::SetEffectSample(uint8_t* pSamples)
+{
+	EffectChannel.SetSourceSamples(pSamples);
+}
+
+void Minima68Win::SetEffectRate(uint8_t rate)
+{
+	EffectChannel.SetRate(rate);
+}
+
+void Minima68Win::SetEffectVolume(uint8_t volume)
+{
+	EffectChannel.SetVolume(volume);
 }

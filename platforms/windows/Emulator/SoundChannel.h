@@ -27,26 +27,37 @@ class ToneChannel : public Uncopyable
 {
 private:
 	const uint8_t* pSourceSamples = nullptr;
+	bool sourceChanged = true;
 	float samples[ToneSampleCount];
-	uint16_t frequency;
 	uint8_t volume = 0;
 	double phase = 0;
 	double step;
-	bool sourceChanged = true;
-protected:
+private:
 	void UpdateSamples();
 public:
 	void SetSourceSamples(const uint8_t* pSamples);
+	void SetVolume(uint8_t volume);
 	void SetFrequency(uint16_t frequency);
-	void SetVolume(uint8_t volume) { this->volume = volume; }
 	float Sample();
 };
 
 class EffectChannel : public Uncopyable
 {
 private:
-	const uint8_t* pSourceSamples;
+	const uint8_t* pSourceSamples = nullptr;
+	bool sourceChanged = true;
 	float samples[EffectSampleCount];
+	uint8_t volume = 0;
+	double phase = 0;
+	double step;
+private:
+	void UpdateSamples();
+public:
+	void SetSourceSamples(const uint8_t* pSamples);
+	void SetVolume(uint8_t volume);
+	void SetRate(uint8_t rate);
+	float Sample();
 };
 
 extern ToneChannel ToneChannels[ToneChannelCount];
+extern EffectChannel EffectChannel;

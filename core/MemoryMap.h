@@ -8,9 +8,11 @@ constexpr auto PaletteAddress = 0xff00;
 constexpr auto ScrollXAddress = 0xff30;
 constexpr auto ScrollYAddress = 0xff31;
 
-constexpr auto EffectSampleAddress = 0xff40;
-constexpr auto ToneSampleAddress = 0xff42;
-constexpr auto FrequencyAddress = 0xff48;
-constexpr auto VolumeAddress = 0xff4e;
+constexpr auto ToneSampleAddress = 0xff40;
+constexpr auto FrequencyAddress = 0xff46;
+constexpr auto ToneVolumeAddress = 0xff4c;
+constexpr auto EffectSampleAddress = 0xff52;
+constexpr auto EffectRateAddress = 0xff54;
+constexpr auto EffectVolumeAddress = 0xff55;
 
 constexpr auto JoystickAddress = 0xff80;

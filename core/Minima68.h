@@ -31,7 +31,15 @@ protected:
 
 	virtual uint8_t ReadMemory(uint16_t address) const { return ram[address & 0xffff]; }
 	virtual void WriteMemory(uint16_t address, uint8_t value) { ram[address & 0xffff] = value; }
+
+	virtual void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) = 0;
+	
 	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;
+	virtual void SetToneFrequency(int index, uint16_t frequency) = 0;
+	virtual void SetToneVolume(int index, uint8_t volume) = 0;
+	virtual void SetEffectSample(uint8_t* pSamples) = 0;
+	virtual void SetEffectRate(uint8_t rate) = 0;
+	virtual void SetEffectVolume(uint8_t volume) = 0;
 public:
 	uint8_t* Ram() { return ram; }
 	auto& Cpu() { return cpu; }
@@ -50,8 +58,5 @@ public:
 		assert(index == 0);
 		return &memory;
 	}
-	
-	virtual void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) = 0;
-	virtual void SetToneFrequency(int index, uint16_t frequency) = 0;
-	virtual void SetToneVolume(int index, uint8_t volume) = 0;
+
 };

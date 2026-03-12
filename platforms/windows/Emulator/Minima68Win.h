@@ -52,11 +52,15 @@ public:
 
 	void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) override;
 	uint32_t ColorAt(int index) const { assert(index >= 0 && index < ColorCount); return colors[index].dword; }
-
+protected:
 	void SetToneSample(int index, const uint8_t* pSample) override;
 	void SetToneFrequency(int index, uint16_t frequency) override;
 	void SetToneVolume(int index, uint8_t volume) override;
+	void SetEffectSample(uint8_t* pSamples) override;
+	void SetEffectRate(uint8_t rate) override;
+	void SetEffectVolume(uint8_t volume) override;
 
-	void SetJoistickBit(uint8_t bit) { Ram()[JoystickAddress] |= bit; }
-	void ClearJoistickBit(uint8_t bit) { Ram()[JoystickAddress] &= ~bit; }
+public:
+	void SetJoystickBit(uint8_t bit) { Ram()[JoystickAddress] |= bit; }
+	void ClearJoystickBit(uint8_t bit) { Ram()[JoystickAddress] &= ~bit; }
 };

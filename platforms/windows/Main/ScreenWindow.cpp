@@ -75,12 +75,12 @@ void ScreenWindow::OnSetFocus(HWND hOldWnd)
 
 void ScreenWindow::OnKeyDown(UINT virtualKey, UINT flags)
 {
-	emulator.SetJoistickBit(ToBit(virtualKey));
+	emulator.SetJoystickBit(ToBit(virtualKey));
 }
 
 void ScreenWindow::OnKeyUp(UINT virtualKey, UINT flags)
 {
-	emulator.ClearJoistickBit(ToBit(virtualKey));
+	emulator.ClearJoystickBit(ToBit(virtualKey));
 }
 
 uint8_t ScreenWindow::ToBit(UINT virtualKey)

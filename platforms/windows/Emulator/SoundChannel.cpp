@@ -1,9 +1,12 @@
 #include <process.h>
-
+#include <algorithm>
 #include "SoundChannel.h"
 #include "Minima68Win.h"
+#undef min
+#undef max
 
 ToneChannel ToneChannels[ToneChannelCount];
+class EffectChannel EffectChannel;
 class SoundThread SoundThread;
 
 unsigned SoundThread::ThreadProc(void* pThis)
@@ -74,6 +77,7 @@ void SoundThread::Loop() const
 				for (auto& channel : ToneChannels) {
 					sum += channel.Sample();
 				}
+				sum += EffectChannel.Sample();
 				auto average = sum / (ToneChannelCount + 1);
 				*pBuffer++ = average;
 				*pBuffer++ = average;
@@ -118,9 +122,13 @@ void ToneChannel::SetSourceSamples(const uint8_t* pSamples)
 	sourceChanged = true;
 }
 
+void ToneChannel::SetVolume(uint8_t volume)
+{
+	this->volume = std::min(static_cast<int>(volume), MaxVolume);
+}
+
 void ToneChannel::SetFrequency(uint16_t frequency)
 {
-	this->frequency = frequency;
 	step = static_cast<double>(frequency * ToneSampleCount) / SoundThread.SampleRate();
 }
 
@@ -137,4 +145,56 @@ float ToneChannel::Sample()
 		phase -= ToneSampleCount;
 	}
 	return sample;
+}
+
+void EffectChannel::UpdateSamples()
+{
+	if (pSourceSamples != nullptr) {
+		for (int i = 0; i < EffectSampleCount; ++i) {
+			samples[i] = ToFloat(pSourceSamples[i]);
+		}
+	}
+	else {
+		ZeroMemory(samples, sizeof(samples));
+	}
+}
+
+void EffectChannel::SetSourceSamples(const uint8_t* pSamples)
+{
+	this->pSourceSamples = pSamples;
+	sourceChanged = true;
+}
+
+void EffectChannel::SetVolume(uint8_t volume)
+{
+	this->volume = std::min(static_cast<int>(volume), MaxVolume);
+	if ((volume & 0x80) != 0) {
+		phase = 0;
+	}
+}
+
+void EffectChannel::SetRate(uint8_t rate)
+{
+	if (rate == 0) {
+		step = 0;
+		volume = 0;
+	}
+	else {
+		step = static_cast<double>(255 * EffectSampleCount) / rate / SoundThread.SampleRate();
+	}
+}
+
+float EffectChannel::Sample()
+{
+	if (sourceChanged) {
+		sourceChanged = false;
+		UpdateSamples();
+	}
+	if (phase < EffectSampleCount) {
+		int index = static_cast<int>(phase);
+		auto sample = samples[index % EffectSampleCount] * volume / MaxVolume;
+		phase += step;
+		return sample;
+	}
+	return 0;
 }

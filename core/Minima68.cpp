@@ -6,25 +6,6 @@
 #include "Sound.h"
 #include "Video.h"
 
-const uint8_t PianoWave[] = {
-	254,238,204,172,150,128,104,84,
-	74,65,50,36,32,33,25,9,
-	0,9,25,33,32,36,50,65,
-	74,84,104,128,150,172,204,238,
-};
-const uint8_t Lead2Wave[] = {
-	203,160,75,22,17,23,17,10,
-	11,10,6,4,4,3,0,0,
-	2,0,0,3,4,4,6,10,
-	11,10,17,23,17,22,75,160,
-};
-const uint8_t BassWave[] = {
-	254,245,219,183,145,110,81,56,
-	35,18,5,0,5,18,35,50,
-	55,50,35,18,5,0,5,18,
-	35,56,81,110,145,183,219,245,
-};
-
 extern const uint8_t TestCode[];
 
 inline uint16_t LoadWord(const uint8_t* p)
@@ -62,12 +43,25 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 		auto frequency = LoadWord(pOwner->Ram() + FrequencyAddress + index * 2);
 		pOwner->SetToneFrequency(index, frequency);
 	}
-	else if (address >= VolumeAddress && address < VolumeAddress + ToneChannelCount * 2) {
-		if ((address - VolumeAddress) % 2 == 0) {
-			auto index = address - VolumeAddress;
+	else if (address >= ToneVolumeAddress && address < ToneVolumeAddress + ToneChannelCount * 2) {
+		if ((address - ToneVolumeAddress) % 2 == 0) {
+			auto index = address - ToneVolumeAddress;
 			auto volume = pOwner->Ram()[address];
 			pOwner->SetToneVolume(index, volume);
 		}
+	}
+	else if (address >= EffectSampleAddress && address <EffectSampleAddress + 2)
+	{
+		auto sampleAddress = LoadWord(pOwner->Ram() + EffectSampleAddress);
+		pOwner->SetEffectSample(pOwner->Ram() + sampleAddress);
+	}
+	else if (address == EffectRateAddress) {
+		auto rate = pOwner->Ram()[address];
+		pOwner->SetEffectRate(rate);
+	}
+	else if (address == EffectVolumeAddress) {
+		auto volume = pOwner->Ram()[address];
+		pOwner->SetEffectVolume(volume);
 	}
 }
 
