@@ -1,6 +1,4 @@
 #include <cstring>
-#include <tusb.h>
-#include <hid.h>
 
 #include "Minima68Pico.h"
 #include "Ntsc.h"
@@ -12,8 +10,6 @@ Minima68Pico emulator;
 
 void Minima68Pico::Run()
 {
-    tusb_init();
-    InitButtons();
     primaryClock.AddDestination(&Cpu());
     Reset();
     primaryClock.Run();

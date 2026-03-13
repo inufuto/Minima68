@@ -1,6 +1,6 @@
 #include <cstring>
-#include "Minima68.h"
 
+#include "Minima68.h"
 #include "Joystick.h"
 #include "MemoryMap.h"
 #include "Sound.h"

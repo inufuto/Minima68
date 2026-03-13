@@ -14,5 +14,10 @@ public:
         static constexpr auto DownButton = 21;
         static constexpr auto Button1 = 22;
         static constexpr auto Button0 = 26;
+
+        static constexpr auto SdMiso = 16;
+        static constexpr auto SdCs = 17;
+        static constexpr auto SdSck = 18;
+        static constexpr auto SdMosi = 19;
     };
 };
