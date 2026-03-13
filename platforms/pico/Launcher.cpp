@@ -270,8 +270,10 @@ void RunLauncher()
     toneChannels[0].SetFrequency(440);
     toneChannels[0].SetVolume(0);
     Loop();
+
     auto path = CurrentDirectory + "/" + FileEntries[CurrentIndex]->name;
     uint8_t* pMemory = emulator.Ram() + Minima68::StartAddress;
+    pf_open(path.c_str());
     pf_read(pMemory, static_cast<UINT>(TilePatternAddress - Minima68::StartAddress), nullptr);
     memset(emulator.Ram() + TileMapAddress, 0, VramWidth * VramHeight);
 }

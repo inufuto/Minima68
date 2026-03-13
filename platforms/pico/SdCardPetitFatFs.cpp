@@ -251,28 +251,28 @@ bool InitSdCardPetitFatFs() {
     return pf_mount(&g_fs) == FR_OK;
 }
 
-bool ReadSdCardFile(const char* path, uint8_t* buffer, size_t bufferSize, size_t* readBytes) {
-    if (readBytes != nullptr) {
-        *readBytes = 0;
-    }
-    if (path == nullptr || buffer == nullptr) {
-        return false;
-    }
-    if (!g_sdReady && !InitSdCardPetitFatFs()) {
-        return false;
-    }
+// bool ReadSdCardFile(const char* path, uint8_t* buffer, size_t bufferSize, size_t* readBytes) {
+//     if (readBytes != nullptr) {
+//         *readBytes = 0;
+//     }
+//     if (path == nullptr || buffer == nullptr) {
+//         return false;
+//     }
+//     if (!g_sdReady && !InitSdCardPetitFatFs()) {
+//         return false;
+//     }
 
-    if (pf_open(path) != FR_OK) {
-        return false;
-    }
+//     if (pf_open(path) != FR_OK) {
+//         return false;
+//     }
 
-    UINT br = 0;
-    if (pf_read(buffer, static_cast<UINT>(bufferSize), &br) != FR_OK) {
-        return false;
-    }
+//     UINT br = 0;
+//     if (pf_read(buffer, static_cast<UINT>(bufferSize), &br) != FR_OK) {
+//         return false;
+//     }
 
-    if (readBytes != nullptr) {
-        *readBytes = br;
-    }
-    return true;
-}
+//     if (readBytes != nullptr) {
+//         *readBytes = br;
+//     }
+//     return true;
+// }
