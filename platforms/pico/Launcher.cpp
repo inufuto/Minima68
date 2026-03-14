@@ -209,7 +209,7 @@ static void Loop()
         do {
             button = ReadJoystick();
         } while (button == 0);
-        if ((button & Joystick::Button0) != 0) {
+        if ((button & Joystick::Buttons) != 0) {
             if (FileEntries[CurrentIndex]->directory) {
                 toneChannels[0].SetVolume(MaxVolume);
                 if (FileEntries[CurrentIndex]->name == ParentDirectory) {
@@ -271,6 +271,7 @@ void RunLauncher()
     toneChannels[0].SetVolume(0);
     Loop();
 
+    while ((ReadJoystick() & Joystick::Buttons) != 0);
     memset(emulator.Ram() + TileMapAddress, 0, VramWidth * VramHeight);
     auto path = CurrentDirectory + "/" + FileEntries[CurrentIndex]->name;
     pf_open(path.c_str());

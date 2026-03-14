@@ -1,5 +1,6 @@
-#pragma
-#include "../core/ClockSource.h"
+#pragma once
+
+#include "../../core/ClockSource.h"
 
 class PrimaryClock : public ClockSource
 {

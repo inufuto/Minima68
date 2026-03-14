@@ -6,6 +6,7 @@ enum Joystick {
     Button0 = 0x10,
     Button1 = 0x20,
 	All = Left | Right | Up | Down | Button0 | Button1,
+    Buttons = Button0 | Button1,
 };
 
 extern void InitInput();

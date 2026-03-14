@@ -57,6 +57,8 @@ LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmSize(wParam, lParam);
 	case WM_ERASEBKGND:
 		return OnWmEraseBackground(wParam, lParam);
+	case WM_SETFOCUS:
+		return OnWmSetFocus(wParam, lParam);
 	case WM_UPDATE_EMULATOR:
 		ReDraw();
 		return 0;
@@ -122,6 +124,13 @@ void MainWindow::OnEraseBackground(DeviceContext& dc)
 	RECT rect;
 	GetClientRect(&rect);
 	dc.FillRect(&rect, GetSysColorBrush(COLOR_ACTIVEBORDER));
+}
+
+void MainWindow::OnSetFocus(HWND hOldWnd)
+{
+	if (selectedPaneIndex >= 0 && selectedPaneIndex < std::size(selectablePanes)) {
+		selectablePanes[selectedPaneIndex]->SetFocus();
+	}
 }
 
 void MainWindow::ShowAboutDialog()
@@ -227,6 +236,7 @@ void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 		if (AddBreakpoint(emulator.Cpu())) {
 			breakpointWindow.Invalidate();
 		}
+		break;
 	case ID_DELETE:
 		breakpointWindow.DeleteSelected();
 		break;

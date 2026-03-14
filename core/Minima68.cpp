@@ -48,7 +48,7 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 	}
 	else if (address >= ToneVolumeAddress && address < ToneVolumeAddress + ToneChannelCount * 2) {
 		if ((address - ToneVolumeAddress) % 2 == 0) {
-			auto index = address - ToneVolumeAddress;
+			auto index = (address - ToneVolumeAddress) /2;
 			auto volume = pOwner->Ram()[address];
 			pOwner->SetToneVolume(index, volume);
 		}
@@ -78,7 +78,6 @@ void Minima68::Reset()
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
-	// memcpy(Ram() + 0x100, TestCode, 0x2000);
 	cpu.Reset();
 }
 

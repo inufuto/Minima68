@@ -1,8 +1,8 @@
 #include <pico/stdlib.h>
 #include <tusb.h>
 #include <hid.h>
-// #include "PrimaryClock.h"
-#include "Minima68Pico.h"
+
+#include "PrimaryClock.h"
 
 void PrimaryClock::Run()
 {

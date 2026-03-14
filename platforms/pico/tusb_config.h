@@ -20,5 +20,3 @@
 
 #define CFG_TUH_HID_EPIN_BUFSIZE 64 // HID入力エンドポイントのバッファサイズ
 #define CFG_TUH_HID_EPOUT_BUFSIZE 64 // HID出力エンドポイントのバッファサイズ
-
-#define CFG_TUSB_DEBUG 1

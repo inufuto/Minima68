@@ -36,6 +36,7 @@ protected:
 	void OnDestroy() override;
 	void OnSize(UINT width, UINT height) override;
 	void OnEraseBackground(DeviceContext& dc) override;
+	void OnSetFocus(HWND hOldWnd) override;
 	void ShowAboutDialog();
 	void OnCommand(UINT id, UINT notificationCode, HWND hWnd) override;
 	LRESULT OnWmSelectPane(WPARAM wParam, LPARAM lParam);

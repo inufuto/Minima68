@@ -11,7 +11,7 @@ class Minima68 : public AbstractEmulator
 public:
 	static constexpr uint16_t StartAddress = 0x0100;
 public:
-	static constexpr double PrimaryClockFrequency = 8'000'000;
+	static constexpr double PrimaryClockFrequency = 2'000'000;
 private:
 	uint8_t ram[0x10000];
 	Cpu6800 cpu;
