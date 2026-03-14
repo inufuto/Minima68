@@ -93,7 +93,7 @@ void Minima68::Reset()
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
-		memcpy(Ram() + 0x100, TestCode, 0x2000);
+		//memcpy(Ram() + 0x100, TestCode, 0x2000);
 	cpu.Reset();
 }
 

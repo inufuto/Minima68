@@ -3,6 +3,8 @@
 #undef min
 #undef max
 #include "MainWindow.h"
+
+#include "FileDialog.h"
 #include "resource.h"
 
 extern HINSTANCE HInstance;
@@ -33,6 +35,15 @@ void MainWindow::ReDraw() {
 	//screenWindow.Invalidate();
 	UpdateWindow(HWnd());
 	waitingForUpdate = false;
+}
+
+void MainWindow::OpenFile()
+{
+	auto fileName = PromptOpenFileName("", "Directry", "bin", "Binary File", HWnd());
+	if (!fileName.empty()) {
+		emulator.LoadFile(fileName.c_str());
+		UpdateView();
+	}
 }
 
 LRESULT MainWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
@@ -113,6 +124,12 @@ void MainWindow::OnEraseBackground(DeviceContext& dc)
 	dc.FillRect(&rect, GetSysColorBrush(COLOR_ACTIVEBORDER));
 }
 
+void MainWindow::ShowAboutDialog()
+{
+	AboutDialog dialog;
+	dialog.ShowModal(HWnd());
+}
+
 LRESULT MainWindow::OnWmSelectPane(WPARAM wParam, LPARAM lParam)
 {
 	OnSelectPane(reinterpret_cast<HWND>(lParam));
@@ -152,6 +169,8 @@ bool MainWindow::UpdateMenuItem(HMENU hMenu, UINT id)
 	case ID_EXIT:
 	case ID_RESET:
 	case ID_ADD_BREAKPOINT:
+	case ID_OPEN_FILE:
+	case ID_ABOUT:
 		return true;
 	case ID_DEBUG_RESUME:
 	case ID_DEBUG_STEP:
@@ -210,6 +229,12 @@ void MainWindow::OnCommand(UINT id, UINT notificationCode, HWND hWnd)
 		}
 	case ID_DELETE:
 		breakpointWindow.DeleteSelected();
+		break;
+	case ID_OPEN_FILE:
+		OpenFile();
+		break;
+	case ID_ABOUT:
+		ShowAboutDialog();
 		break;
 	default:
 		EmulatorWindow::OnCommand(id, notificationCode, hWnd);

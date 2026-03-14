@@ -34,7 +34,7 @@ void WindowsAudioClient::Create()
 	waveFormat.Format.nChannels = 2;
 	waveFormat.SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
 
-	result = pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, REFTIMES_PER_SEC * 1, 0, &waveFormat.Format, nullptr);
+	result = pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, REFTIMES_PER_SEC / 100, 0, &waveFormat.Format, nullptr);
 	if (FAILED(result)) {
 		throw ApiException(result);
 	}

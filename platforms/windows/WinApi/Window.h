@@ -61,7 +61,8 @@ protected:
 	LRESULT OnWmInitMenuPopup(WPARAM wParam, LPARAM lParam);
 	virtual void OnInitMenuPopup(HMENU hmenu, UINT index){}
 	LRESULT OnWmInitDialog(WPARAM wParam, LPARAM lParam);
-	virtual void OnInitDialog() {}
+	virtual void OnInitDialog();
+
 public:
 	Window() { pointers.push_back(this); }
 	~Window() override;

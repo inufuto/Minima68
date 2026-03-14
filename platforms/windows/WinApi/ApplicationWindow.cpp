@@ -9,7 +9,7 @@ extern LPCSTR CompanyName, ProductName;
 auto ApplicationWindow::LayoutRegistry()
 {
 	char s[256];
-	snprintf(s, sizeof(s), "Software\\%s\\%s\\", CompanyName, ProductName);
+	snprintf(s, sizeof(s), "Software\\%s\\%s\\Window", CompanyName, ProductName);
 	return std::string(s);
 }
 

@@ -6,6 +6,7 @@
 #include "ScreenWindow.h"
 #include "TitledPane.h"
 #include "EmulatorWindow.h"
+#include "AboutDialog.h"
 
 class MainWindow : public EmulatorWindow, public PrimaryClock::Owner
 {
@@ -28,12 +29,14 @@ private:
 	void SelectPane(int index);
 	void UpdateView();
 	void ReDraw();
+	void OpenFile();
 protected:
 	LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	void OnDestroy() override;
 	void OnSize(UINT width, UINT height) override;
 	void OnEraseBackground(DeviceContext& dc) override;
+	void ShowAboutDialog();
 	void OnCommand(UINT id, UINT notificationCode, HWND hWnd) override;
 	LRESULT OnWmSelectPane(WPARAM wParam, LPARAM lParam);
 	void OnSelectPane(HWND hPane);

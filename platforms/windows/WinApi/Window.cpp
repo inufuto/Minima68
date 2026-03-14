@@ -141,6 +141,20 @@ LRESULT Window::OnWmInitDialog(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
+void Window::OnInitDialog()
+{
+	auto hParent = GetParent();
+	if (hParent == nullptr) {
+		hParent = ::GetDesktopWindow();
+	}
+	RECT parentRect, thisRest;
+	GetWindowRect(hParent, &parentRect);
+	GetWindowRect(hWnd, &thisRest);
+	auto x = parentRect.left + (parentRect.right - parentRect.left - (thisRest.right - thisRest.left)) / 2;
+	auto y = parentRect.top + (parentRect.bottom - parentRect.top - (thisRest.bottom - thisRest.top)) / 2;
+	Move(x, y, thisRest.right - thisRest.left, thisRest.bottom - thisRest.top);
+}
+
 Window::~Window() {
 	if (hWnd != nullptr) {
 		Destroy();

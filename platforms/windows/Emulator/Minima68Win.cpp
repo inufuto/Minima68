@@ -61,6 +61,21 @@ void Minima68Win::SetColor(int index, uint8_t r, uint8_t g, uint8_t b) {
 	colors[index] = { b, g, r, 0xff };
 }
 
+void Minima68Win::LoadFile(LPCSTR fileName)
+{
+	auto hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		throw ApiException();
+	}
+	auto result = ReadFile(hFile, Ram()+StartAddress, TilePatternAddress-StartAddress, nullptr,nullptr);
+	if (!result) {
+		CloseHandle(hFile);
+		throw ApiException();
+	}
+	CloseHandle(hFile);
+	Reset();
+}
+
 void Minima68Win::SetToneSample(int index, const uint8_t* pSample)
 {
 	assert(index >= 0 && index < ToneSampleCount);

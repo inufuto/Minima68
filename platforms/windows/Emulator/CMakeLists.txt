@@ -19,3 +19,7 @@ add_library(Emulator STATIC ${EMULATOR_SOURCES} ${EMULATOR_HEADERS})
 
 # Include directory for other projects to use
 target_include_directories(Emulator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Include generated version header
+target_include_directories(Emulator PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/..)
+target_compile_definitions(Emulator PRIVATE VERSION_INFO_AVAILABLE)

@@ -19,7 +19,7 @@ protected:
 	void OnInitMenuPopup(HMENU hmenu, UINT index) override;
 	virtual bool UpdateMenuItem(HMENU hMenu, UINT id) { return false;}
 
-	auto LayoutRegistry();
+	static auto LayoutRegistry();
 	virtual void SaveLayout();
 	virtual void SaveLayout(const Registry& registry);
 	virtual void RestoreLayout();

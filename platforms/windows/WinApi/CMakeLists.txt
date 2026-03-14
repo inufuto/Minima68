@@ -2,12 +2,12 @@
 set(WINAPI_SOURCES
     Window.cpp
     ApiException.cpp
- ApplicationWindow.cpp "Registry.cpp" "DeviceContext.cpp"  "Font.cpp" "Dialog.cpp" "Control.cpp")
+ ApplicationWindow.cpp "Registry.cpp" "DeviceContext.cpp"  "Font.cpp" "Dialog.cpp" "Control.cpp" "FileDialog.cpp")
 
 set(WINAPI_HEADERS
     Window.h
     ApiException.h
- ApplicationWindow.h "Registry.h" "ComPtr.h" "DeviceContext.h"  "Font.h" "Dialog.h" "Control.h")
+ ApplicationWindow.h "Registry.h" "ComPtr.h" "DeviceContext.h"  "Font.h" "Dialog.h" "Control.h" "FileDialog.h")
 
 add_library(WinApi STATIC ${WINAPI_SOURCES} ${WINAPI_HEADERS})
 

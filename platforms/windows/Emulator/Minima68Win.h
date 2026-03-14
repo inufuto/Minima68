@@ -37,6 +37,13 @@ private:
 		explicit VSync(Minima68Win* pOwner) : pOwner(pOwner) {}
 		void OnClock(uint32_t time) override { pOwner->MakeInterrupt(); }
 	} vsync;
+protected:
+	void SetToneSample(int index, const uint8_t* pSample) override;
+	void SetToneFrequency(int index, uint16_t frequency) override;
+	void SetToneVolume(int index, uint8_t volume) override;
+	void SetEffectSample(uint8_t* pSamples) override;
+	void SetEffectRate(uint8_t rate) override;
+	void SetEffectVolume(uint8_t volume) override;
 public:
 	explicit Minima68Win(PrimaryClock::Owner* pOwner);
 	const auto& ClockSource() const { return primaryClock; }
@@ -52,14 +59,7 @@ public:
 
 	void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) override;
 	uint32_t ColorAt(int index) const { assert(index >= 0 && index < ColorCount); return colors[index].dword; }
-protected:
-	void SetToneSample(int index, const uint8_t* pSample) override;
-	void SetToneFrequency(int index, uint16_t frequency) override;
-	void SetToneVolume(int index, uint8_t volume) override;
-	void SetEffectSample(uint8_t* pSamples) override;
-	void SetEffectRate(uint8_t rate) override;
-	void SetEffectVolume(uint8_t volume) override;
-
+	void LoadFile(LPCSTR fileName);
 public:
 	void SetJoystickBit(uint8_t bit) { Ram()[JoystickAddress] |= bit; }
 	void ClearJoystickBit(uint8_t bit) { Ram()[JoystickAddress] &= ~bit; }

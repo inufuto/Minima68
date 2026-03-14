@@ -4,6 +4,31 @@ if(WIN32)
     set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /nologo")
 endif()
 
+# Get version from Git
+find_package(Git QUIET)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --always --dirty
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
+# Set default version if Git is not available
+if(NOT GIT_VERSION)
+    set(GIT_VERSION "v0.0.0-dev")
+endif()
+
+# Configure version header
+set(APP_VERSION "${GIT_VERSION}")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    @ONLY
+)
+
 # Add WinApi subdirectory
 add_subdirectory(WinApi)
 
@@ -18,18 +43,20 @@ add_subdirectory(Audio)
 
 # Source files
 set(SOURCES
-    Main/WinMain.cpp
-    Main/MainWindow.cpp
-    Main/ScreenWindow.cpp
-    Main/resource.rc
+    WinMain.cpp
+    MainWindow.cpp
+    ScreenWindow.cpp
+    AboutDialog.cpp
+    resource.rc
     Emulator/emulator.rc
  )
 
 # Header files
 set(HEADERS
-    Main/resource.h
-    Main/MainWindow.h
-    Main/ScreenWindow.h
+    resource.h
+    MainWindow.h
+    ScreenWindow.h
+    AboutDialog.h
 )
 
 # Create executable
@@ -40,7 +67,9 @@ if(WIN32)
     target_include_directories(${MAIN_PROJECT_NAME} PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Emulator
+        ${CMAKE_CURRENT_BINARY_DIR}
     )
+    target_compile_definitions(${MAIN_PROJECT_NAME} PRIVATE VERSION_INFO_AVAILABLE)
 endif()
 
 # Windows linker settings

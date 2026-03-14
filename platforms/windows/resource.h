@@ -4,6 +4,9 @@
 // resource
 
 #define IDC_EDIT1                           1000
+#define IDC_VERSION                        1001
+
+#define IDD_ABOUT                           101
 
 #define IDR_MAIN                            100
 
@@ -18,14 +21,16 @@
 #define ID_RESET                            40007
 #define ID_DEBUG_STEP                       40008
 #define ID_DEBUG_NEXT                       40009
-#define ID_DELETE 						   40010
+#define ID_DELETE                           40010
+#define ID_OPEN_FILE                        40011
+#define ID_ABOUT                            40012
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
         #define _APS_NO_MFC                 1
         #define _APS_NEXT_RESOURCE_VALUE    101
-        #define _APS_NEXT_COMMAND_VALUE     40010
-        #define _APS_NEXT_CONTROL_VALUE     1001
+        #define _APS_NEXT_COMMAND_VALUE     40013
+        #define _APS_NEXT_CONTROL_VALUE     1002
         #define _APS_NEXT_SYMED_VALUE       300
     #endif
 #endif
