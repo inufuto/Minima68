@@ -87,8 +87,7 @@ struct FileEntry {
     bool directory;
 };
 
-static const char* RootDirectory = "/";
-static std::string CurrentDirectory = RootDirectory;
+static std::string CurrentDirectory = "";
 static const char* ParentDirectory = "..";
 static const char* Suffix = ".BIN";
 static std::vector<std::unique_ptr<FileEntry>> FileEntries;
@@ -131,7 +130,7 @@ static void ReadDirectory()
     FileEntries.clear();
     DIR dir;
     if ((pf_opendir(&dir, CurrentDirectory.c_str()) == FR_OK)) {
-        if (CurrentDirectory != RootDirectory) {
+        if (!CurrentDirectory.empty()) {
             auto pFileEntry = std::make_unique<FileEntry>();
             pFileEntry->name = ParentDirectory;
             pFileEntry->directory = true;
@@ -176,13 +175,14 @@ static void ShowList()
     memset(emulator.Ram() + TileMapAddress, ' ', VramWidth * VramHeight);
     std::string title = "Minima68 " APP_VERSION;
     PrintS((WindowWidth - title.length()) / 2, title.c_str());
-    PrintS(VramWidth * 2 + LeftX, CurrentDirectory.c_str());
+    auto vram = PrintS(VramWidth * 2 + LeftX, CurrentDirectory.c_str());
+    PrintC(vram, '/');
     auto line = VramWidth * 3;
     for (auto i = 0; i < VisibleLineCount; ++i) {
         auto index = TopIndex + i;
         if (index >= FileEntries.size()) break;
         const auto& pFileEntry = FileEntries[index];
-        auto vram = line + LeftX;
+        vram = line + LeftX;
         vram = PrintC(vram, index == CurrentIndex ? '>' : ' ');
         vram = PrintC(vram, ' ');
         vram = PrintS(vram, pFileEntry->name.c_str());
@@ -215,14 +215,14 @@ static void Loop()
                 if (FileEntries[CurrentIndex]->name == ParentDirectory) {
                     auto pos = CurrentDirectory.find_last_of('/', CurrentDirectory.length() - 2);
                     if (pos == std::string::npos || pos == 0) {
-                        CurrentDirectory = RootDirectory;
+                        CurrentDirectory = "";
                     }
                     else {
                         CurrentDirectory = CurrentDirectory.substr(0, pos);
                     }
                 }
                 else {
-                    if (CurrentDirectory != RootDirectory) {
+                    if (!CurrentDirectory.empty()) {
                         CurrentDirectory += "/";
                     }
                     CurrentDirectory += FileEntries[CurrentIndex]->name;
@@ -271,9 +271,11 @@ void RunLauncher()
     toneChannels[0].SetVolume(0);
     Loop();
 
-    auto path = CurrentDirectory + "/" + FileEntries[CurrentIndex]->name;
-    uint8_t* pMemory = emulator.Ram() + Minima68::StartAddress;
-    pf_open(path.c_str());
-    pf_read(pMemory, static_cast<UINT>(TilePatternAddress - Minima68::StartAddress), nullptr);
     memset(emulator.Ram() + TileMapAddress, 0, VramWidth * VramHeight);
+    auto path = CurrentDirectory + "/" + FileEntries[CurrentIndex]->name;
+    pf_open(path.c_str());
+    pf_read(
+        emulator.Ram() + Minima68::StartAddress,
+        static_cast<UINT>(TilePatternAddress - Minima68::StartAddress), nullptr
+    );
 }

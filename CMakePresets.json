@@ -26,7 +26,7 @@
       }
     },
     {
-      "name": "pico",
+      "name": "pico-debug",
       "hidden": false,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/pico",
@@ -36,6 +36,23 @@
         "PICO_SDK_FETCH_FROM_GIT": "ON",
         "PICO_NO_PICOTOOL": "ON"
       }
+    },
+    {
+      "name": "pico-release",
+      "hidden": false,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/pico-release",
+      "cacheVariables": {
+        "BUILD_FOR_PICO": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "PICO_SDK_FETCH_FROM_GIT": "ON",
+        "PICO_NO_PICOTOOL": "ON"
+      }
+    },
+    {
+      "name": "pico",
+      "hidden": false,
+      "inherits": "pico-debug"
     }
   ],
   "buildPresets": [
@@ -50,8 +67,16 @@
       "configuration": "Release"
     },
     {
+      "name": "pico-debug",
+      "configurePreset": "pico-debug"
+    },
+    {
+      "name": "pico-release",
+      "configurePreset": "pico-release"
+    },
+    {
       "name": "pico",
-      "configurePreset": "pico"
+      "configurePreset": "pico-debug"
     }
   ]
 }
