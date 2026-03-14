@@ -2,6 +2,7 @@
 
 #include "../core/Minima68.h"
 #include "PrimaryClock.h"
+#include "MemoryMap.h"
 
 extern class Minima68Pico : public Minima68
 {

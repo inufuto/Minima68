@@ -3,7 +3,7 @@
 #include "Minima68Pico.h"
 #include "Ntsc.h"
 #include "MemoryMap.h"
-#include "Joystick.h"
+#include "Input.h"
 #include "SoundChannel.h"
 
 Minima68Pico emulator;

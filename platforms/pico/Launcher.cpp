@@ -16,7 +16,7 @@ extern "C" {
 #include "MemoryMap.h"
 #include "Video.h"
 #include "SoundChannel.h"
-#include "Joystick.h"
+#include "Input.h"
 #include "version.h"
 
 static uint8_t AsciiPattern[] = {

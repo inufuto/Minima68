@@ -8,7 +8,7 @@
 #include "Ntsc.h"
 #include "SoundChannel.h"
 #include "SdCardPetitFatFs.h"
-#include "Joystick.h"
+#include "Input.h"
 
 extern void RunLauncher();
 
@@ -16,10 +16,10 @@ int main()
 {
     stdio_init_all();
     tusb_init();
-    InitButtons();
     InitSdCardPetitFatFs();
     InitNtsc();
     InitSound();
+    InitInput();
     RunLauncher();
     emulator.Run();
 }

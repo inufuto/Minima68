@@ -7,6 +7,7 @@ set(CORE_SOURCES
 
 set(CORE_HEADERS
 	ClockSource.h
+	Input.h
    "MemorySpace.h" "Uncopyable.h"  Minima68.h "AbtractEmulator.h" "Cpu6800.h"
    "Video.h"
  "MemoryMap.h" "Sound.h")

@@ -1,7 +1,7 @@
 #include <cstring>
 
 #include "Minima68.h"
-#include "Joystick.h"
+#include "Input.h"
 #include "MemoryMap.h"
 #include "Sound.h"
 #include "Video.h"

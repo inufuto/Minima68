@@ -56,7 +56,7 @@ add_executable(${MAIN_PROJECT_NAME}
         Main.cpp PrimaryClock.cpp Minima68Pico.cpp
         Color.cpp Ntsc.cpp
         SoundChannel.cpp
-        Joystick.cpp
+        Input.cpp
         Launcher.cpp
 )
 

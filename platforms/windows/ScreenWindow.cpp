@@ -2,7 +2,7 @@
 #include "ScreenWindow.h"
 #include "EmulatorWindow.h"
 #include "../../core/Video.h"
-#include "../../core/Joystick.h"
+#include "../../core/Input.h"
 
 constexpr auto ScreenWidth = XResolution * 2 * 115 / 100;
 constexpr auto ScreenHeight = YResolution;

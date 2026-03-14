@@ -8,5 +8,5 @@ enum Joystick {
 	All = Left | Right | Up | Down | Button0 | Button1,
 };
 
-extern void InitButtons();
+extern void InitInput();
 extern uint8_t ReadButtons();
