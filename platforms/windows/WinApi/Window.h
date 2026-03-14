@@ -48,6 +48,8 @@ protected:
 	virtual void OnKeyDown(UINT virtualKey, UINT flags) {}
 	LRESULT OnWmKeyUp(WPARAM wParam, LPARAM lParam);
 	virtual void OnKeyUp(UINT virtualKey, UINT flags) {}
+	LRESULT OnWmChar(WPARAM wParam, LPARAM lParam);
+	virtual void OnChar(UINT charCode, UINT flags) {}
 	LRESULT OnWmLButtonDown(WPARAM wParam, LPARAM lParam);
 	virtual void OnLButtonDown(UINT flags, POINT point) {}
 	LRESULT OnWmMouseMove(WPARAM wParam, LPARAM lParam);

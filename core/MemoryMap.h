@@ -16,3 +16,4 @@ constexpr auto EffectRateAddress = 0xff54;
 constexpr auto EffectVolumeAddress = 0xff55;
 
 constexpr auto JoystickAddress = 0xff80;
+constexpr auto KeyCodeAddress = 0xff81;

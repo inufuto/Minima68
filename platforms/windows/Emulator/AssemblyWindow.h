@@ -17,7 +17,7 @@ private:
 	float marginX;
 	int minWindowWidth;
 	uint32_t topAddress;
-	std::vector<std::unique_ptr<AssemblyElement>> elements;
+	std::vector<AssemblyElement> elements;
 protected:
 	void OnCreate(CREATESTRUCT* pCreateStruct) override;
 	void OnSize(UINT width, UINT height) override;

@@ -35,6 +35,7 @@ protected:
 	void OnSetFocus(HWND hOldWnd) override;
 	void OnKeyDown(UINT virtualKey, UINT flags) override;
 	void OnKeyUp(UINT virtualKey, UINT flags) override;
+	void OnChar(UINT charCode, UINT flags) override;
 private:
 	static uint8_t ToBit(UINT virtualKey);
 	uint32_t ColorAt(uint8_t index) const { assert(index < ColorCount); return emulator.ColorAt(index); }

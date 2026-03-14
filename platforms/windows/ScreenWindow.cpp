@@ -44,6 +44,8 @@ LRESULT ScreenWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		return OnWmKeyDown(wParam, lParam);
 	case WM_KEYUP:
 		return OnWmKeyUp(wParam, lParam);
+	case WM_CHAR:
+		return OnWmChar(wParam, lParam);
 	}
 	return RenderTargetWindow::OnMessage(message, wParam, lParam);
 }
@@ -81,6 +83,11 @@ void ScreenWindow::OnKeyDown(UINT virtualKey, UINT flags)
 void ScreenWindow::OnKeyUp(UINT virtualKey, UINT flags)
 {
 	emulator.ClearJoystickBit(ToBit(virtualKey));
+}
+
+void ScreenWindow::OnChar(UINT charCode, UINT flags)
+{
+	emulator.AddKeyCode(charCode);
 }
 
 uint8_t ScreenWindow::ToBit(UINT virtualKey)

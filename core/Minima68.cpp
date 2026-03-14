@@ -6,7 +6,7 @@
 #include "Sound.h"
 #include "Video.h"
 
-extern const uint8_t TestCode[];
+//extern const uint8_t TestCode[];
 
 inline uint16_t LoadWord(const uint8_t* p)
 {
@@ -18,6 +18,9 @@ uint8_t Minima68::Memory::Read(const uint16_t address) const
 	uint8_t value = pOwner->ReadMemory(address);
 	if (address == JoystickAddress) {
 		value &= Joystick::All;
+	}
+	else if (address == KeyCodeAddress) {
+		return pOwner->RetrieveKeyCode();
 	}
 	return value;
 }
@@ -50,8 +53,7 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 			pOwner->SetToneVolume(index, volume);
 		}
 	}
-	else if (address >= EffectSampleAddress && address <EffectSampleAddress + 2)
-	{
+	else if (address >= EffectSampleAddress && address < EffectSampleAddress + 2) {
 		auto sampleAddress = LoadWord(pOwner->Ram() + EffectSampleAddress);
 		pOwner->SetEffectSample(pOwner->Ram() + sampleAddress);
 	}
@@ -67,23 +69,6 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 
 void Minima68::Reset()
 {
-	//static const uint8_t PaletteValues[] = {
-	//	0x00, 0x00, 0x00, 0x55, 0x00, 0xff, 0xff, 0x00,
-	//	0x00, 0xff, 0xbb, 0xff, 0x00, 0xff, 0x00, 0x00,
-	//	0xff, 0xff, 0xff, 0xff, 0x00, 0xff, 0xff, 0xff,
-	//	0x00, 0x00, 0x00, 0x99, 0x44, 0x44, 0xff, 0xbb,
-	//	0x55, 0xbb, 0x55, 0x55, 0x00, 0x55, 0x00, 0x00,
-	//	0x55, 0xbb, 0xff, 0xff, 0x55, 0xbb, 0xbb, 0xbb,
-	//};
-	//{
-	//	auto pSource = PaletteValues;
-	//	for (auto i = 0; i < ColorCount; ++i) {
-	//		auto r = *pSource++;
-	//		auto g = *pSource++;
-	//		auto b = *pSource++;
-	//		SetColor(i, r, g, b);
-	//	}
-	//}
 	ram[ScrollXAddress] = ram[ScrollYAddress] = 0;
 	ram[JoystickAddress] = 0;
 	for (auto i = 0; i < ToneChannelCount; ++i) {
@@ -93,7 +78,7 @@ void Minima68::Reset()
 
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
-		// memcpy(Ram() + 0x100, TestCode, 0x2000);
+	// memcpy(Ram() + 0x100, TestCode, 0x2000);
 	cpu.Reset();
 }
 
@@ -105,4 +90,13 @@ uint8_t Minima68::ScrollX() const
 uint8_t Minima68::ScrollY() const
 {
 	return ram[ScrollYAddress];
+}
+
+char Minima68::RetrieveKeyCode() {
+	if (keyCodes.empty()) {
+		return 0;
+	}
+	char charCode = keyCodes.front();
+	keyCodes.pop();
+	return charCode;
 }

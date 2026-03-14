@@ -2,7 +2,7 @@
 set(CORE_SOURCES
 	ClockSource.cpp
 	"Minima68.cpp" "AbtractEmulator.cpp" "Cpu6800.cpp"
-	test.cpp
+	
 )
 
 set(CORE_HEADERS

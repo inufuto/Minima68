@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cassert>
+#include <queue>
 
 #include "AbtractEmulator.h"
 #include "Cpu6800.h"
-#include "MemoryMap.h"
 
 class Minima68 : public AbstractEmulator
 {
@@ -26,6 +26,7 @@ private:
 		uint8_t Read(const uint16_t address) const override;;
 		void Write(const uint16_t address, const uint8_t value) override;
 	} memory;
+	std::queue<char> keyCodes;
 protected:
 	explicit Minima68(Debugger* pDebugger = nullptr) : cpu(pDebugger, &memory), memory(this) {}
 
@@ -33,7 +34,7 @@ protected:
 	virtual void WriteMemory(uint16_t address, uint8_t value) { ram[address & 0xffff] = value; }
 
 	virtual void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) = 0;
-	
+
 	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;
 	virtual void SetToneFrequency(int index, uint16_t frequency) = 0;
 	virtual void SetToneVolume(int index, uint8_t volume) = 0;
@@ -58,5 +59,6 @@ public:
 		assert(index == 0);
 		return &memory;
 	}
-
+	void AddKeyCode(char charCode) { keyCodes.push(charCode); }
+	char RetrieveKeyCode();
 };

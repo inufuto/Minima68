@@ -1,0 +1,87 @@
+Minima68
+Copyright (c) 2026 Inufuto
+
+========================================
+1. Main license (MIT License)
+========================================
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+========================================
+2. Third-party software and licenses
+========================================
+
+This software uses the following third-party components:
+
+  - Raspberry Pi Pico SDK
+  - TinyUSB
+  - Petit FatFs
+
+Each component is licensed under its own license terms as described below.
+Where required by the respective licenses, the original copyright notices
+and license texts are reproduced.
+
+----------------------------------------
+2.1 Raspberry Pi Pico SDK
+----------------------------------------
+
+The Raspberry Pi Pico SDK is provided by Raspberry Pi Ltd.
+It is licensed under the BSD 3-Clause License.
+
+For the full and up-to-date license text, please refer to the Pico SDK
+distribution (typically found as `LICENSE.TXT` in the pico-sdk repository)
+or the official Raspberry Pi Pico SDK repository.
+
+  third_party/pico-sdk/LICENSE.TXT
+
+----------------------------------------
+2.2 TinyUSB
+----------------------------------------
+
+TinyUSB is an open source cross-platform USB stack.
+
+TinyUSB is licensed under the MIT License.
+
+For the full and up-to-date license text, please refer to the TinyUSB
+distribution or the official TinyUSB repository.
+
+  third_party/tinyusb/LICENSE
+
+----------------------------------------
+2.3 Petit FatFs
+----------------------------------------
+
+Petit FatFs is a small FAT file system module written by ChaN.
+
+Petit FatFs is distributed under a permissive open source license.
+
+For the full and up-to-date license text, please refer to the Petit FatFs
+distribution or the official Petit FatFs/FatFs website.
+
+  third_party/petitfatfs/LICENSE.txt
+
+========================================
+3. Notes
+========================================
+
+- This project itself is licensed under the MIT License as described in
+  section 1.
+- The third-party components listed in section 2 are licensed under their
+  respective licenses. Use, redistribution, and modification of those
+  components must comply with their original license terms.

@@ -4,6 +4,7 @@
 #include "../../../core/Minima68.h"
 #include "../../../core/Video.h"
 #include "../Audio/WindowsAudioClient.h"
+#include "../../../core/MemoryMap.h"
 
 class Minima68Win : public Minima68, public Debugger
 {
@@ -37,7 +38,6 @@ private:
 		explicit VSync(Minima68Win* pOwner) : pOwner(pOwner) {}
 		void OnClock(uint32_t time) override { pOwner->MakeInterrupt(); }
 	} vsync;
-protected:
 	void SetToneSample(int index, const uint8_t* pSample) override;
 	void SetToneFrequency(int index, uint16_t frequency) override;
 	void SetToneVolume(int index, uint8_t volume) override;
