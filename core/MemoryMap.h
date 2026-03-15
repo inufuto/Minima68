@@ -3,10 +3,11 @@
 constexpr auto TilePatternAddress = 0xd000;
 constexpr auto SpritePatternAddress = 0xe000;
 constexpr auto TileMapAddress = 0xf000;
+constexpr auto Page0Address = TileMapAddress;
+constexpr auto Page1Address = 0xf400;
 constexpr auto SpriteAttributeAddress = 0xf800;
 constexpr auto PaletteAddress = 0xff00;
-constexpr auto ScrollXAddress = 0xff30;
-constexpr auto ScrollYAddress = 0xff31;
+constexpr auto PageAddress = 0xff30;
 
 constexpr auto ToneSampleAddress = 0xff40;
 constexpr auto FrequencyAddress = 0xff46;

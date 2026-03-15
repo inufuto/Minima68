@@ -26,13 +26,13 @@ static constexpr auto HStartPosition = HSyncLength + 120;
 static Color colors[ColorCount];
 static int dmaChannels[DmaChannelCount];
 static uint16_t dmaBuffer[DmaChannelCount][SamplesPerRaster] __attribute__ ((aligned (4)));
+
 static volatile uint16_t currentRaster;
 static volatile int currentY;
-static volatile uint8_t* pTileRow;
+static const volatile uint8_t* pTileRow;
 static volatile int yMod;
-static volatile int xModLeft;
+static const volatile uint8_t* pTileMap;
 
-const auto TileMap = emulator.Ram() + TileMapAddress;
 const auto TilePattern = emulator.Ram() + TilePatternAddress;
 const auto SpriteAttributes = reinterpret_cast<SpriteAttribute*>(emulator.Ram() + SpriteAttributeAddress);
 const auto SpritePattern = emulator.Ram() + SpritePatternAddress;
@@ -74,58 +74,36 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
         static uint8_t lineBuffer[XResolution];
         if (raster == VSyncRasterCount + BlankingRasterCount) {
             currentY = 0;
-            pTileRow = TileMap;
-            yMod = xModLeft = 0;
-        }
-        else if (raster == VSyncRasterCount + BlankingRasterCount + TileHeight * StatusAreaHeight) {
-            auto scrollY = emulator.ScrollY();
-            auto scrollX = emulator.ScrollX();
-            pTileRow = TileMap + VramWidth * StatusAreaHeight +
-                 (scrollY / TileHeight) * VramWidth +
-                  (scrollX / TileWidth);
-            yMod = scrollY % TileHeight;
-            xModLeft = scrollX % TileWidth;
+            pTileRow = pTileMap;
+            yMod = 0;
         }
         {
             auto pLine = lineBuffer;
             auto pTile = pTileRow;
-            auto xMod = xModLeft;
-            auto tile = *pTile++;
-            auto pPattern = TilePattern + 
-                (static_cast<uint16_t>(tile) * TilePatternSize) +
-                (yMod * TileWidthInBytes) +
-                xMod / DotsPerByte;
-            auto patternByte = *pPattern++;
-            for (auto x = 0; x < XResolution; ++x) {
-                if ((xMod % DotsPerByte) == 0) {
+            auto xCount = VramWidth;
+            do {
+                auto tile = *pTile++;
+                auto pPattern = TilePattern +
+                    (static_cast<uint16_t>(tile) * TilePatternSize) +
+                    (yMod * TileWidthInBytes);
+                auto byteCount = TileWidthInBytes;
+                do {
+                    auto patternByte = *pPattern++;
                     *pLine++ = patternByte >> 4;
-                }
-                else {
                     *pLine++ = patternByte & 0x0f;
-                }
-                if (++xMod >= TileWidth) {
-                    xMod = 0;
-                    tile = *pTile++;
-                    pPattern = TilePattern +
-                        (static_cast<uint16_t>(tile) * TilePatternSize) +
-                        (yMod * TileWidthInBytes);
-                }
-                if ((xMod % DotsPerByte) == 0) {
-                    patternByte = *pPattern++;
-                }
-            }
+                } while (--byteCount > 0);
+            } while (--xCount > 0);
             if (++yMod >= TileHeight) {
                 pTileRow += VramWidth;
                 yMod = 0;
             }
         }
         {
-            auto fieldY = currentY - StatusAreaHeight * TileHeight;
             auto horizontalCount = 0;
             auto pSprite = SpriteAttributes + SpriteCount;
             for (auto i = 0; i < SpriteCount; ++i) {
                 --pSprite;
-                uint8_t yOffset = fieldY - pSprite->y;
+                uint8_t yOffset = currentY - pSprite->y;
                 if (yOffset < SpriteHeight) {
                     uint8_t x = pSprite->x;
                     auto pPattern = SpritePattern +
@@ -278,4 +256,9 @@ void SetColor(int index, uint8_t r, uint8_t g, uint8_t b)
 {
     assert(index < ColorCount);
     colors[index].SetRgb(r, g, b);
+}
+
+void SetPage(uint8_t page)
+{
+    pTileMap = emulator.Ram() + TileMapAddress + (page * 0x400);
 }

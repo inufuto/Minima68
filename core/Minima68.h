@@ -34,7 +34,8 @@ protected:
 	virtual void WriteMemory(uint16_t address, uint8_t value) { ram[address & 0xffff] = value; }
 
 	virtual void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) = 0;
-
+	virtual void SetPage(uint8_t page) = 0;
+	
 	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;
 	virtual void SetToneFrequency(int index, uint16_t frequency) = 0;
 	virtual void SetToneVolume(int index, uint8_t volume) = 0;
@@ -47,9 +48,6 @@ public:
 	const auto& Cpu() const { return cpu; }
 	void Reset();
 	void MakeInterrupt() { cpu.MakeInterrupt(); }
-
-	uint8_t ScrollX() const;
-	uint8_t ScrollY() const;
 
 	int RegisterHolderCount() const override { return 1; }
 	const RegisterHolder* RegisterHolderAt(int index) const override { return &cpu; }

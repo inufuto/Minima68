@@ -36,7 +36,10 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 		auto b = *p;
 		pOwner->SetColor(index, r, g, b);
 	}
-	if (address >= ToneSampleAddress && address < ToneSampleAddress + ToneChannelCount * 2) {
+	else if (address == PageAddress) {
+		pOwner->SetPage(value & 0x01);
+	}
+	else if (address >= ToneSampleAddress && address < ToneSampleAddress + ToneChannelCount * 2) {
 		auto index = (address - ToneSampleAddress) / 2;
 		auto sampleAddress = LoadWord(pOwner->Ram() + ToneSampleAddress + index * 2);
 		pOwner->SetToneSample(index, pOwner->Ram() + sampleAddress);
@@ -69,8 +72,8 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 
 void Minima68::Reset()
 {
-	ram[ScrollXAddress] = ram[ScrollYAddress] = 0;
 	ram[JoystickAddress] = 0;
+	SetPage(0);
 	for (auto i = 0; i < ToneChannelCount; ++i) {
 		SetToneVolume(i, 0);
 	}
@@ -79,16 +82,6 @@ void Minima68::Reset()
 	WriteMemory(0xfffe, HighByte(StartAddress));
 	WriteMemory(0xffff, LowByte(StartAddress));
 	cpu.Reset();
-}
-
-uint8_t Minima68::ScrollX() const
-{
-	return ram[ScrollXAddress];
-}
-
-uint8_t Minima68::ScrollY() const
-{
-	return ram[ScrollYAddress];
 }
 
 char Minima68::RetrieveKeyCode() {

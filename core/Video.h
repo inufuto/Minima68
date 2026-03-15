@@ -2,11 +2,8 @@
 
 constexpr auto ColorCount = 16;
 
-constexpr auto WindowWidth = 32;
-constexpr auto VramWidth = WindowWidth * 2;
-constexpr auto StatusAreaHeight = 2;
-constexpr auto FieldAreaHeight = 24;
-constexpr auto VramHeight = StatusAreaHeight + FieldAreaHeight;
+constexpr auto VramWidth = 32;
+constexpr auto VramHeight = 26;
 
 constexpr auto DotsPerByte = 2;
 constexpr auto TileWidth = 4;
@@ -17,10 +14,10 @@ constexpr auto SpriteWidth = TileWidth * 2;
 constexpr auto SpriteHeight = TileHeight * 2;
 constexpr auto SpritePatternSize = SpriteWidth / DotsPerByte * SpriteHeight;
 
-constexpr auto XResolution = TileWidth * WindowWidth;
+constexpr auto XResolution = TileWidth * VramWidth;
 constexpr auto YResolution = TileHeight * VramHeight;
-constexpr auto SpriteRangeX = TileWidth * WindowWidth;
-constexpr auto SpriteRangeY = TileHeight * FieldAreaHeight;
+constexpr auto SpriteRangeX = TileWidth * VramWidth;
+constexpr auto SpriteRangeY = TileHeight * VramHeight;
 constexpr auto SpriteCount = 64;
 constexpr auto MaxHorizontalSpriteCount = 16;
 

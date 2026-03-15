@@ -174,7 +174,7 @@ static void ShowList()
 {
     memset(emulator.Ram() + TileMapAddress, ' ', VramWidth * VramHeight);
     std::string title = "Minima68 " APP_VERSION;
-    PrintS((WindowWidth - title.length()) / 2, title.c_str());
+    PrintS((VramWidth - title.length()) / 2, title.c_str());
     auto vram = PrintS(VramWidth * 2 + LeftX, CurrentDirectory.c_str());
     PrintC(vram, '/');
     auto line = VramWidth * 3;
@@ -266,6 +266,7 @@ void RunLauncher()
 {
     InitAsciiPattern();
     InitColors();
+    emulator.SetPage(0);
     toneChannels[0].SetSamples(SquareWave);
     toneChannels[0].SetFrequency(440);
     toneChannels[0].SetVolume(0);

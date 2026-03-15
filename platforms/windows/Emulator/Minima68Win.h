@@ -25,6 +25,8 @@ private:
 		};
 		uint32_t dword;
 	} colors[ColorCount];
+	uint8_t* pTileMap = Ram() + TileMapAddress;
+private:
 	class VideoClockSource : public SecondaryClockSource
 	{
 	public:
@@ -59,6 +61,8 @@ public:
 
 	void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) override;
 	uint32_t ColorAt(int index) const { assert(index >= 0 && index < ColorCount); return colors[index].dword; }
+	void SetPage(uint8_t page) override;
+	uint8_t* TileMap() const { return pTileMap; }
 	void LoadFile(LPCSTR fileName);
 public:
 	void SetJoystickBit(uint8_t bit) { Ram()[JoystickAddress] |= bit; }

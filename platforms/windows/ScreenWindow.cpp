@@ -115,10 +115,10 @@ void ScreenWindow::UpdateScreenBitmap()
 {
 	auto pScreen = screen;
 	{
-		// Status area
-		auto pTile = pTileMap;
-		for (auto tileY = 0; tileY < StatusAreaHeight; tileY++) {
-			for (auto tileX = 0; tileX < WindowWidth; ++tileX) {
+		// Background
+		auto pTile = emulator.TileMap();
+		for (auto tileY = 0; tileY < VramHeight; tileY++) {
+			for (auto tileX = 0; tileX < VramWidth; ++tileX) {
 				auto tile = *pTile++;
 				auto pPattern = pTilePattern + static_cast<uint16_t>(tile) * TilePatternSize;
 				for (auto y = 0; y < TileHeight; ++y) {
@@ -131,55 +131,12 @@ void ScreenWindow::UpdateScreenBitmap()
 				}
 				pScreen += TileWidth - XResolution * TileHeight;
 			}
-			pScreen += XResolution * TileHeight - TileWidth * WindowWidth;
-			pTile += VramWidth - WindowWidth;
-		}
-	}
-	{
-		// Field area
-		uint8_t scrollY = emulator.ScrollY();
-		uint8_t scrollX = emulator.ScrollX();
-		auto pTileRow = pTileMap + VramWidth * StatusAreaHeight +
-			scrollY / TileHeight * VramWidth +
-			scrollX / TileWidth;
-		auto yMod = scrollY % TileHeight;
-		auto xModLeft = scrollX % TileWidth;
-		for (auto y = 0; y < YResolution - TileHeight * StatusAreaHeight; y++) {
-			auto pTile = pTileRow;
-			auto xMod = xModLeft;
-			auto tile = *pTile++;
-			auto pPattern = pTilePattern +
-				(static_cast<uint16_t>(tile) * TilePatternSize) +
-				yMod * TileWidthInBytes +
-				xMod / DotsPerByte;
-			auto patternByte = *pPattern++;
-			for (auto x = 0; x < XResolution; ++x) {
-				if ((xMod % DotsPerByte) == 0) {
-					*pScreen++ = ColorAt(patternByte >> 4);
-				}
-				else {
-					*pScreen++ = ColorAt(patternByte & 0x0f);
-				}
-				if (++xMod >= TileWidth) {
-					xMod = 0;
-					tile = *pTile++;
-					pPattern = pTilePattern +
-						(static_cast<uint16_t>(tile) * TilePatternSize) +
-						yMod * TileWidthInBytes;
-				}
-				if ((xMod % DotsPerByte) == 0) {
-					patternByte = *pPattern++;
-				}
-			}
-			if (++yMod >= TileHeight) {
-				pTileRow += VramWidth;
-				yMod = 0;
-			}
+			pScreen += XResolution * TileHeight - TileWidth * VramWidth;
 		}
 	}
 	{
 		// Sprites
-		auto pScreenRow = screen + XResolution * TileHeight * StatusAreaHeight;
+		auto pScreenRow = screen;
 		for (auto y = 0; y < SpriteRangeY; ++y) {
 			auto horizontalCount = 0;
 			auto pSprite = pSpriteAttributes + SpriteCount;

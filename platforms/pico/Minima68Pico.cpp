@@ -29,6 +29,11 @@ void Minima68Pico::SetColor(int index, uint8_t r, uint8_t g, uint8_t b)
     ::SetColor(index, r, g, b);
 }
 
+void Minima68Pico::SetPage(uint8_t page)
+{
+    ::SetPage(page);
+}
+
 void Minima68Pico::SetToneSample(int index, const uint8_t *pSample)
 {
     toneChannels[index].SetSamples(pSample);

@@ -61,6 +61,11 @@ void Minima68Win::SetColor(int index, uint8_t r, uint8_t g, uint8_t b) {
 	colors[index] = { b, g, r, 0xff };
 }
 
+void Minima68Win::SetPage(uint8_t page)
+{
+	pTileMap = Ram() + TileMapAddress + static_cast<uint16_t>(page) * 0x400;
+}
+
 void Minima68Win::LoadFile(LPCSTR fileName)
 {
 	auto hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
