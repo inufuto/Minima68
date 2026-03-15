@@ -48,6 +48,7 @@ void AssemblyWindow::OnRender(class ::RenderTarget& renderTarget)
 				char valueText[2 + 1];
 				sprintf_s(valueText, sizeof(valueText), "%02X", value);
 				renderTarget.DrawText(valueText, TextFormat(), rect, TextBrush());
+				address &= 0xffff;
 			}
 			rect.left = rect.right + spaceWidth;
 		}

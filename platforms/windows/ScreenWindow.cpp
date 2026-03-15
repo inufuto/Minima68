@@ -102,6 +102,8 @@ uint8_t ScreenWindow::ToBit(UINT virtualKey)
 		{ VK_RIGHT, Joystick::Right },
 		{ 'Z', Joystick::Button0 },
 		{ 'X', Joystick::Button1 },
+		{ VK_SPACE, Joystick::Button0 },
+		{ VK_RETURN, Joystick::Button1 },
 	};
 	for (const auto& m : mapping) {
 		if (virtualKey == m.virtualKey) {

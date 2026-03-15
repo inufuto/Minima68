@@ -86,12 +86,12 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
                 auto pPattern = TilePattern +
                     (static_cast<uint16_t>(tile) * TilePatternSize) +
                     (yMod * TileWidthInBytes);
-                auto byteCount = TileWidthInBytes;
-                do {
-                    auto patternByte = *pPattern++;
-                    *pLine++ = patternByte >> 4;
-                    *pLine++ = patternByte & 0x0f;
-                } while (--byteCount > 0);
+                auto patternByte = *pPattern++;
+                *pLine++ = patternByte >> 4;
+                *pLine++ = patternByte & 0x0f;
+                patternByte = *pPattern++;
+                *pLine++ = patternByte >> 4;
+                *pLine++ = patternByte & 0x0f;
             } while (--xCount > 0);
             if (++yMod >= TileHeight) {
                 pTileRow += VramWidth;
