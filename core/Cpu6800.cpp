@@ -851,7 +851,7 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{5,"CPX\tw",[](Cpu6800& cpu)
 	{
 		// bc CPX w
-		cpu.CompareX(cpu.LoadExtended());
+		cpu.CompareX(cpu.LoadWordExtended());
 	}},
 	{ 9,"JSR\tw",[](Cpu6800& cpu)
 	{
