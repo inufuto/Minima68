@@ -2,12 +2,17 @@
 
 #include <cassert>
 
-static auto Undefined = "???";
+// On non-Pico builds __not_in_flash_func is not available; define it as identity.
+#ifndef __not_in_flash_func
+#define __not_in_flash_func(x) x
+#endif
 
-static const std::function<void(Cpu6800&)> Nop = [](Cpu6800& cpu) {};
 int ShiftRightLogical(int _cpp_par_);
 int RotateRight(int _cpp_par_);
 int ShiftRightArithmetic(int _cpp_par_);
+
+static constexpr auto Undefined = "???";
+static void Nop(Cpu6800& cpu) {}
 const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{ 2, Undefined,Nop}, // 00
 	{2,"NOP",Nop}, // 01 NOP
@@ -406,7 +411,7 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{7,"NEG\tb,X",[](Cpu6800& cpu)
 	{
 		// 60 NEG b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu, uint8_t value) {
 			return cpu.Negate(value);
 		});
 	}},
@@ -415,14 +420,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{7,"COM\tb,X",[](Cpu6800& cpu)
 	{
 		// 63 COM b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Complement(value);
 		});
 	}},
 	{7,"LSR\tb,X",[](Cpu6800& cpu)
 	{
 		// 64 LSR b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.ShiftRightLogical(value);
 		});
 	}},
@@ -430,35 +435,35 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{7,"ROR\tb,X",[](Cpu6800& cpu)
 	{
 		// 66 ROR b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.RotateRight(value);
 		});
 	} },
 	{7,"ASR\tb,X",[](Cpu6800& cpu)
 	{
 		// 67 ASR b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.ShiftRightArithmetic(value);
 		});
 	}},
 	{7,"ASL\tb,X",[](Cpu6800& cpu)
 	{
 		// 68 ASL b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.ShiftLeftLogical(value);
 		});
 	}},
 	{7,"ROL\tb,X",[](Cpu6800& cpu)
 	{
 		// 69 ROL b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.RotateLeft(value);
 		});
 	} },
 	{7,"DEC\tb,X",[](Cpu6800& cpu)
 	{
 		// 6a DEC b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Decrement(value);
 		});
 	}},
@@ -466,14 +471,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{7,"INC\tb,X",[](Cpu6800& cpu)
 	{
 		// 6c INC b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Increment(value);
 		});
 	}},
 	{7,"TST\tb,X",[](Cpu6800& cpu)
 	{
 		// 6d TST b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Test(value);
 		});
 	}},
@@ -485,14 +490,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{7,"CLR\tb,X",[](Cpu6800& cpu)
 	{
 		// 6f CLR b,X
-		cpu.IndexedOperation([&](uint8_t value) {
+		cpu.IndexedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Clear(value);
 		});
 	}},
 	{6,"NEG\tw",[](Cpu6800& cpu)
 	{
 		// 70 NEG w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Negate(value);
 		});
 	}},
@@ -501,14 +506,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{6,"COM\tw",[](Cpu6800& cpu)
 	{
 		// 73 COM w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Complement(value);
 		});
 	}},
 	{6,"LSR\tw",[](Cpu6800& cpu)
 	{
 		// 74 LSR w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.ShiftRightLogical(value);
 		});
 	}},
@@ -516,35 +521,35 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{6,"ROR\tw",[](Cpu6800& cpu)
 	{
 		// 76 ROR w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.RotateRight(value);
 		});
 	}},
 	{6,"ASR\tw",[](Cpu6800& cpu)
 	{
 		// 77 ASR w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.ShiftRightArithmetic(value);
 		});
 	}},
 	{6,"ASL\tw",[](Cpu6800& cpu)
 	{
 		// 78 ASL w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.ShiftLeftLogical(value);
 		});
 	}},
 	{6,"ROL\tw",[](Cpu6800& cpu)
 	{
 		// 79 ROL w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.RotateLeft(value);
 		});
 	} },
 	{6,"DEC\tw",[](Cpu6800& cpu)
 	{
 		// 7a DEC w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Decrement(value);
 		});
 	}},
@@ -552,14 +557,14 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{6,"INC\tw",[](Cpu6800& cpu)
 	{
 		// 7c INC w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Increment(value);
 		});
 	}},
 	{6,"TST\tw",[](Cpu6800& cpu)
 	{
 		// 7d TST w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Test(value);
 		});
 	}},
@@ -571,7 +576,7 @@ const Cpu6800::Instruction Cpu6800::Instructions[] = {
 	{6,"CLR\tw",[](Cpu6800& cpu)
 	{
 		// 7f CLR w
-		cpu.ExtendedOperation([&](uint16_t value) {
+		cpu.ExtendedOperation([](Cpu6800& cpu,uint8_t value) {
 			return cpu.Clear(value);
 		});
 	} },
@@ -1422,7 +1427,7 @@ void Cpu6800::Branch()
 	pc += offset;
 }
 
-void Cpu6800::BranchIf(const std::function<bool(uint8_t)>& condition)
+void Cpu6800::BranchIf(BranchCondition condition)
 {
 	if (condition(cc)) {
 		clockCountToExecute += 2;
@@ -1507,20 +1512,20 @@ uint16_t Cpu6800::IndexedAddress() {
 	return address;
 }
 
-void Cpu6800::OperateMemory(uint16_t address, const std::function<uint8_t(uint8_t)>& operation) const
+void Cpu6800::OperateMemory(uint16_t address, MemoryOperation operation)
 {
 	auto value = pMemorySpace->Read(address);
-	auto result = operation(value);
+	auto result = operation(*this,value);
 	pMemorySpace->Write(address, result);
 }
 
-void Cpu6800::IndexedOperation(const std::function<uint8_t(uint8_t)>& operation)
+void Cpu6800::IndexedOperation(MemoryOperation operation)
 {
 	auto address = IndexedAddress();
 	OperateMemory(address, operation);
 }
 
-void Cpu6800::ExtendedOperation(const std::function<uint8_t(uint8_t)>& operation)
+void Cpu6800::ExtendedOperation(MemoryOperation operation)
 {
 	auto address = FetchWord();
 	OperateMemory(address, operation);
@@ -1622,7 +1627,7 @@ void Cpu6800::StoreWordExtended(uint16_t value)
 	UpdateFlagsForWord(value);
 }
 
-void Cpu6800::FetchInstruction()
+void __not_in_flash_func(Cpu6800::FetchInstruction)()
 {
 	if (interrupted) {
 		interrupted = false;
@@ -1647,7 +1652,7 @@ void Cpu6800::FetchInstruction()
 	}
 }
 
-Cpu6800::Cpu6800(::Debugger* pDebugger, MemorySpace* pMemorySpace) : Cpu(pDebugger),pMemorySpace(pMemorySpace)
+Cpu6800::Cpu6800(::Debugger* pDebugger, MemorySpace* pMemorySpace) : Cpu(pDebugger), pMemorySpace(pMemorySpace)
 {
 	static_assert(std::size(Instructions) == 256, "Instructions array must have exactly 256 elements (0x00-0xFF)");
 }
@@ -1667,7 +1672,7 @@ void Cpu6800::Reset()
 	FetchInstruction();
 }
 
-void Cpu6800::ExecuteInstruction() {
+void __not_in_flash_func(Cpu6800::ExecuteInstruction)() {
 	auto pInstruction = pNextInstruction;
 	pInstruction->execute(*this);
 	if (pNextInstruction == pInstruction) {
@@ -1675,7 +1680,7 @@ void Cpu6800::ExecuteInstruction() {
 	}
 }
 
-void Cpu6800::OnClock(uint32_t time)
+void __not_in_flash_func(Cpu6800::OnClock)(uint32_t time)
 {
 	if (--clockCountToExecute == 0) {
 		ExecuteInstruction();

@@ -27,7 +27,7 @@ void ToneChannel::SetVolume(uint8_t volume)
     this->volume = std::min(static_cast<int>(volume), MaxVolume);
 }
 
-uint8_t ToneChannel::Sample()
+uint8_t __not_in_flash_func(ToneChannel::Sample)()
 {
     auto sample = pSamples[sampleIndex] * volume / MaxVolume;
 
@@ -60,7 +60,7 @@ void EffectChannel::SetRate(uint8_t rate)
     }
 }
 
-uint8_t EffectChannel::Sample()
+uint8_t __not_in_flash_func(EffectChannel::Sample)()
 {
     if (volume > 0 && rate != 0) {
         auto sample = pSamples[sampleIndex] * volume / MaxVolume;
@@ -86,7 +86,7 @@ uint8_t EffectChannel::Sample()
 ToneChannel toneChannels[ToneChannelCount];
 EffectChannel effectChannel;
 
-static void PwmHandler()
+static void __not_in_flash_func(PwmHandler)()
 {
     auto pwmSlice = pwm_gpio_to_slice_num(Config::Gpio::Sound);
     pwm_clear_irq(pwmSlice);

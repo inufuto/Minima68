@@ -4,19 +4,22 @@
 
 #include "PrimaryClock.h"
 
-void PrimaryClock::Run()
+void __not_in_flash_func(PrimaryClock::Run)()
 {
     time = 0;
-    auto last = time_us_64();
+    const uint64_t freq = static_cast<uint64_t>(targetFrequency + 0.5); // cycles per second (integer)
+    uint64_t accumulator = 0;
+    uint64_t last = time_us_64();
     while (true) {
-        auto now = time_us_64();
-        auto elapsed = static_cast<double>(now - last) / 1'000'000.0;
+        uint64_t now = time_us_64();
+        accumulator += (now - last) * freq;
         last = now;
-        auto cyclesToRun = static_cast<uint32_t>(targetFrequency * elapsed);
+        uint32_t cyclesToRun = static_cast<uint32_t>(accumulator / 1'000'000ULL);
+        accumulator %= 1'000'000ULL;
         for (uint32_t i = 0; i < cyclesToRun; i++) {
             OnClock(time);
             ++time;
-            if ((i & 0x0fff) == 0) {
+            if ((i & 0x3fff) == 0) {
                 tuh_task();
             }
         }

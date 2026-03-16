@@ -5,6 +5,8 @@
 
 class Cpu6800 : public Cpu
 {
+public:
+	using InstructionFunction = void(*)(Cpu6800&);
 private:
 	struct Condition {
 		static constexpr uint8_t Carry = 1 << 0;
@@ -17,7 +19,7 @@ private:
 	struct Instruction {
 		int clockCount;
 		const char* mnemonic;
-		std::function<void(Cpu6800&)> execute;
+		void (*execute)(Cpu6800&);
 	};
 	static const Instruction Instructions[];
 	struct RegisterView
@@ -71,8 +73,10 @@ private:
 	uint8_t Load(uint8_t source);
 	void CompareX(uint16_t value);
 	void UpdateFlagsForWord(uint16_t value);
+
+	using BranchCondition = bool (*)(uint8_t);
 	void Branch();
-	void BranchIf(const std::function<bool(uint8_t)>& condition);
+	void BranchIf(BranchCondition condition);
 	void BranchToSubroutine();
 	void ReturnFromSubroutine();
 	void ReturnFromInterrupt();
@@ -85,9 +89,10 @@ private:
 	void Interrupt(uint16_t vectorAddress);
 
 	uint16_t IndexedAddress();
-	void OperateMemory(uint16_t address, const std::function<uint8_t(uint8_t)>& operation) const;
-	void IndexedOperation(const std::function<uint8_t(uint8_t)>& operation);
-	void ExtendedOperation(const std::function<uint8_t(uint8_t)>& operation);
+	using MemoryOperation = uint8_t(*)(Cpu6800&, uint8_t);
+	void OperateMemory(uint16_t address, MemoryOperation operation);
+	void IndexedOperation(MemoryOperation operation);
+	void ExtendedOperation(MemoryOperation operation);
 	uint8_t LoadDirect();
 	void StoreDirect(uint8_t value);
 	uint16_t LoadWordDirect();

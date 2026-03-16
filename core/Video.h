@@ -18,8 +18,8 @@ constexpr auto XResolution = TileWidth * VramWidth;
 constexpr auto YResolution = TileHeight * VramHeight;
 constexpr auto SpriteRangeX = TileWidth * VramWidth;
 constexpr auto SpriteRangeY = TileHeight * VramHeight;
-constexpr auto SpriteCount = 64;
-constexpr auto MaxHorizontalSpriteCount = 16;
+constexpr auto SpriteCount = 32;
+constexpr auto MaxHorizontalSpriteCount = 8;
 
 struct SpriteAttribute
 {
