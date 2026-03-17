@@ -36,11 +36,9 @@ protected:
 	virtual void SetColor(int index, uint8_t r, uint8_t g, uint8_t b) = 0;
 	virtual void SetPage(uint8_t page) = 0;
 
-	virtual void SetToneSample(int index, const uint8_t* pSample) = 0;
 	virtual void SetToneFrequency(int index, uint16_t frequency) = 0;
 	virtual void SetToneVolume(int index, uint8_t volume) = 0;
-	virtual void SetEffectSample(uint8_t* pSamples) = 0;
-	virtual void SetEffectRate(uint8_t rate) = 0;
+	virtual void SetEffectFrequency(uint16_t frequency) = 0;
 	virtual void SetEffectVolume(uint8_t volume) = 0;
 public:
 	uint8_t* Ram() { return ram; }

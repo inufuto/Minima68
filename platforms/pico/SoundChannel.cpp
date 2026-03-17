@@ -8,18 +8,17 @@
 #include "MemoryMap.h"
 #include "Sound.h"
 
-static constexpr auto ReferenceToneFrequency = 440.0;
 static constexpr auto PwmWrap = 0x100;
+static constexpr uint32_t PwmSampleRateHz = 22050 / 2;
+static constexpr uint16_t DefaultEffectFrequencyHz = 4000;
+static constexpr auto PwmSampleRate = static_cast<double>(PwmSampleRateHz);  // Standard audio sample rate
 static constexpr auto PwmDivision =
     (Config::SystemClock * 1000.0) /
-    (ReferenceToneFrequency * ToneSampleCount * PwmWrap);
-static constexpr auto PwmSampleRate =
-    (Config::SystemClock * 1000.0) / (PwmDivision * PwmWrap);
-static constexpr int32_t PwmSampleRateInt = static_cast<int32_t>(PwmSampleRate + 0.5);
+    (PwmSampleRate * PwmWrap);
 
 void ToneChannel::SetFrequency(uint16_t frequency)
 {
-    phaseDelta = static_cast<uint32_t>(frequency) * ToneSampleCount;
+    phaseDelta = (static_cast<uint64_t>(frequency) << 32) / PwmSampleRateHz;
 }
 
 void ToneChannel::SetVolume(uint8_t volume)
@@ -29,55 +28,56 @@ void ToneChannel::SetVolume(uint8_t volume)
 
 uint8_t __not_in_flash_func(ToneChannel::Sample)()
 {
-    auto sample = pSamples[sampleIndex] * volume / MaxVolume;
-
-    phaseError -= static_cast<int32_t>(phaseDelta);
-    while (phaseError < 0) {
-        phaseError += PwmSampleRateInt;
-        ++sampleIndex;
-        if (sampleIndex >= ToneSampleCount) {
-            sampleIndex = 0;
-        }
+    if (volume == 0 || phaseDelta == 0) {
+        return 0;
     }
 
-    return sample;
+    phase += phaseDelta;
+
+    // Top bit indicates high/low half-cycle of a 50% duty square wave.
+    uint8_t sample = ((phase & 0x80000000u) != 0) ? 255 : 0;
+    return sample * volume / MaxVolume;
 }
 
 void EffectChannel::SetVolume(uint8_t volume)
 {
     this->volume = std::min(static_cast<int>(volume), MaxVolume);
+    if (this->volume > 0 && phaseDelta == 0) {
+        SetFrequency(DefaultEffectFrequencyHz);
+    }
     if ((volume & 0x80) != 0) {
         phase = 0;
-        sampleIndex = 0;
+        noiseState = 1;  // Reset LFSR
     }
+}
+
+void EffectChannel::SetFrequency(uint16_t frequency)
+{
+    phaseDelta = (static_cast<uint64_t>(frequency) << 32) / PwmSampleRateHz;
 }
 
 void EffectChannel::SetRate(uint8_t rate)
 {
-    this->rate = rate;
-    if (rate == 0) {
-        volume = 0;
-    }
+    (void)rate;
 }
 
 uint8_t __not_in_flash_func(EffectChannel::Sample)()
 {
-    if (volume > 0 && rate != 0) {
-        auto sample = pSamples[sampleIndex] * volume / MaxVolume;
+    if (volume > 0 && phaseDelta != 0) {
+        const uint32_t previousPhase = phase;
+        phase += phaseDelta;
 
-        // Playback time is proportional to rate and becomes 1 second at rate=255.
-        static constexpr uint32_t EffectPhasePerSecond = EffectSampleCount * 255;
-        phase += EffectPhasePerSecond;
-        const uint32_t threshold = static_cast<uint32_t>(rate) * PwmSampleRateInt;
-        while (phase >= threshold) {
-            phase -= threshold;
-            ++sampleIndex;
-            if (sampleIndex >= EffectSampleCount) {
-                sampleIndex = 0;
-                // volume = 0;
+        // Advance LFSR at configured frequency.
+        if (phase < previousPhase) {
+            const uint32_t lsb = noiseState & 1;
+            noiseState >>= 1;
+            if (lsb != 0) {
+                noiseState ^= 0xB800;  // Feedback polynomial
             }
         }
-        return sample;
+
+        const uint8_t noise = (noiseState & 1) != 0 ? 255 : 0;
+        return noise * volume / MaxVolume;
     }
     return 0;
 }

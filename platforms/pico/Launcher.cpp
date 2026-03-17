@@ -71,13 +71,6 @@ static uint8_t AsciiPattern[] = {
 	0xa4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-const uint8_t SquareWave[] = {
-	254,254,254,254,254,254,254,254,
-	254,254,254,254,254,254,254,254,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-};
-
 constexpr auto AsciiColor = 7;
 constexpr auto VisibleLineCount = VramHeight - 3;
 constexpr auto LeftX = 8;
@@ -267,7 +260,7 @@ void RunLauncher()
     InitAsciiPattern();
     InitColors();
     emulator.SetPage(0);
-    toneChannels[0].SetSamples(SquareWave);
+    // ToneChannel now generates sine waves, no sample needed
     toneChannels[0].SetFrequency(440);
     toneChannels[0].SetVolume(0);
     Loop();

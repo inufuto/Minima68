@@ -9,12 +9,10 @@ constexpr auto SpriteAttributeAddress = 0xf800;
 constexpr auto PaletteAddress = 0xff00;
 constexpr auto PageAddress = 0xff30;
 
-constexpr auto ToneSampleAddress = 0xff40;
-constexpr auto FrequencyAddress = 0xff46;
-constexpr auto ToneVolumeAddress = 0xff4c;
-constexpr auto EffectSampleAddress = 0xff52;
-constexpr auto EffectRateAddress = 0xff54;
-constexpr auto EffectVolumeAddress = 0xff55;
+constexpr auto ToneFrequencyAddress = 0xff40;
+constexpr auto ToneVolumeAddress = 0xff46;
+constexpr auto EffectFrequencyAddress = 0xff4c;
+constexpr auto EffectVolumeAddress = 0xff4e;
 
 constexpr auto JoystickAddress = 0xff80;
 constexpr auto KeyCodeAddress = 0xff81;

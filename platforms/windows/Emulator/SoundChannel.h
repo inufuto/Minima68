@@ -26,16 +26,10 @@ extern SoundThread SoundThread;
 class ToneChannel : public Uncopyable
 {
 private:
-	const uint8_t* pSourceSamples = nullptr;
-	bool sourceChanged = true;
-	float samples[ToneSampleCount];
+	uint32_t phase = 0;
 	uint8_t volume = 0;
-	double phase = 0;
-	double step;
-private:
-	void UpdateSamples();
+	uint32_t phaseDelta = 0;
 public:
-	void SetSourceSamples(const uint8_t* pSamples);
 	void SetVolume(uint8_t volume);
 	void SetFrequency(uint16_t frequency);
 	float Sample();
@@ -44,17 +38,13 @@ public:
 class EffectChannel : public Uncopyable
 {
 private:
-	const uint8_t* pSourceSamples = nullptr;
-	bool sourceChanged = true;
-	float samples[EffectSampleCount];
+	uint32_t noiseState = 1;
 	uint8_t volume = 0;
-	double phase = 0;
-	double step;
-private:
-	void UpdateSamples();
+	uint32_t phase = 0;
+	uint32_t phaseDelta = 0;
 public:
-	void SetSourceSamples(const uint8_t* pSamples);
 	void SetVolume(uint8_t volume);
+	void SetFrequency(uint16_t frequency);
 	void SetRate(uint8_t rate);
 	float Sample();
 };

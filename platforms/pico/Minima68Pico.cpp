@@ -34,11 +34,6 @@ void Minima68Pico::SetPage(uint8_t page)
     ::SetPage(page);
 }
 
-void Minima68Pico::SetToneSample(int index, const uint8_t *pSample)
-{
-    toneChannels[index].SetSamples(pSample);
-}
-
 void Minima68Pico::SetToneFrequency(int index, uint16_t frequency)
 {
     toneChannels[index].SetFrequency(frequency);
@@ -49,14 +44,9 @@ void Minima68Pico::SetToneVolume(int index, uint8_t volume)
     toneChannels[index].SetVolume(volume);
 }
 
-void Minima68Pico::SetEffectSample(uint8_t *pSamples)
+void Minima68Pico::SetEffectFrequency(uint16_t frequency)
 {
-    effectChannel.SetSamples(pSamples);
-}
-
-void Minima68Pico::SetEffectRate(uint8_t rate)
-{
-    effectChannel.SetRate(rate);
+    effectChannel.SetFrequency(frequency);
 }
 
 void Minima68Pico::SetEffectVolume(uint8_t volume)

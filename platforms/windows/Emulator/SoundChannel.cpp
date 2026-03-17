@@ -97,31 +97,6 @@ void SoundThread::Loop() const
 }
 
 
-inline float ToFloat(uint8_t b)
-{
-	return (static_cast<int>(b) - 128) / 128.0f;
-}
-
-
-
-void ToneChannel::UpdateSamples()
-{
-	if (pSourceSamples != nullptr) {
-		for (int i = 0; i < ToneSampleCount; ++i) {
-			samples[i] = ToFloat(pSourceSamples[i]);
-		}
-	}
-	else {
-		ZeroMemory(samples, sizeof(samples));
-	}
-}
-
-void ToneChannel::SetSourceSamples(const uint8_t* pSamples)
-{
-	this->pSourceSamples = pSamples;
-	sourceChanged = true;
-}
-
 void ToneChannel::SetVolume(uint8_t volume)
 {
 	this->volume = std::min(static_cast<int>(volume), MaxVolume);
@@ -129,40 +104,20 @@ void ToneChannel::SetVolume(uint8_t volume)
 
 void ToneChannel::SetFrequency(uint16_t frequency)
 {
-	step = static_cast<double>(frequency * ToneSampleCount) / SoundThread.SampleRate();
+	phaseDelta = (static_cast<uint64_t>(frequency) << 32) / SoundThread.SampleRate();
 }
 
 float ToneChannel::Sample()
 {
-	if (sourceChanged) {
-		sourceChanged = false;
-		UpdateSamples();
+	if (volume == 0 || phaseDelta == 0) {
+		return 0.0f;
 	}
-	int index = static_cast<int>(phase);
-	auto sample = samples[index % ToneSampleCount] * volume / MaxVolume;
-	phase += step;
-	if (phase >= ToneSampleCount) {
-		phase -= ToneSampleCount;
-	}
-	return sample;
-}
 
-void EffectChannel::UpdateSamples()
-{
-	if (pSourceSamples != nullptr) {
-		for (int i = 0; i < EffectSampleCount; ++i) {
-			samples[i] = ToFloat(pSourceSamples[i]);
-		}
-	}
-	else {
-		ZeroMemory(samples, sizeof(samples));
-	}
-}
+	phase += phaseDelta;
 
-void EffectChannel::SetSourceSamples(const uint8_t* pSamples)
-{
-	this->pSourceSamples = pSamples;
-	sourceChanged = true;
+	// Top bit indicates high/low half-cycle of a 50% duty square wave.
+	float sample = ((phase & 0x80000000u) != 0) ? 1.0f : -1.0f;
+	return sample * volume / MaxVolume;
 }
 
 void EffectChannel::SetVolume(uint8_t volume)
@@ -170,34 +125,32 @@ void EffectChannel::SetVolume(uint8_t volume)
 	this->volume = std::min(static_cast<int>(volume), MaxVolume);
 	if ((volume & 0x80) != 0) {
 		phase = 0;
+		noiseState = 1;  // Reset LFSR
 	}
 }
 
-void EffectChannel::SetRate(uint8_t rate)
+void EffectChannel::SetFrequency(uint16_t frequency)
 {
-	if (rate == 0) {
-		step = 0;
-		volume = 0;
-	}
-	else {
-		step = static_cast<double>(255 * EffectSampleCount) / rate / SoundThread.SampleRate();
-	}
+	phaseDelta = (static_cast<uint64_t>(frequency) << 32) / SoundThread.SampleRate();
 }
 
 float EffectChannel::Sample()
 {
-	if (sourceChanged) {
-		sourceChanged = false;
-		UpdateSamples();
-	}
-	if (phase < EffectSampleCount) {
-		int index = static_cast<int>(phase);
-		auto sample = samples[index % EffectSampleCount] * volume / MaxVolume;
-		phase += step;
-		if (phase >= EffectSampleCount) {
-			phase -= EffectSampleCount;
+	if (volume > 0 && phaseDelta != 0) {
+		const uint32_t previousPhase = phase;
+		phase += phaseDelta;
+
+		// Advance LFSR at configured frequency.
+		if (phase < previousPhase) {
+			const uint32_t lsb = noiseState & 1;
+			noiseState >>= 1;
+			if (lsb != 0) {
+				noiseState ^= 0xB800;  // Feedback polynomial
+			}
 		}
-		return sample;
+
+		const float noise = (noiseState & 1) != 0 ? 1.0f : -1.0f;
+		return noise * volume / MaxVolume;
 	}
-	return 0;
+	return 0.0f;
 }

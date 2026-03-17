@@ -40,11 +40,9 @@ private:
 		explicit VSync(Minima68Win* pOwner) : pOwner(pOwner) {}
 		void OnClock(uint32_t time) override { pOwner->MakeInterrupt(); }
 	} vsync;
-	void SetToneSample(int index, const uint8_t* pSample) override;
 	void SetToneFrequency(int index, uint16_t frequency) override;
 	void SetToneVolume(int index, uint8_t volume) override;
-	void SetEffectSample(uint8_t* pSamples) override;
-	void SetEffectRate(uint8_t rate) override;
+	void SetEffectFrequency(uint16_t frequency) override;
 	void SetEffectVolume(uint8_t volume) override;
 public:
 	explicit Minima68Win(PrimaryClock::Owner* pOwner);

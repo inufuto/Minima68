@@ -43,8 +43,8 @@ private:
 	void ClearFlag(const uint8_t flag) { cc &= ~flag; }
 	void UpdateFlag(uint8_t flag, bool condition);
 	bool IsFlagSet(const uint8_t flag) const { return (cc & flag) != 0; }
-	void UpdateZeroFlagForByte(uint8_t result);
-	void UpdateNegativeFlagForByte(uint8_t result);
+	void UpdateZeroFlagForByte(uint8_t result) { UpdateFlag(Condition::Zero, (result & 0xff) == 0); }
+	void UpdateNegativeFlagForByte(uint8_t result) { UpdateFlag(Condition::Negative, (result & 0x80) != 0); }
 	void UpdateFlagsForByte(uint8_t result);
 	void UpdateOverflowFlagAfterShift();
 

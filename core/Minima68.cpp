@@ -39,14 +39,9 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 	else if (address == PageAddress) {
 		pOwner->SetPage(value & 0x01);
 	}
-	else if (address >= ToneSampleAddress && address < ToneSampleAddress + ToneChannelCount * 2) {
-		auto index = (address - ToneSampleAddress) / 2;
-		auto sampleAddress = LoadWord(pOwner->Ram() + ToneSampleAddress + index * 2);
-		pOwner->SetToneSample(index, pOwner->Ram() + sampleAddress);
-	}
-	else if (address >= FrequencyAddress && address < FrequencyAddress + ToneChannelCount * 2) {
-		auto index = (address - FrequencyAddress) / 2;
-		auto frequency = LoadWord(pOwner->Ram() + FrequencyAddress + index * 2);
+	else if (address >= ToneFrequencyAddress && address < ToneFrequencyAddress + ToneChannelCount * 2) {
+		auto index = (address - ToneFrequencyAddress) / 2;
+		auto frequency = LoadWord(pOwner->Ram() + ToneFrequencyAddress + index * 2);
 		pOwner->SetToneFrequency(index, frequency);
 	}
 	else if (address >= ToneVolumeAddress && address < ToneVolumeAddress + ToneChannelCount * 2) {
@@ -56,13 +51,10 @@ void Minima68::Memory::Write(const uint16_t address, const uint8_t value)
 			pOwner->SetToneVolume(index, volume);
 		}
 	}
-	else if (address >= EffectSampleAddress && address < EffectSampleAddress + 2) {
-		auto sampleAddress = LoadWord(pOwner->Ram() + EffectSampleAddress);
-		pOwner->SetEffectSample(pOwner->Ram() + sampleAddress);
-	}
-	else if (address == EffectRateAddress) {
-		auto rate = pOwner->Ram()[address];
-		pOwner->SetEffectRate(rate);
+	else if (address >= EffectFrequencyAddress && address < EffectFrequencyAddress + 2) {
+		auto index = (address - EffectFrequencyAddress) / 2;
+		auto frequency = LoadWord(pOwner->Ram() + EffectFrequencyAddress);
+		pOwner->SetEffectFrequency(frequency);
 	}
 	else if (address == EffectVolumeAddress) {
 		auto volume = pOwner->Ram()[address];

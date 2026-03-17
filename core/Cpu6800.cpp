@@ -1167,15 +1167,15 @@ void Cpu6800::UpdateFlag(const uint8_t flag, const bool condition)
 	}
 }
 
-void Cpu6800::UpdateZeroFlagForByte(uint8_t result)
-{
-	return UpdateFlag(Condition::Zero, (result & 0xff) == 0);
-}
+// void Cpu6800::UpdateZeroFlagForByte(uint8_t result)
+// {
+// 	UpdateFlag(Condition::Zero, (result & 0xff) == 0);
+// }
 
-void Cpu6800::UpdateNegativeFlagForByte(uint8_t result)
-{
-	UpdateFlag(Condition::Negative, (result & 0x80) != 0);
-}
+// void Cpu6800::UpdateNegativeFlagForByte(uint8_t result)
+// {
+// 	UpdateFlag(Condition::Negative, (result & 0x80) != 0);
+// }
 
 void Cpu6800::UpdateFlagsForByte(const uint8_t result)
 {

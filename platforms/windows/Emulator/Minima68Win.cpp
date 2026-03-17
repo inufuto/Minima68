@@ -81,12 +81,6 @@ void Minima68Win::LoadFile(LPCSTR fileName)
 	Reset();
 }
 
-void Minima68Win::SetToneSample(int index, const uint8_t* pSample)
-{
-	assert(index >= 0 && index < ToneSampleCount);
-	ToneChannels[index].SetSourceSamples(pSample);
-}
-
 void Minima68Win::SetToneFrequency(int index, uint16_t frequency)
 {
 	assert(index >= 0 && index < ToneSampleCount);
@@ -99,14 +93,9 @@ void Minima68Win::SetToneVolume(int index, uint8_t volume)
 	ToneChannels[index].SetVolume(volume);
 }
 
-void Minima68Win::SetEffectSample(uint8_t* pSamples)
+void Minima68Win::SetEffectFrequency(uint16_t frequency)
 {
-	EffectChannel.SetSourceSamples(pSamples);
-}
-
-void Minima68Win::SetEffectRate(uint8_t rate)
-{
-	EffectChannel.SetRate(rate);
+	EffectChannel.SetFrequency(frequency);
 }
 
 void Minima68Win::SetEffectVolume(uint8_t volume)
