@@ -9,7 +9,7 @@
 #include "Sound.h"
 
 static constexpr auto PwmWrap = 0x100;
-static constexpr uint32_t PwmSampleRateHz = 22050 / 2;
+static constexpr uint32_t PwmSampleRateHz = 22050;
 static constexpr uint16_t DefaultEffectFrequencyHz = 4000;
 static constexpr auto PwmSampleRate = static_cast<double>(PwmSampleRateHz);  // Standard audio sample rate
 static constexpr auto PwmDivision =

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <pico/stdlib.h>
+#include <pico/multicore.h>
 #include <hardware/dma.h>
 #include <tusb.h>
 #include <hid.h>
@@ -12,14 +13,20 @@
 
 extern void RunLauncher();
 
+void main1()
+{
+    InitNtsc();
+    InitSound();
+    while (true);
+}
+
 int main()
 {
     stdio_init_all();
     tusb_init();
     InitSdCardPetitFatFs();
-    InitNtsc();
-    InitSound();
     InitInput();
+    multicore_launch_core1(main1);
     RunLauncher();
     emulator.Run();
 }

@@ -88,6 +88,7 @@ target_link_libraries(${MAIN_PROJECT_NAME}
         hardware_pwm
         hardware_clocks
         hardware_irq
+        pico_multicore
     tinyusb_host
     tinyusb_board
 )
