@@ -50,10 +50,44 @@
       }
     },
     {
+      "name": "pico2-debug",
+      "hidden": false,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/pico2",
+      "cacheVariables": {
+        "BUILD_FOR_PICO": "ON",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "PICO_BOARD": "pico2",
+        "PICO_PLATFORM": "rp2350",
+        "PICO_SDK_FETCH_FROM_GIT": "ON",
+        "PICO_NO_PICOTOOL": "ON"
+      }
+    },
+    {
+      "name": "pico2-release",
+      "hidden": false,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/pico2-release",
+      "cacheVariables": {
+        "BUILD_FOR_PICO": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "PICO_BOARD": "pico2",
+        "PICO_PLATFORM": "rp2350",
+        "PICO_SDK_FETCH_FROM_GIT": "ON",
+        "PICO_NO_PICOTOOL": "ON"
+      }
+    },
+    {
       "name": "pico",
       "hidden": false,
       "inherits": "pico-release",
       "binaryDir": "${sourceDir}/build/pico"
+    },
+    {
+      "name": "pico2",
+      "hidden": false,
+      "inherits": "pico2-release",
+      "binaryDir": "${sourceDir}/build/pico2"
     }
   ],
   "buildPresets": [
@@ -78,6 +112,18 @@
     {
       "name": "pico",
       "configurePreset": "pico"
+    },
+    {
+      "name": "pico2-debug",
+      "configurePreset": "pico2-debug"
+    },
+    {
+      "name": "pico2-release",
+      "configurePreset": "pico2-release"
+    },
+    {
+      "name": "pico2",
+      "configurePreset": "pico2"
     }
   ]
 }

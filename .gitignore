@@ -1,12 +1,7 @@
-﻿################################################################################
-# この .gitignore ファイルは Microsoft(R) Visual Studio によって自動的に作成されました。
-################################################################################
-
-/.vs
+﻿/.vs
 /.vscode
 /build
-/out/build/x64-Debug
-/out/build/windows-x64-debug
-/out/build/windows-x64-release
+/out
 resource.aps
 /platforms/windows/RC*
+/dist
