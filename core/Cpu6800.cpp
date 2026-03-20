@@ -1534,7 +1534,9 @@ void Cpu6800::ExtendedOperation(MemoryOperation operation)
 uint8_t Cpu6800::LoadDirect()
 {
 	auto address = MakeWord(0, FetchByte());
-	return pMemorySpace->Read(address);
+	uint8_t value = pMemorySpace->Read(address);
+	UpdateFlagsForByte(value);
+	return value;
 }
 
 void Cpu6800::StoreDirect(const uint8_t value)
