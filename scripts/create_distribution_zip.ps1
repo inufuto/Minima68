@@ -48,7 +48,7 @@ if (-not $SkipBuild) {
     Invoke-CMake -Arguments @('--preset', 'pico2-release') -Label 'Configure pico2-release'
     Invoke-CMake -Arguments @('--build', '--preset', 'pico2-release') -Label 'Build pico2-release'
 
-    Invoke-CMake -Arguments @('--preset', 'windows-x64-release') -Label 'Configure windows-x64-release'
+    Invoke-CMake -Arguments @('--preset', 'windows-x64-release', '--fresh') -Label 'Configure windows-x64-release'
     Invoke-CMake -Arguments @('--build', '--preset', 'windows-x64-release') -Label 'Build windows-x64-release'
 }
 

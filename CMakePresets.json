@@ -6,6 +6,9 @@
       "hidden": false,
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
+      "environment": {
+        "CMAKE_GENERATOR_INSTANCE": "C:/Program Files/Microsoft Visual Studio/18/Community"
+      },
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "BUILD_FOR_PICO": "OFF",
@@ -18,6 +21,9 @@
       "hidden": false,
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
+      "environment": {
+        "CMAKE_GENERATOR_INSTANCE": "C:/Program Files/Microsoft Visual Studio/18/Community"
+      },
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "BUILD_FOR_PICO": "OFF",
