@@ -147,10 +147,11 @@ void ScreenWindow::UpdateScreenBitmap()
 				uint8_t yOffset = y - pSprite->y;
 				if (yOffset < SpriteHeight) {
 					uint8_t x = pSprite->x;
+					uint8_t pattern = pSprite->pattern & 0x3f;
 					auto pPattern = pSpritePattern +
-						(static_cast<uint16_t>(pSprite->pattern) * SpritePatternSize);
+						(static_cast<uint16_t>(pattern) * SpritePatternSize);
 					pPattern += yOffset * SpriteWidth / DotsPerByte;
-					auto pScreenDot = pScreenRow + x;
+					auto pScreenDot = pScreenRow + static_cast<int8_t>(x);
 					for (auto j = 0; j < SpriteWidth / DotsPerByte; ++j) {
 						auto patternByte = *pPattern++;
 						if (x < XResolution) {

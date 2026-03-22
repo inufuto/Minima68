@@ -107,7 +107,7 @@ static void MakeDmaBuffer(uint16_t* pBuffer, uint16_t raster)
                 if (yOffset < SpriteHeight) {
                     uint8_t x = pSprite->x;
                     auto pPattern = SpritePattern +
-                        (static_cast<uint16_t>(pSprite->pattern) * SpritePatternSize);
+                        (static_cast<uint16_t>(pSprite->pattern & 0x3f) * SpritePatternSize);
                     pPattern += yOffset * SpriteWidth / DotsPerByte;
                     for (auto j = 0; j < SpriteWidth / DotsPerByte; ++j) {
                         auto b = *pPattern;
